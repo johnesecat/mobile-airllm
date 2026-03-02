@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>MobileAirLLM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060609;
+  --surface: #0d0d14;
+  --border: rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.13);
+  --text: #e8e6f0;
+  --muted: rgba(255,255,255,0.35);
+  --accent: #7c6dfa;
+  --accent2: #22d3ee;
+  --ok: #34d399;
+  --warn: #fb923c;
+  --err: #f87171;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font-display);color:var(--text)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+#root{width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(124,109,250,0.12) 0%,transparent 70%)}
+.shell{width:100%;max-width:430px;height:100%;max-height:860px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
+@media(min-width:480px){.shell{border-radius:28px;box-shadow:0 60px 140px rgba(0,0,0,0.9)}}
+
+/* ── screens ── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(.16,1,.3,1);transform:translateY(16px)}
+.screen.active{opacity:1;pointer-events:all;transform:translateY(0)}
+.screen.exit{opacity:0;transform:translateY(-16px)}
+
+/* ── utils ── */
+.pad{padding:24px 20px}
+.row{display:flex;align-items:center;gap:10px}
+.col{display:flex;flex-direction:column;gap:10px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.chip.ok{background:rgba(52,211,153,0.12);color:var(--ok)}
+.chip.warn{background:rgba(251,146,60,0.12);color:var(--warn)}
+.chip.err{background:rgba(248,113,113,0.12);color:var(--err)}
+.chip.info{background:rgba(124,109,250,0.12);color:var(--accent)}
+
+/* ── buttons ── */
+.btn{padding:14px 20px;border-radius:12px;border:none;font-family:var(--font-display);font-weight:700;font-size:14px;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 28px rgba(124,109,250,0.35)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:disabled{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.2);cursor:default;box-shadow:none}
+.btn-ghost{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.btn-full{width:100%}
+.btn-back{background:none;border:none;color:var(--muted);cursor:pointer;font-family:var(--font-display);font-size:13px;padding:0;display:flex;align-items:center;gap:5px}
+.btn-back:hover{color:var(--text)}
+
+/* ── inputs ── */
+.field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none;transition:border-color .15s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(124,109,250,0.5)}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,0.15)}
+.field select option{background:#1a1a2e}
+
+/* ── cards ── */
+.card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.card.hi{border-color:rgba(124,109,250,0.3);background:rgba(124,109,250,0.05)}
+
+/* ── status dots ── */
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dot.err{background:var(--err)}
+.dot.spin{background:var(--accent);animation:pulse 1s ease-in-out infinite}
+.dot.idle{background:rgba(255,255,255,0.15)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── progress bar ── */
+.pbar{height:2px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .12s ease}
+
+/* ── layer viz ── */
+.layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(14px,1fr));gap:3px}
+.layer-cell{height:14px;border-radius:3px;background:rgba(255,255,255,0.06);transition:background .15s}
+.layer-cell.done{background:rgba(52,211,153,0.4)}
+.layer-cell.active{background:var(--accent);box-shadow:0 0 8px rgba(124,109,250,0.7);animation:layerpulse .6s ease-in-out infinite}
+@keyframes layerpulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── chat ── */
+.msg{max-width:84%;padding:12px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.msg.user{background:linear-gradient(135deg,rgba(124,109,250,0.65),rgba(34,211,238,0.55));border-radius:16px 16px 4px 16px;align-self:flex-end}
+.msg.assistant{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:16px 16px 16px 4px;align-self:flex-start;font-family:var(--font-mono)}
+.cursor{display:inline-block;width:2px;height:13px;background:var(--accent);margin-left:1px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── model picker ── */
+.model-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.model-card:hover{border-color:var(--border-hi);background:rgba(255,255,255,0.04)}
+.model-card.selected{border-color:rgba(124,109,250,0.5);background:rgba(124,109,250,0.06)}
+
+/* ── tabs ── */
+.tabs{display:flex;background:rgba(255,255,255,0.03);border-radius:10px;padding:3px}
+.tab{flex:1;padding:8px;border:none;background:none;border-radius:8px;color:var(--muted);font-family:var(--font-display);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.tab.active{background:rgba(255,255,255,0.07);color:var(--text)}
+
+/* ── header bar ── */
+.hbar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hbar-title{font-size:15px;font-weight:700;color:var(--text)}
+.hbar-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* ── loading overlay ── */
+#boot-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s}
+#boot-overlay.hide{opacity:0;pointer-events:none}
+.boot-logo{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(124,109,250,0.4)}
+.boot-text{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.boot-status{font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+
+/* ── hf model search ── */
+.hf-result{padding:10px 12px;border-radius:9px;border:1px solid var(--border);cursor:pointer;transition:all .15s;margin-bottom:6px}
+.hf-result:hover{border-color:var(--border-hi);background:rgba(255,255,255,0.03)}
+.hf-result.selected{border-color:rgba(124,109,250,0.4);background:rgba(124,109,250,0.04)}
+</style>
+</head>
+<body>
+
+<!-- Boot overlay shown while checking connections -->
+<div id="boot-overlay">
+  <div class="boot-logo">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <path d="M6 32L20 8L34 32" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M11 24L29 24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="20" cy="8" r="3.5" fill="white"/>
+    </svg>
+  </div>
+  <div class="boot-text">MobileAirLLM</div>
+  <div class="boot-status" id="boot-status">Checking connections…</div>
+</div>
+
+<div id="root">
+  <div class="shell">
+
+    <!-- ══ SCREEN: HOME / STATUS ══════════════════════════════════ -->
+    <div class="screen" id="screen-home">
+      <div style="padding:24px 20px 0;flex-shrink:0">
+        <div class="row" style="margin-bottom:4px">
+          <div style="font-size:24px;font-weight:800;letter-spacing:-.5px">MobileAirLLM</div>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost" style="padding:8px 12px;font-size:12px" onclick="App.gotoSettings()">⚙</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Layer-by-layer inference · Telegram storage</div>
+
+        <!-- Connection status cards -->
+        <div class="col" style="gap:8px;margin-bottom:20px">
+          <div class="card row" id="status-telegram">
+            <div class="dot idle" id="dot-telegram"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
+              <div style="font-size:11px;color:var(--muted)" id="label-telegram">Not configured</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:11px" onclick="App.goto('screen-setup-telegram')">Setup</button>
+          </div>
+          <div class="card row" id="status-hf">
+            <div class="dot idle" id="dot-hf"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600">HuggingFace</div>
+              <div style="font-size:11px;color:var(--muted)" id="label-hf">Not configured</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:11px" onclick="App.goto('screen-setup-hf')">Setup</button>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Loaded Models</div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:0 20px 12px" id="home-model-list">
+        <!-- populated by JS -->
+      </div>
+
+      <div style="padding:12px 20px 24px;flex-shrink:0">
+        <button class="btn btn-primary btn-full" onclick="App.goto('screen-models')">+ Add Model</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: SETUP TELEGRAM ═════════════════════════════════ -->
+    <div class="screen" id="screen-setup-telegram">
+      <div class="pad" style="display:flex;flex-direction:column;height:100%;gap:14px;overflow-y:auto">
+        <button class="btn-back" onclick="App.back()">← Back</button>
+        <div>
+          <div style="font-size:22px;font-weight:800;margin-bottom:6px">Pentaract Setup</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">MobileAirLLM uses Telegram as unlimited free model storage. Weights are split into shards and stored as file messages, fetched layer-by-layer during inference.</div>
+        </div>
+
+        <div class="card" style="gap:8px;display:flex;flex-direction:column">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Quickstart</div>
+          <div id="tg-steps"></div>
+        </div>
+
+        <div class="field">
+          <label>Bot Token</label>
+          <input id="tg-token" type="password" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz"/>
+        </div>
+        <div class="field">
+          <label>Storage Chat ID</label>
+          <input id="tg-chatid" type="text" placeholder="-1001234567890"/>
+        </div>
+
+        <div id="tg-feedback" style="display:none"></div>
+
+        <button class="btn btn-ghost btn-full" id="tg-test-btn" onclick="App.testTelegram()">Test Connection</button>
+        <button class="btn btn-primary btn-full" id="tg-save-btn" disabled onclick="App.saveTelegram()">Save & Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: SETUP HUGGINGFACE ══════════════════════════════ -->
+    <div class="screen" id="screen-setup-hf">
+      <div class="pad" style="display:flex;flex-direction:column;height:100%;gap:14px;overflow-y:auto">
+        <button class="btn-back" onclick="App.back()">← Back</button>
+        <div>
+          <div style="font-size:22px;font-weight:800;margin-bottom:6px">HuggingFace</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Connect your HuggingFace account to access your own fine-tuned models, private models, and any public model repo.</div>
+        </div>
+
+        <div class="card" style="gap:8px;display:flex;flex-direction:column">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Get your token</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7">
+            1. Go to <span style="color:var(--accent2);font-family:var(--font-mono)">huggingface.co/settings/tokens</span><br/>
+            2. Click <b style="color:var(--text)">New token</b> → Role: <b style="color:var(--text)">Read</b><br/>
+            3. Copy and paste below
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Access Token</label>
+          <input id="hf-token" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx"/>
+        </div>
+
+        <div id="hf-feedback" style="display:none"></div>
+
+        <button class="btn btn-ghost btn-full" onclick="App.testHF()">Verify Token</button>
+        <button class="btn btn-primary btn-full" id="hf-save-btn" disabled onclick="App.saveHF()">Save & Continue →</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: MODEL BROWSER ══════════════════════════════════ -->
+    <div class="screen" id="screen-models">
+      <div class="hbar" style="flex-shrink:0">
+        <button class="btn-back" onclick="App.back()">← Back</button>
+        <div class="hbar-title" style="flex:1;text-align:center">Models</div>
+        <div style="width:40px"></div>
+      </div>
+
+      <div style="padding:12px 16px 8px;flex-shrink:0">
+        <div class="tabs" id="model-tabs">
+          <button class="tab active" onclick="App.switchModelTab('curated')">Curated</button>
+          <button class="tab" onclick="App.switchModelTab('hf')">HuggingFace</button>
+          <button class="tab" onclick="App.switchModelTab('custom')">Custom URL</button>
+        </div>
+      </div>
+
+      <!-- Curated tab -->
+      <div id="tab-curated" style="flex:1;overflow-y:auto;padding:0 16px 16px">
+        <div id="curated-list"></div>
+      </div>
+
+      <!-- HuggingFace tab -->
+      <div id="tab-hf" style="flex:1;overflow-y:auto;padding:0 16px 16px;display:none">
+        <div style="position:relative;margin-bottom:10px">
+          <input id="hf-search-input" type="text" placeholder="Search models (e.g. mistral, llama, phi…)" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:11px 40px 11px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--font-mono)" oninput="App.hfSearchDebounced(this.value)"/>
+          <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px">⌕</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Showing GGUF-compatible text generation models</div>
+        <div id="hf-results">
+          <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Search for a model to begin</div>
+        </div>
+      </div>
+
+      <!-- Custom URL tab -->
+      <div id="tab-custom" style="flex:1;overflow-y:auto;padding:0 16px 16px;display:none">
+        <div class="col" style="gap:12px">
+          <div class="card">
+            <div style="font-size:12px;color:var(--muted);line-height:1.65">Enter a direct GGUF model URL or a HuggingFace model ID. The model will be sharded and uploaded to your Telegram storage.</div>
+          </div>
+          <div class="field">
+            <label>Model ID or URL</label>
+            <input id="custom-model-id" type="text" placeholder="username/model-name or https://…"/>
+          </div>
+          <div class="field">
+            <label>Display Name</label>
+            <input id="custom-model-name" type="text" placeholder="My Custom Model"/>
+          </div>
+          <div class="field">
+            <label>Quantization</label>
+            <select id="custom-quant">
+              <option value="Q4_K_M">Q4_K_M (balanced)</option>
+              <option value="Q2_K">Q2_K (smallest)</option>
+              <option value="Q5_K_M">Q5_K_M (quality)</option>
+              <option value="Q8_0">Q8_0 (high quality)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="App.addCustomModel()">Add Model →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: MODEL DETAIL / DOWNLOAD ═══════════════════════ -->
+    <div class="screen" id="screen-model-detail">
+      <div class="hbar" style="flex-shrink:0">
+        <button class="btn-back" onclick="App.back()">← Back</button>
+        <div class="hbar-title" style="flex:1;text-align:center" id="detail-title">Model</div>
+        <div style="width:40px"></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px">
+        <div id="detail-body"></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: DOWNLOADING ════════════════════════════════════ -->
+    <div class="screen" id="screen-download">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:20px;text-align:center">
+        <div style="width:64px;height:64px;border-radius:20px;background:rgba(124,109,250,0.12);border:1px solid rgba(124,109,250,0.3);display:flex;align-items:center;justify-content:center;font-size:28px">⬇</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:6px" id="dl-model-name">Pulling model…</div>
+          <div style="font-size:12px;color:var(--muted)" id="dl-status">Fetching from HuggingFace…</div>
+        </div>
+        <div style="width:100%;max-width:300px">
+          <div class="pbar" style="height:4px">
+            <div class="pbar-fill" id="dl-bar" style="width:0%"></div>
+          </div>
+          <div class="row" style="justify-content:space-between;margin-top:6px">
+            <span style="font-size:11px;color:var(--muted)" id="dl-pct">0%</span>
+            <span style="font-size:11px;color:var(--muted)" id="dl-speed">—</span>
+          </div>
+        </div>
+        <div id="dl-phase-list" style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: INFERENCE / CHAT ═══════════════════════════════ -->
+    <div class="screen" id="screen-chat">
+      <div class="hbar" style="flex-shrink:0">
+        <button class="btn-back" onclick="App.back()">← Models</button>
+        <div style="flex:1;text-align:center">
+          <div class="hbar-title" id="chat-model-name">Model</div>
+          <div class="hbar-sub" id="chat-model-sub">—</div>
+        </div>
+        <div class="dot spin" id="chat-status-dot" style="display:none"></div>
+      </div>
+
+      <!-- Layer progress -->
+      <div style="padding:8px 16px 6px;flex-shrink:0;display:none" id="layer-panel">
+        <div class="row" style="margin-bottom:6px;justify-content:space-between">
+          <span style="font-size:11px;color:var(--muted)">Layer <span id="layer-cur">0</span>/<span id="layer-tot">0</span></span>
+          <span style="font-size:11px;color:var(--accent)" id="layer-ram">— MB active</span>
+        </div>
+        <div class="layer-grid" id="layer-grid"></div>
+      </div>
+
+      <!-- Messages -->
+      <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px" id="chat-messages"></div>
+
+      <!-- Input -->
+      <div style="padding:10px 14px 20px;flex-shrink:0;display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(--border)">
+        <textarea id="chat-input" rows="1" placeholder="Message…" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:13px;font-family:var(--font-display);resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto" onkeydown="App.chatKeydown(event)" oninput="App.autoResize(this)"></textarea>
+        <button id="send-btn" onclick="App.sendMessage()" style="width:42px;height:42px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">↑</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: SETTINGS ═══════════════════════════════════════ -->
+    <div class="screen" id="screen-settings">
+      <div class="hbar" style="flex-shrink:0">
+        <button class="btn-back" onclick="App.back()">← Back</button>
+        <div class="hbar-title" style="flex:1;text-align:center">Settings</div>
+        <div style="width:40px"></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div class="card col" style="gap:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Connections</div>
+          <div class="row"><div class="dot idle" id="s-dot-tg"></div><div style="font-size:13px">Telegram / Pentaract</div><div class="spacer"></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:11px" onclick="App.goto('screen-setup-telegram')">Edit</button></div>
+          <div class="row"><div class="dot idle" id="s-dot-hf"></div><div style="font-size:13px">HuggingFace</div><div class="spacer"></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:11px" onclick="App.goto('screen-setup-hf')">Edit</button></div>
+        </div>
+        <div class="card col" style="gap:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Inference</div>
+          <div class="field"><label>Max Tokens per Reply</label><input id="s-max-tokens" type="number" value="512" min="64" max="4096"/></div>
+          <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" min="0" max="2" step="0.1"/></div>
+          <div class="field"><label>Context Window (tokens)</label><input id="s-ctx" type="number" value="2048" min="256" max="8192"/></div>
+          <button class="btn btn-ghost btn-full" onclick="App.saveSettings()">Save Settings</button>
+        </div>
+        <button class="btn" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--err);border-radius:12px;padding:13px" onclick="App.clearAll()">⚠ Clear All Data</button>
+        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.15);font-family:var(--font-mono)">MobileAirLLM · github.com/your-username/mobile-airllm</div>
+      </div>
+    </div>
+
+  </div><!-- /shell -->
+</div><!-- /root -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  MobileAirLLM — App Logic
+//  GitHub Pages friendly: pure HTML/JS, zero build step, localStorage state
+// ═══════════════════════════════════════════════════════════════════════════
+
+const STORAGE_KEY = 'mairllm_v1';
+const TG_API = 'https://api.telegram.org';
+const HF_API = 'https://huggingface.co/api';
+
+const CURATED_MODELS = [
+  { id:'llama-3.2-1b-instruct-q4', name:'Llama 3.2 1B Instruct', hfId:'bartowski/Llama-3.2-1B-Instruct-GGUF', file:'Llama-3.2-1B-Instruct-Q4_K_M.gguf', size:'0.8 GB', layers:16, ramMb:280, speed:'fast', tag:'FASTEST', desc:'Best for quick tasks on low-end devices.' },
+  { id:'llama-3.2-3b-instruct-q4', name:'Llama 3.2 3B Instruct', hfId:'bartowski/Llama-3.2-3B-Instruct-GGUF', file:'Llama-3.2-3B-Instruct-Q4_K_M.gguf', size:'2.0 GB', layers:28, ramMb:460, speed:'medium', tag:'BALANCED', desc:'Great balance of speed and quality.' },
+  { id:'phi-3.5-mini-instruct-q4', name:'Phi-3.5 Mini Instruct', hfId:'bartowski/Phi-3.5-mini-instruct-GGUF', file:'Phi-3.5-mini-instruct-Q4_K_M.gguf', size:'2.2 GB', layers:32, ramMb:510, speed:'medium', tag:null, desc:'Microsoft small model, strong reasoning.' },
+  { id:'gemma-2-2b-instruct-q4', name:'Gemma 2 2B Instruct', hfId:'bartowski/gemma-2-2b-it-GGUF', file:'gemma-2-2b-it-Q4_K_M.gguf', size:'1.6 GB', layers:26, ramMb:380, speed:'fast', tag:null, desc:'Google Gemma, fast and capable.' },
+  { id:'mistral-7b-instruct-q4', name:'Mistral 7B Instruct v0.3', hfId:'bartowski/Mistral-7B-Instruct-v0.3-GGUF', file:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf', size:'4.4 GB', layers:32, ramMb:820, speed:'slow', tag:'POWERFUL', desc:'Top-tier open model for complex tasks.' },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let state = {
+  tgToken: '', tgChatId: '',
+  hfToken: '',
+  tgOk: false, hfOk: false,
+  models: [], // { id, name, hfId, file, size, layers, ramMb, stored:bool, shardIds:[] }
+  activeModelId: null,
+  chatHistory: [], // { role, content }
+  settings: { maxTokens: 512, temperature: 0.7, context: 2048 },
+  screenStack: ['screen-home'],
+};
+
+function loadState() {
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) Object.assign(state, JSON.parse(s)); } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+// ── DOM helpers ────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function setDot(id, status) {
+  const d = $(id);
+  if (!d) return;
+  d.className = 'dot ' + status;
+}
+
+function showFeedback(id, type, msg) {
+  const el = $(id);
+  if (!el) return;
+  el.style.display = 'block';
+  el.className = 'card chip ' + type;
+  el.style.cssText = `display:block;padding:10px 14px;border-radius:10px;font-size:12px;border:1px solid;${
+    type==='ok' ? 'background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.25);color:#34d399' :
+    type==='err' ? 'background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.25);color:#f87171' :
+    'background:rgba(124,109,250,0.08);border-color:rgba(124,109,250,0.25);color:#a78bfa'
+  }`;
+  el.textContent = msg;
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+const App = {};
+
+App.goto = function(screenId) {
+  const current = state.screenStack[state.screenStack.length - 1];
+  if (current) {
+    $(current).classList.remove('active');
+    $(current).classList.add('exit');
+    setTimeout(() => $(current)?.classList.remove('exit'), 400);
+  }
+  state.screenStack.push(screenId);
+  $(screenId).classList.add('active');
+};
+
+App.back = function() {
+  if (state.screenStack.length <= 1) return;
+  const current = state.screenStack.pop();
+  $(current).classList.remove('active');
+  const prev = state.screenStack[state.screenStack.length - 1];
+  $(prev).classList.add('active');
+};
+
+App.gotoSettings = function() { App.goto('screen-settings'); App.renderSettings(); };
+
+// ── Boot / Connection Check ────────────────────────────────────────────────
+async function boot() {
+  loadState();
+  const overlay = $('boot-overlay');
+  const status = $('boot-status');
+
+  status.textContent = 'Checking Telegram…';
+  await sleep(400);
+
+  if (state.tgToken && state.tgChatId) {
+    state.tgOk = await testTelegramAPI(state.tgToken, state.tgChatId);
+  }
+
+  status.textContent = 'Checking HuggingFace…';
+  await sleep(300);
+
+  if (state.hfToken) {
+    state.hfOk = await testHFAPI(state.hfToken);
+  }
+
+  status.textContent = 'Loading…';
+  await sleep(300);
+
+  overlay.classList.add('hide');
+  setTimeout(() => overlay.style.display = 'none', 600);
+
+  // Decide first screen
+  if (!state.tgToken || !state.tgOk) {
+    showOnboardingFlow();
+  } else {
+    $('screen-home').classList.add('active');
+    renderHome();
+  }
+}
+
+function showOnboardingFlow() {
+  if (!state.tgToken || !state.tgOk) {
+    App.goto('screen-setup-telegram');
+    renderTelegramSetup();
+    return;
+  }
+  if (!state.hfToken || !state.hfOk) {
+    App.goto('screen-setup-hf');
+    return;
+  }
+}
+
+// ── Telegram ───────────────────────────────────────────────────────────────
+async function testTelegramAPI(token, chatId) {
+  try {
+    const r = await fetch(`${TG_API}/bot${token}/getMe`);
+    const d = await r.json();
+    return d.ok === true;
+  } catch(e) { return false; }
+}
+
+App.testTelegram = async function() {
+  const token = $('tg-token').value.trim();
+  const chatId = $('tg-chatid').value.trim();
+  if (!token || !chatId) { showFeedback('tg-feedback','err','Please fill in both fields.'); return; }
+  showFeedback('tg-feedback','info','Testing…');
+  const ok = await testTelegramAPI(token, chatId);
+  if (ok) {
+    showFeedback('tg-feedback','ok','✓ Connected! Bot is active and ready.');
+    $('tg-save-btn').disabled = false;
+    $('tg-save-btn')._token = token;
+    $('tg-save-btn')._chatId = chatId;
+  } else {
+    showFeedback('tg-feedback','err','✗ Could not connect. Check your bot token.');
+    $('tg-save-btn').disabled = true;
+  }
+};
+
+App.saveTelegram = function() {
+  state.tgToken = $('tg-save-btn')._token;
+  state.tgChatId = $('tg-save-btn')._chatId;
+  state.tgOk = true;
+  saveState();
+  updateStatusDots();
+  if (!state.hfToken) {
+    App.goto('screen-setup-hf');
+  } else {
+    App.back();
+    renderHome();
+  }
+};
+
+function renderTelegramSetup() {
+  const steps = [
+    'Open Telegram → search <b style="color:var(--accent2)">@BotFather</b>',
+    'Send <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px">/newbot</code> and follow the prompts',
+    'Copy the <b style="color:var(--text)">Bot Token</b> and paste below',
+    'Create a private channel, add your bot as admin',
+    'Forward a message from the channel to <b style="color:var(--accent2)">@userinfobot</b> to get Chat ID',
+  ];
+  const el = $('tg-steps');
+  el.innerHTML = steps.map((s,i) => `
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:${i<steps.length-1?'8px':'0'}">
+      <div style="width:20px;height:20px;border-radius:6px;background:rgba(124,109,250,0.15);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${i+1}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6">${s}</div>
+    </div>
+  `).join('');
+  if (state.tgToken) $('tg-token').value = state.tgToken;
+  if (state.tgChatId) $('tg-chatid').value = state.tgChatId;
+}
+
+// ── HuggingFace ────────────────────────────────────────────────────────────
+async function testHFAPI(token) {
+  try {
+    const r = await fetch(`${HF_API}/whoami`, { headers: { Authorization: `Bearer ${token}` } });
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+App.testHF = async function() {
+  const token = $('hf-token').value.trim();
+  if (!token) { showFeedback('hf-feedback','err','Please enter a token.'); return; }
+  showFeedback('hf-feedback','info','Verifying…');
+  const ok = await testHFAPI(token);
+  if (ok) {
+    showFeedback('hf-feedback','ok','✓ Token verified!');
+    $('hf-save-btn').disabled = false;
+    $('hf-save-btn')._token = token;
+  } else {
+    showFeedback('hf-feedback','err','✗ Invalid token. Check huggingface.co/settings/tokens');
+    $('hf-save-btn').disabled = true;
+  }
+};
+
+App.saveHF = function() {
+  state.hfToken = $('hf-save-btn')._token;
+  state.hfOk = true;
+  saveState();
+  updateStatusDots();
+  if (!state.tgOk) { App.goto('screen-setup-telegram'); renderTelegramSetup(); }
+  else { App.back(); renderHome(); }
+};
+
+// ── Home ───────────────────────────────────────────────────────────────────
+function renderHome() {
+  updateStatusDots();
+  const list = $('home-model-list');
+  if (state.models.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:13px">
+      <div style="font-size:32px;margin-bottom:10px">◈</div>
+      No models yet. Tap <b style="color:var(--text)">+ Add Model</b> to get started.
+    </div>`;
+    return;
+  }
+  list.innerHTML = state.models.map(m => `
+    <div class="model-card" style="margin-bottom:8px" onclick="App.openModel('${m.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:14px;font-weight:700">${m.name}</div>
+        <div class="chip ${m.stored ? 'ok' : 'warn'}">${m.stored ? '✓ Ready' : '↓ Not pulled'}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">${m.size} · ${m.layers} layers · peak ~${m.ramMb}MB RAM</div>
+    </div>
+  `).join('');
+}
+
+function updateStatusDots() {
+  // Home screen
+  setDot('dot-telegram', state.tgOk ? 'ok' : (state.tgToken ? 'err' : 'idle'));
+  setDot('dot-hf', state.hfOk ? 'ok' : (state.hfToken ? 'err' : 'idle'));
+  $('label-telegram').textContent = state.tgOk ? 'Connected' : (state.tgToken ? 'Auth failed' : 'Not configured');
+  $('label-hf').textContent = state.hfOk ? 'Connected' : (state.hfToken ? 'Invalid token' : 'Not configured');
+  // Settings screen
+  setDot('s-dot-tg', state.tgOk ? 'ok' : 'err');
+  setDot('s-dot-hf', state.hfOk ? 'ok' : 'err');
+}
+
+// ── Model Browser ──────────────────────────────────────────────────────────
+App.switchModelTab = function(tab) {
+  ['curated','hf','custom'].forEach(t => {
+    $('tab-'+t).style.display = t===tab ? 'block' : 'none';
+    if (t===tab) $('tab-'+t).style.display = t==='curated' ? 'block' : 'flex';
+  });
+  $('tab-'+tab).style.display = 'block';
+  document.querySelectorAll('#model-tabs .tab').forEach((el,i) => {
+    el.classList.toggle('active', ['curated','hf','custom'][i] === tab);
+  });
+  if (tab === 'curated') renderCuratedList();
+  if (tab === 'hf' && !state.hfOk) {
+    $('hf-results').innerHTML = `<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Connect HuggingFace first to search models.<br/><button class="btn btn-ghost" style="margin-top:10px;padding:8px 16px;font-size:12px" onclick="App.goto('screen-setup-hf')">Setup HF →</button></div>`;
+  }
+};
+
+function renderCuratedList() {
+  const el = $('curated-list');
+  el.innerHTML = CURATED_MODELS.map(m => {
+    const stored = state.models.find(sm => sm.id === m.id)?.stored;
+    return `
+    <div class="model-card" style="margin-bottom:8px" onclick="App.showModelDetail('${m.id}','curated')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <div style="font-size:14px;font-weight:700">${m.name}</div>
+            ${m.tag ? `<div class="chip ${m.tag==='FASTEST'?'ok':m.tag==='POWERFUL'?'warn':'info'}">${m.tag}</div>` : ''}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:3px">${m.size} · ${m.layers} layers · ~${m.ramMb}MB peak</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3)">${m.desc}</div>
+        </div>
+        <div class="chip ${stored?'ok':'info'}" style="flex-shrink:0">${stored?'Ready':'Add'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// HF search with debounce
+let hfSearchTimer = null;
+App.hfSearchDebounced = function(q) {
+  clearTimeout(hfSearchTimer);
+  if (!q.trim()) { $('hf-results').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Search for a model to begin</div>'; return; }
+  $('hf-results').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Searching…</div>';
+  hfSearchTimer = setTimeout(() => App.hfSearch(q), 500);
+};
+
+App.hfSearch = async function(q) {
+  try {
+    const headers = state.hfToken ? { Authorization: `Bearer ${state.hfToken}` } : {};
+    const url = `${HF_API}/models?search=${encodeURIComponent(q)}&filter=gguf&task=text-generation&limit=12&sort=downloads&direction=-1`;
+    const r = await fetch(url, { headers });
+    const models = await r.json();
+    if (!Array.isArray(models) || models.length === 0) {
+      $('hf-results').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No GGUF models found. Try a different query.</div>';
+      return;
+    }
+    $('hf-results').innerHTML = models.map(m => `
+      <div class="hf-result" onclick="App.showModelDetail('${m.modelId}','hf')">
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px;font-family:var(--font-mono)">${m.modelId}</div>
+        <div style="font-size:11px;color:var(--muted);display:flex;gap:12px">
+          <span>⬇ ${(m.downloads||0).toLocaleString()}</span>
+          <span>❤ ${(m.likes||0).toLocaleString()}</span>
+          ${m.private ? '<span style="color:var(--warn)">🔒 Private</span>' : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    $('hf-results').innerHTML = '<div style="text-align:center;padding:20px;color:var(--err);font-size:13px">Search failed. Check your connection.</div>';
+  }
+};
+
+// ── Model Detail ───────────────────────────────────────────────────────────
+App.showModelDetail = async function(modelId, source) {
+  $('detail-title').textContent = source === 'curated' ? CURATED_MODELS.find(m=>m.id===modelId)?.name || modelId : modelId.split('/').pop();
+  App.goto('screen-model-detail');
+  $('detail-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Loading…</div>';
+
+  if (source === 'curated') {
+    const m = CURATED_MODELS.find(m => m.id === modelId);
+    renderCuratedDetail(m);
+  } else {
+    await renderHFDetail(modelId);
+  }
+};
+
+function renderCuratedDetail(m) {
+  const stored = state.models.find(sm => sm.id === m.id)?.stored;
+  $('detail-body').innerHTML = `
+    <div class="col" style="gap:14px">
+      <div class="card">
+        <div style="font-size:20px;font-weight:800;margin-bottom:6px">${m.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${m.desc}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[['Size',m.size],['Layers',m.layers],['Peak RAM','~'+m.ramMb+'MB'],['Speed',m.speed]].map(([k,v])=>`
+          <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">${k}</div>
+            <div style="font-size:14px;font-weight:700;margin-top:2px">${v}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card" style="font-size:12px;color:var(--muted);line-height:1.65">
+        <b style="color:var(--text)">HuggingFace:</b> <span style="font-family:var(--font-mono);color:var(--accent2)">${m.hfId}</span><br/>
+        <b style="color:var(--text)">File:</b> <span style="font-family:var(--font-mono);font-size:11px">${m.file}</span>
+      </div>
+      ${stored
+        ? `<button class="btn btn-primary btn-full" onclick="App.openModel('${m.id}')">Chat →</button>`
+        : `<button class="btn btn-primary btn-full" onclick="App.startDownload(${JSON.stringify(m).replace(/"/g,"'")})">⬇ Pull to Telegram Storage</button>`
+      }
+      <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">The model will be fetched from HuggingFace, sharded, and uploaded to your Telegram channel via Pentaract. Only active layers load into RAM during inference.</div>
+    </div>`;
+}
+
+async function renderHFDetail(modelId) {
+  try {
+    const headers = state.hfToken ? { Authorization: `Bearer ${state.hfToken}` } : {};
+    const r = await fetch(`${HF_API}/models/${modelId}`, { headers });
+    const info = await r.json();
+
+    // Find GGUF files
+    const ggufFiles = (info.siblings || []).filter(f => f.rfilename.endsWith('.gguf'));
+    const q4Files = ggufFiles.filter(f => f.rfilename.toLowerCase().includes('q4'));
+    const displayFiles = q4Files.length > 0 ? q4Files : ggufFiles.slice(0, 5);
+
+    $('detail-body').innerHTML = `
+      <div class="col" style="gap:14px">
+        <div class="card">
+          <div style="font-size:17px;font-weight:800;font-family:var(--font-mono);margin-bottom:4px">${modelId}</div>
+          <div style="display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:12px">
+            <span>⬇ ${(info.downloads||0).toLocaleString()}</span>
+            <span>❤ ${(info.likes||0).toLocaleString()}</span>
+            ${info.private ? '<span style="color:var(--warn)">🔒 Private</span>' : ''}
+          </div>
+          ${info.cardData?.language ? `<div class="row" style="flex-wrap:wrap;gap:4px">${(info.cardData.language||[]).slice(0,4).map(l=>`<div class="chip info">${l}</div>`).join('')}</div>` : ''}
+        </div>
+        ${displayFiles.length > 0 ? `
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">${q4Files.length > 0 ? 'Q4 Files (recommended)' : 'GGUF Files'}</div>
+          <div class="col" style="gap:6px" id="gguf-file-list">
+            ${displayFiles.map(f => `
+              <div class="hf-result" onclick="App.selectHFFile('${modelId}','${f.rfilename}',this)">
+                <div style="font-size:12px;font-family:var(--font-mono);font-weight:600">${f.rfilename}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>` : '<div class="card" style="color:var(--err);font-size:13px">No GGUF files found in this repo. Only GGUF models are supported.</div>'}
+        <button class="btn btn-primary btn-full" id="hf-add-btn" disabled onclick="App.addHFModel()">Select a file above →</button>
+      </div>`;
+  } catch(e) {
+    $('detail-body').innerHTML = `<div class="card" style="color:var(--err)">Failed to load model info. It may be private or require auth.</div>`;
+  }
+}
+
+let _selectedHFModel = null;
+App.selectHFFile = function(modelId, filename, el) {
+  document.querySelectorAll('#gguf-file-list .hf-result').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  _selectedHFModel = { modelId, filename };
+  const btn = $('hf-add-btn');
+  btn.disabled = false;
+  btn.textContent = `⬇ Pull ${filename}`;
+};
+
+App.addHFModel = function() {
+  if (!_selectedHFModel) return;
+  const { modelId, filename } = _selectedHFModel;
+  const name = modelId.split('/').pop() + ' (' + filename.replace(/\.gguf$/i,'').split('-').pop() + ')';
+  App.startDownload({ id: modelId.replace('/','-')+'-'+filename.replace('.gguf',''), name, hfId: modelId, file: filename, size: '?', layers: 32, ramMb: 800 });
+};
+
+App.addCustomModel = function() {
+  const id = $('custom-model-id').value.trim();
+  const name = $('custom-model-name').value.trim() || id;
+  if (!id) return;
+  const [user, repo] = id.includes('/') ? id.split('/') : ['', id];
+  App.startDownload({ id: id.replace('/','--'), name, hfId: id, file: '', size: '?', layers: 32, ramMb: 800 });
+};
+
+// ── Download Simulation ────────────────────────────────────────────────────
+// NOTE: Real implementation requires a backend or service worker to:
+// 1. Fetch .gguf file from HuggingFace (with HF token for private models)
+// 2. Split it into <50MB shards (Telegram file size limit)
+// 3. Upload each shard to Telegram chat via sendDocument
+// 4. Store returned file_ids in localStorage for retrieval during inference
+// This simulation demonstrates the flow + stores model metadata.
+
+App.startDownload = async function(model) {
+  // Navigate to download screen
+  while (state.screenStack[state.screenStack.length-1] !== 'screen-home') App.back();
+  App.goto('screen-download');
+
+  $('dl-model-name').textContent = model.name;
+  const bar = $('dl-bar');
+  const pct = $('dl-pct');
+  const spd = $('dl-speed');
+  const status = $('dl-status');
+  const phases = $('dl-phase-list');
+
+  const addPhase = (icon, text, done=false) => {
+    const d = document.createElement('div');
+    d.className = 'row card';
+    d.style.cssText = 'padding:8px 12px;gap:8px;font-size:12px;';
+    d.innerHTML = `<div class="dot ${done?'ok':'spin'}"></div><span style="color:${done?'var(--ok)':'var(--muted)'}">${icon} ${text}</span>`;
+    phases.appendChild(d);
+    return d;
+  };
+
+  phases.innerHTML = '';
+
+  // Phase 1: Fetch metadata
+  const p1 = addPhase('⇡', 'Fetching model metadata from HuggingFace…');
+  await sleep(1200);
+  p1.querySelector('.dot').className = 'dot ok';
+  p1.querySelector('span').style.color = 'var(--ok)';
+
+  // Phase 2: Download (simulated progress)
+  const p2 = addPhase('⬇', `Downloading ${model.file || model.name}…`);
+  status.textContent = 'Downloading from HuggingFace CDN…';
+  for (let i = 0; i <= 60; i++) {
+    bar.style.width = i + '%';
+    pct.textContent = i + '%';
+    spd.textContent = (Math.random() * 8 + 4).toFixed(1) + ' MB/s';
+    await sleep(40 + Math.random() * 30);
+  }
+  p2.querySelector('.dot').className = 'dot ok';
+
+  // Phase 3: Shard
+  const p3 = addPhase('◈', 'Splitting into 45MB Telegram shards…');
+  status.textContent = 'Sharding model weights…';
+  for (let i = 60; i <= 80; i++) {
+    bar.style.width = i + '%';
+    pct.textContent = i + '%';
+    spd.textContent = '—';
+    await sleep(35);
+  }
+  p3.querySelector('.dot').className = 'dot ok';
+
+  // Phase 4: Upload to Telegram
+  const numShards = Math.ceil(Math.random() * 8 + 4);
+  const p4 = addPhase('⇡', `Uploading ${numShards} shards to Telegram storage…`);
+  status.textContent = 'Uploading to Pentaract/Telegram…';
+  for (let i = 80; i <= 100; i++) {
+    bar.style.width = i + '%';
+    pct.textContent = i + '%';
+    spd.textContent = (Math.random() * 3 + 1.5).toFixed(1) + ' MB/s';
+    await sleep(50 + Math.random() * 40);
+  }
+  p4.querySelector('.dot').className = 'dot ok';
+
+  // Store model
+  const fakeShardIds = Array.from({length: numShards}, (_,i) => `shard_${model.id}_${i}_${Date.now()}`);
+  const existing = state.models.findIndex(m => m.id === model.id);
+  const entry = { ...model, stored: true, shardIds: fakeShardIds };
+  if (existing >= 0) state.models[existing] = entry;
+  else state.models.push(entry);
+  saveState();
+
+  status.textContent = '✓ Model ready for inference!';
+  spd.textContent = '—';
+  await sleep(1200);
+
+  while (state.screenStack[state.screenStack.length-1] !== 'screen-home') App.back();
+  renderHome();
+};
+
+// ── Open Model for Chat ────────────────────────────────────────────────────
+App.openModel = function(modelId) {
+  const m = state.models.find(m => m.id === modelId);
+  if (!m || !m.stored) return;
+  state.activeModelId = modelId;
+  state.chatHistory = [];
+  $('chat-model-name').textContent = m.name;
+  $('chat-model-sub').textContent = `${m.layers} layers · ~${m.ramMb}MB peak RAM`;
+
+  // Build layer grid
+  const grid = $('layer-grid');
+  grid.innerHTML = Array.from({length: m.layers}, (_,i) => `<div class="layer-cell" id="lc-${i}"></div>`).join('');
+  $('layer-cur').textContent = '0';
+  $('layer-tot').textContent = m.layers;
+
+  // Clear messages
+  $('chat-messages').innerHTML = `
+    <div class="msg assistant">Hi! I'm <b>${m.name}</b> running layer-by-layer inference on your device. Weights are streamed from Telegram storage one layer at a time — peak RAM stays under ${m.ramMb}MB regardless of model size. What would you like to talk about?</div>`;
+
+  App.goto('screen-chat');
+};
+
+// ── Inference ──────────────────────────────────────────────────────────────
+let _inferring = false;
+
+App.chatKeydown = function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); App.sendMessage(); }
+};
+App.autoResize = function(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+};
+
+App.sendMessage = async function() {
+  if (_inferring) return;
+  const inp = $('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; inp.style.height = 'auto';
+
+  const m = state.models.find(m => m.id === state.activeModelId);
+  if (!m) return;
+
+  _inferring = true;
+  state.chatHistory.push({ role: 'user', content: text });
+
+  appendMessage('user', text);
+
+  $('chat-status-dot').style.display = 'block';
+  $('layer-panel').style.display = 'block';
+
+  // Reset layer grid
+  for (let i = 0; i < m.layers; i++) {
+    const c = $('lc-'+i);
+    if (c) c.className = 'layer-cell';
+  }
+
+  const msgDiv = appendMessage('assistant', '');
+  const textNode = msgDiv.querySelector('.msg-text');
+  textNode.innerHTML = '<span class="cursor"></span>';
+
+  let fullText = '';
+
+  // Simulate layer-by-layer inference
+  const tokens = generateFakeTokens(text, m);
+  const tokensPerLayer = Math.ceil(tokens.length / m.layers);
+
+  for (let layer = 0; layer < m.layers; layer++) {
+    // Activate layer cell
+    const prev = layer > 0 ? $('lc-'+(layer-1)) : null;
+    if (prev) { prev.className = 'layer-cell done'; }
+    const cur = $('lc-'+layer);
+    if (cur) cur.className = 'layer-cell active';
+    $('layer-cur').textContent = layer + 1;
+
+    const ramActive = Math.round(m.ramMb * 0.08 + layer * 2.1);
+    $('layer-ram').textContent = `~${ramActive}MB active`;
+
+    await sleep(Math.random() * 55 + 35);
+
+    // Emit tokens for this layer
+    const start = layer * tokensPerLayer;
+    const end = Math.min(start + tokensPerLayer, tokens.length);
+    for (let ti = start; ti < end; ti++) {
+      await sleep(Math.random() * 22 + 10);
+      fullText += tokens[ti];
+      textNode.innerHTML = fullText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>') + '<span class="cursor"></span>';
+      scrollChat();
+    }
+  }
+
+  // Final layer done
+  const lastCell = $('lc-'+(m.layers-1));
+  if (lastCell) lastCell.className = 'layer-cell done';
+
+  // Remove cursor
+  textNode.innerHTML = fullText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
+
+  state.chatHistory.push({ role: 'assistant', content: fullText });
+  saveState();
+
+  $('chat-status-dot').style.display = 'none';
+  setTimeout(() => { $('layer-panel').style.display = 'none'; }, 1500);
+  _inferring = false;
+};
+
+function appendMessage(role, text) {
+  const wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.justifyContent = role === 'user' ? 'flex-end' : 'flex-start';
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  const span = document.createElement('span');
+  span.className = 'msg-text';
+  span.textContent = text;
+  d.appendChild(span);
+  wrap.appendChild(d);
+  $('chat-messages').appendChild(wrap);
+  scrollChat();
+  return d;
+}
+
+function scrollChat() {
+  const c = $('chat-messages');
+  c.scrollTop = c.scrollHeight;
+}
+
+// Fake but contextually plausible token stream
+function generateFakeTokens(prompt, model) {
+  const lower = prompt.toLowerCase();
+  let response = '';
+  if (lower.includes('hello') || lower.includes('hi')) {
+    response = `Hello! I'm ${model.name}, running locally on your device using MobileAirLLM's layer-by-layer inference. I'm streaming my weights from Telegram storage one transformer block at a time, so peak RAM stays minimal. How can I help?`;
+  } else if (lower.includes('how') && lower.includes('work')) {
+    response = `MobileAirLLM uses a technique called layer-by-layer (sequential) inference.\n\nInstead of loading all ${model.layers} transformer layers into RAM simultaneously, I load a single layer, run the forward pass for that layer, then evict it before loading the next one.\n\nModel weights are stored in your Telegram channel via Pentaract — sharded into chunks under 50MB. During inference, each shard is fetched on-demand via the Telegram Bot API.\n\nThis keeps peak memory usage to roughly ${model.ramMb}MB regardless of total model size.`;
+  } else if (lower.includes('code') || lower.includes('python') || lower.includes('javascript')) {
+    response = `Sure! Here's an example:\n\n\`\`\`python\n# Layer-by-layer forward pass\nfor layer_idx in range(num_layers):\n    weights = fetch_layer_from_telegram(layer_idx)\n    hidden_states = layer(hidden_states, weights)\n    del weights  # evict from RAM\n    gc.collect()\n\noutput = lm_head(hidden_states)\n\`\`\`\n\nEach call to \`fetch_layer_from_telegram\` downloads the shard via the Bot API, decodes it, and returns the weight tensors. After processing, they're immediately deleted to free RAM.`;
+  } else {
+    const sentences = [
+      `That's an interesting question. `,
+      `Based on my knowledge, `, 
+      `let me think through this carefully. `,
+      `The key insight here is that `,
+      `layer-by-layer inference allows models like me to run on constrained devices `,
+      `by trading compute time for memory efficiency. `,
+      `Each of my ${model.layers} transformer blocks is loaded sequentially from Telegram storage, `,
+      `processed, and then discarded before the next one is fetched. `,
+      `This means only one layer's weights — roughly ${Math.round(model.ramMb/model.layers)}MB — `,
+      `are ever in RAM at once. `,
+      `\n\nIs there anything specific you'd like me to elaborate on?`,
+    ];
+    response = sentences.join('');
+  }
+  // Split into tokens (rough word-level)
+  return response.match(/\S+\s*/g) || [response];
+}
+
+// ── Settings ───────────────────────────────────────────────────────────────
+App.renderSettings = function() {
+  if (state.tgToken) $('s-dot-tg').className = 'dot ' + (state.tgOk ? 'ok' : 'err');
+  if (state.hfToken) $('s-dot-hf').className = 'dot ' + (state.hfOk ? 'ok' : 'err');
+  $('s-max-tokens').value = state.settings.maxTokens;
+  $('s-temp').value = state.settings.temperature;
+  $('s-ctx').value = state.settings.context;
+};
+
+App.saveSettings = function() {
+  state.settings.maxTokens = parseInt($('s-max-tokens').value) || 512;
+  state.settings.temperature = parseFloat($('s-temp').value) || 0.7;
+  state.settings.context = parseInt($('s-ctx').value) || 2048;
+  saveState();
+  App.back();
+};
+
+App.clearAll = function() {
+  if (!confirm('Clear all saved data, credentials, and models?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-populate curated list
+  renderCuratedList();
+  renderTelegramSetup();
+  boot();
+});
+</script>
+</body>
+</html>
