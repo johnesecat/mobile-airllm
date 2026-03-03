@@ -3,1213 +3,647 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>Mobile LLM</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+<title>MobileAirLLM</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
-:root{
-  --bg:#07080f;--surface:#0f1019;--surface2:#161722;--surface3:#1d1f2e;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
-  --text:#edeaf5;--muted:rgba(255,255,255,0.38);--muted2:rgba(255,255,255,0.18);
-  --accent:#8b7cf8;--accent2:#26d4f0;--accentg:linear-gradient(135deg,#8b7cf8,#26d4f0);
-  --ok:#2dd4a0;--warn:#f59e40;--err:#f06060;
-  --radius:14px;--font:'Outfit',sans-serif;--mono:'DM Mono',monospace;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text)}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
-
-/* ── Root ── */
-#app{width:100%;height:100%;display:flex;justify-content:center;align-items:center;
-  background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(139,124,248,0.1) 0%,transparent 65%)}
-.shell{width:100%;max-width:430px;height:100%;max-height:900px;
-  background:var(--surface);display:flex;flex-direction:column;
-  overflow:hidden;position:relative}
-@media(min-width:480px){.shell{border-radius:26px;border:1px solid var(--border);
-  box-shadow:0 50px 120px rgba(0,0,0,0.85)}}
-
-/* ── Screen system — only ONE screen visible at a time ── */
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;
-  visibility:hidden;opacity:0;pointer-events:none;
-  transition:opacity 0.28s ease,transform 0.28s cubic-bezier(.16,1,.3,1);
-  transform:translateX(24px);will-change:transform,opacity;z-index:1}
-.screen.active{visibility:visible;opacity:1;pointer-events:all;transform:translateX(0);z-index:2}
-.screen.slide-out{visibility:visible;opacity:0;transform:translateX(-24px);z-index:1;pointer-events:none}
-
-/* ── Boot overlay ── */
-#boot{position:fixed;inset:0;background:var(--bg);z-index:999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
-  transition:opacity 0.5s ease}
-#boot.gone{opacity:0;pointer-events:none}
-.boot-icon{width:76px;height:76px;border-radius:22px;background:var(--accentg);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 60px rgba(139,124,248,0.45)}
-.boot-title{font-size:23px;font-weight:800;letter-spacing:-.5px}
-.boot-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
-.boot-spinner{width:32px;height:32px;border:2px solid rgba(139,124,248,0.2);
-  border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+:root{--bg:#080a0e;--bg1:#0d1017;--bg2:#131720;--bg3:#181d28;--line:rgba(255,255,255,0.055);--line2:rgba(255,255,255,0.10);--tx:#d8dce8;--tx2:rgba(216,220,232,0.5);--tx3:rgba(216,220,232,0.25);--cyan:#00d4c8;--amber:#f0a830;--green:#26c87a;--red:#e05555;--cyan-dim:rgba(0,212,200,0.10);--amber-dim:rgba(240,168,48,0.10);--green-dim:rgba(38,200,122,0.10);--red-dim:rgba(224,85,85,0.10);--font:'Manrope',sans-serif;--mono:'IBM Plex Mono',monospace;--r:10px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--tx)}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+#app{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(0,212,200,0.05) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 100%,rgba(240,168,48,0.04) 0%,transparent 60%),var(--bg)}
+.shell{position:relative;width:100%;max-width:420px;height:100%;max-height:880px;overflow:hidden;background:var(--bg1)}
+@media(min-width:480px){.shell{border-radius:20px;border:1px solid var(--line2);box-shadow:0 40px 100px rgba(0,0,0,0.9)}}
+.page{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
+.page.active{display:flex}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideBack{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+.page.anim-fwd{animation:slideIn 0.2s cubic-bezier(.16,1,.3,1) both}
+.page.anim-back{animation:slideBack 0.2s cubic-bezier(.16,1,.3,1) both}
+#boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--bg);transition:opacity 0.4s}
+#boot.fade{opacity:0;pointer-events:none}
+.boot-mark{width:64px;height:64px;border-radius:16px;background:var(--bg2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,212,200,0.15)}
+.spin{width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--cyan);animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── Header bar ── */
-.hbar{display:flex;align-items:center;gap:10px;padding:14px 16px;
-  border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
-.hbar-title{font-size:15px;font-weight:700;flex:1;text-align:center}
-.hbar-sub{font-size:11px;color:var(--muted);text-align:center}
-.btn-back{background:rgba(255,255,255,0.05);border:1px solid var(--border);
-  border-radius:9px;color:var(--muted);padding:7px 11px;cursor:pointer;
-  font-size:12px;font-family:var(--font);display:flex;align-items:center;gap:5px;
-  transition:all .15s;flex-shrink:0}
-.btn-back:hover{color:var(--text);background:rgba(255,255,255,0.08)}
-.icon-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);
-  background:rgba(255,255,255,0.04);cursor:pointer;display:flex;align-items:center;
-  justify-content:center;font-size:15px;color:var(--muted);transition:all .15s;flex-shrink:0}
-.icon-btn:hover{color:var(--text);background:rgba(255,255,255,0.07)}
-
-/* ── Buttons ── */
-.btn{padding:14px 20px;border-radius:var(--radius);border:none;font-family:var(--font);
-  font-weight:600;font-size:14px;cursor:pointer;transition:all .15s;letter-spacing:.01em;width:100%}
-.btn-primary{background:var(--accentg);color:#fff;box-shadow:0 4px 24px rgba(139,124,248,0.3)}
-.btn-primary:hover{filter:brightness(1.08)}
-.btn-primary:disabled{background:rgba(255,255,255,0.06);color:var(--muted2);
-  cursor:default;box-shadow:none}
-.btn-outline{background:rgba(255,255,255,0.04);border:1px solid var(--border2);
-  color:var(--muted)}
-.btn-outline:hover:not(:disabled){background:rgba(255,255,255,0.07);color:var(--text)}
-.btn-outline:disabled{opacity:.4;cursor:default}
-.btn-danger{background:rgba(240,96,96,0.08);border:1px solid rgba(240,96,96,0.2);color:var(--err)}
-
-/* ── Inputs ── */
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
-.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;padding:12px 14px;color:var(--text);font-family:var(--mono);
-  font-size:13px;outline:none;transition:border-color .15s;width:100%}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(139,124,248,0.5)}
-.field input::placeholder{color:var(--muted2)}
-.field select option{background:var(--surface2)}
-
-/* ── Cards ── */
-.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.card-hi{border-color:rgba(139,124,248,0.25);background:rgba(139,124,248,0.04)}
-.card-ok{border-color:rgba(45,212,160,0.25);background:rgba(45,212,160,0.04)}
-.card-err{border-color:rgba(240,96,96,0.25);background:rgba(240,96,96,0.04)}
-.card-warn{border-color:rgba(245,158,64,0.25);background:rgba(245,158,64,0.04)}
-
-/* ── Status dots ── */
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .2s}
-.dot-ok{background:var(--ok);box-shadow:0 0 6px var(--ok)}
-.dot-err{background:var(--err)}
-.dot-idle{background:rgba(255,255,255,0.15)}
-.dot-spin{background:var(--accent);animation:dotpulse 1s ease-in-out infinite}
-@keyframes dotpulse{0%,100%{opacity:1}50%{opacity:.25}}
-
-/* ── Chips ── */
-.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;
-  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.chip-ok{background:rgba(45,212,160,0.12);color:var(--ok)}
-.chip-warn{background:rgba(245,158,64,0.12);color:var(--warn)}
-.chip-info{background:rgba(139,124,248,0.12);color:var(--accent)}
-.chip-muted{background:rgba(255,255,255,0.06);color:var(--muted)}
-
-/* ── Progress bar ── */
-.pbar{height:3px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
-.pbar-fill{height:100%;border-radius:3px;background:var(--accentg);transition:width .1s ease}
-
-/* ── Tabs ── */
-.tabs{display:flex;background:var(--surface2);border-radius:10px;padding:3px;gap:2px}
-.tab{flex:1;padding:8px 4px;border:none;background:none;border-radius:8px;
-  color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;
-  cursor:pointer;transition:all .15s}
-.tab.active{background:rgba(255,255,255,0.07);color:var(--text)}
-
-/* ── Layer grid ── */
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(12px,1fr));gap:2px}
-.lc{height:10px;border-radius:2px;background:var(--surface3);transition:all .12s}
-.lc.done{background:rgba(45,212,160,0.35)}
-.lc.active{background:var(--accent);box-shadow:0 0 6px var(--accent);animation:lp .5s ease-in-out infinite}
-@keyframes lp{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* ── Chat messages ── */
-.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
-.msg-row{display:flex}
+.hdr{display:flex;align-items:center;gap:8px;padding:13px 14px;border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg1)}
+.hdr-title{font-size:14px;font-weight:700;flex:1;text-align:center}
+.btn{width:100%;padding:13px 16px;border-radius:var(--r);border:none;font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .12s}
+.btn-p{background:var(--cyan);color:#050809;box-shadow:0 4px 20px rgba(0,212,200,0.25)}
+.btn-p:hover{filter:brightness(1.1)}
+.btn-p:disabled{background:var(--bg3);color:var(--tx3);box-shadow:none;cursor:default}
+.btn-g{background:var(--bg2);border:1px solid var(--line2);color:var(--tx2)}
+.btn-g:hover:not(:disabled){background:var(--bg3);color:var(--tx)}
+.btn-g:disabled{opacity:.4;cursor:default}
+.btn-d{background:var(--red-dim);border:1px solid rgba(224,85,85,.2);color:var(--red)}
+.back-btn{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--tx3);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .12s;flex-shrink:0}
+.back-btn:hover{color:var(--tx);background:var(--bg3)}
+.icon-btn{width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;flex-shrink:0}
+.icon-btn:hover{color:var(--tx);background:var(--bg3)}
+.spacer34{width:34px;flex-shrink:0}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.field input,.field select,.field textarea{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .12s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(0,212,200,.4)}
+.field input::placeholder{color:var(--tx3)}
+.field select option{background:var(--bg2)}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px}
+.card-cy{border-color:rgba(0,212,200,.2);background:var(--cyan-dim)}
+.card-gn{border-color:rgba(38,200,122,.2);background:var(--green-dim)}
+.card-rd{border-color:rgba(224,85,85,.2);background:var(--red-dim)}
+.card-am{border-color:rgba(240,168,48,.2);background:var(--amber-dim)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all .2s}
+.dot-ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot-err{background:var(--red)}
+.dot-idle{background:var(--tx3)}
+.dot-spin{background:var(--cyan);animation:dp .9s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
+.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.chip-gn{background:var(--green-dim);color:var(--green);border:1px solid rgba(38,200,122,.2)}
+.chip-am{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(240,168,48,.2)}
+.chip-cy{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,200,.2)}
+.chip-rd{background:var(--red-dim);color:var(--red);border:1px solid rgba(224,85,85,.2)}
+.chip-mu{background:var(--bg3);color:var(--tx3);border:1px solid var(--line)}
+.pbar{height:3px;background:var(--line);border-radius:3px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:3px;background:var(--cyan);transition:width .1s ease}
+.tabs{display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px}
+.tab{flex:1;padding:7px 4px;border:none;background:none;border-radius:6px;color:var(--tx3);font-family:var(--font);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .12s}
+.tab.active{background:var(--bg3);color:var(--tx)}
+.scroll{flex:1;overflow-y:auto}
+.sec-lbl{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;padding:14px 14px 6px}
+.fb{padding:10px 13px;border-radius:var(--r);font-size:12px;line-height:1.55;border:1px solid;display:none}
+.fb.show{display:block}
+.fb-ok{background:var(--green-dim);border-color:rgba(38,200,122,.25);color:var(--green)}
+.fb-err{background:var(--red-dim);border-color:rgba(224,85,85,.25);color:var(--red)}
+.fb-info{background:var(--cyan-dim);border-color:rgba(0,212,200,.25);color:var(--cyan)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(10px,1fr));gap:2px}
+.lc{height:8px;border-radius:2px;background:var(--bg3);transition:background .1s}
+.lc.done{background:rgba(0,212,200,.3)}
+.lc.active{background:var(--cyan);box-shadow:0 0 5px var(--cyan);animation:lp .5s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+.msg-row{display:flex;margin-bottom:10px}
 .msg-row.user{justify-content:flex-end}
 .msg-row.assistant{justify-content:flex-start}
-.bubble{max-width:86%;padding:11px 14px;font-size:13.5px;line-height:1.65;word-break:break-word}
-.bubble.user{background:linear-gradient(135deg,rgba(139,124,248,0.7),rgba(38,212,240,0.6));
-  border-radius:16px 16px 4px 16px}
-.bubble.assistant{background:var(--surface2);border:1px solid var(--border);
-  border-radius:16px 16px 16px 4px;font-family:var(--font)}
-.bubble.assistant p{margin-bottom:8px}
-.bubble.assistant p:last-child{margin-bottom:0}
-.typing-dots{display:flex;gap:4px;align-items:center;padding:4px 0}
-.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent);
-  animation:tdot 1.2s ease-in-out infinite}
-.typing-dots span:nth-child(2){animation-delay:.2s}
-.typing-dots span:nth-child(3){animation-delay:.4s}
-@keyframes tdot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
-.cursor-blink{display:inline-block;width:2px;height:14px;background:var(--accent);
-  margin-left:1px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
+.bubble{max-width:88%;padding:10px 13px;font-size:13.5px;line-height:1.7;word-break:break-word}
+.bubble.user{background:linear-gradient(135deg,rgba(0,212,200,.55),rgba(0,212,200,.35));border:1px solid rgba(0,212,200,.25);border-radius:14px 14px 3px 14px;color:var(--tx)}
+.bubble.assistant{background:var(--bg2);border:1px solid var(--line);border-radius:14px 14px 14px 3px}
+.bubble p{margin-bottom:8px}.bubble p:last-child{margin-bottom:0}
+.bubble strong{font-weight:700;color:var(--tx)}
+.bubble code{background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cyan)}
+.bubble pre{margin:8px 0;border-radius:8px;overflow:hidden;position:relative}
+.bubble pre code{background:none;border:none;padding:0;color:inherit;font-size:12px!important}
+.bubble ul,.bubble ol{padding-left:20px;margin-bottom:8px}
+.bubble li{margin-bottom:3px}
+.bubble h1,.bubble h2,.bubble h3{font-weight:700;margin-bottom:6px;color:var(--tx)}
+.bubble h1{font-size:16px}.bubble h2{font-size:14px}.bubble h3{font-size:13px}
+.bubble blockquote{border-left:2px solid var(--cyan);padding-left:10px;color:var(--tx2);margin:6px 0}
+.bubble a{color:var(--cyan);text-decoration:none}
+.bubble table{border-collapse:collapse;font-size:12px;margin:6px 0;width:100%}
+.bubble th,.bubble td{border:1px solid var(--line);padding:5px 8px;text-align:left}
+.bubble th{background:var(--bg3)}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;background:#161b22;padding:7px 12px;border-radius:8px 8px 0 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.code-lang-label{font-size:10px;color:rgba(255,255,255,0.35);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.copy-btn{background:rgba(255,255,255,0.06);border:none;border-radius:4px;color:rgba(255,255,255,0.4);padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font);transition:all .12s}
+.copy-btn:hover{background:rgba(255,255,255,0.1);color:var(--tx)}
+.tdots{display:flex;gap:4px;padding:3px 0}
+.tdots span{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:td 1.1s ease-in-out infinite}
+.tdots span:nth-child(2){animation-delay:.18s}.tdots span:nth-child(3){animation-delay:.36s}
+@keyframes td{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.cur{display:inline-block;width:2px;height:13px;background:var(--cyan);margin-left:1px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-/* ── Code blocks in chat ── */
-.bubble pre{margin:8px 0;border-radius:8px;overflow:hidden}
-.bubble pre code{font-size:12px!important;line-height:1.5!important;font-family:var(--mono)!important}
-.code-wrap{position:relative}
-.code-lang{position:absolute;top:7px;right:36px;font-size:9px;color:rgba(255,255,255,0.3);
-  font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;pointer-events:none}
-.copy-btn{position:absolute;top:6px;right:7px;background:rgba(255,255,255,0.06);
-  border:none;border-radius:5px;color:rgba(255,255,255,0.4);padding:3px 7px;
-  font-size:10px;cursor:pointer;font-family:var(--font);transition:all .15s}
-.copy-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
-.bubble code{background:rgba(255,255,255,0.07);border-radius:4px;padding:1px 5px;
-  font-size:12px;font-family:var(--mono)}
-.bubble pre code{background:none;padding:0;border-radius:0}
-
-/* ── Chat input ── */
-.chat-bar{padding:10px 12px 18px;border-top:1px solid var(--border);
-  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:var(--surface)}
-.chat-bar textarea{flex:1;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;padding:11px 13px;color:var(--text);font-size:13.5px;
-  font-family:var(--font);resize:none;outline:none;line-height:1.5;max-height:110px;
-  overflow-y:auto;transition:border-color .15s}
-.chat-bar textarea:focus{border-color:rgba(139,124,248,0.4)}
-.chat-bar textarea::placeholder{color:var(--muted2)}
-.send-btn{width:42px;height:42px;border-radius:10px;border:none;flex-shrink:0;
-  background:var(--accentg);color:#fff;cursor:pointer;font-size:17px;
-  display:flex;align-items:center;justify-content:center;transition:all .15s}
-.send-btn:disabled{background:var(--surface2);border:1px solid var(--border);
-  color:var(--muted2);cursor:default}
+.chat-bar{display:flex;gap:8px;align-items:flex-end;padding:10px 12px 16px;border-top:1px solid var(--line);flex-shrink:0;background:var(--bg1)}
+.chat-bar textarea{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto;transition:border-color .12s}
+.chat-bar textarea:focus{border-color:rgba(0,212,200,.35)}
+.chat-bar textarea::placeholder{color:var(--tx3)}
+.send-btn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;background:var(--cyan);color:#050809;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.send-btn:disabled{background:var(--bg2);border:1px solid var(--line);color:var(--tx3);cursor:default}
 .send-btn:not(:disabled):hover{filter:brightness(1.12)}
-
-/* ── Model cards ── */
-.model-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
-  padding:13px 14px;cursor:pointer;transition:all .15s;margin-bottom:8px}
-.model-card:hover{border-color:var(--border2);background:var(--surface3)}
-.model-card.selected{border-color:rgba(139,124,248,0.4);background:rgba(139,124,248,0.04)}
-.model-card.downloaded{border-color:rgba(45,212,160,0.2)}
-
-/* ── Home status rows ── */
-.status-row{display:flex;align-items:center;gap:12px;padding:12px 14px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
-  cursor:pointer;transition:all .15s}
-.status-row:hover{border-color:var(--border2)}
-
-/* ── Folder cards ── */
-.folder-card{display:flex;align-items:center;gap:12px;padding:11px 14px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
-  margin-bottom:6px;cursor:pointer;transition:all .15s}
-.folder-card:hover{border-color:var(--border2);background:var(--surface3)}
-
-/* ── Divider ── */
-.divider{height:1px;background:var(--border);margin:4px 0}
-
-/* ── Misc helpers ── */
-.row{display:flex;align-items:center;gap:8px}
-.col{display:flex;flex-direction:column;gap:10px}
-.spacer{flex:1}
-.scroll{overflow-y:auto;flex:1}
-.padded{padding:16px}
-.padded-h{padding:0 16px}
-.section-label{font-size:10px;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.12em;font-weight:600;padding:12px 16px 6px}
-.empty{text-align:center;padding:48px 24px;color:var(--muted);font-size:13px;line-height:1.7}
-.feedback{padding:10px 14px;border-radius:10px;font-size:12.5px;border:1px solid;
-  margin-top:2px;display:none;line-height:1.5}
-.feedback.ok{background:rgba(45,212,160,0.07);border-color:rgba(45,212,160,0.25);color:var(--ok)}
-.feedback.err{background:rgba(240,96,96,0.07);border-color:rgba(240,96,96,0.25);color:var(--err)}
-.feedback.info{background:rgba(139,124,248,0.07);border-color:rgba(139,124,248,0.25);color:#b8aff9}
-.feedback.show{display:block}
+.mcard{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:7px}
+.mcard:hover{border-color:var(--line2);background:var(--bg3)}
+.mcard.ready{border-color:rgba(38,200,122,.2)}
+.hfrow{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
+.hfrow:hover{border-color:var(--line2);background:var(--bg3)}
+.hfrow.sel{border-color:rgba(0,212,200,.4);background:var(--cyan-dim)}
+.srow{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
+.srow:hover{border-color:var(--line2);background:var(--bg3)}
+.phase-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:6px}
+.infer-bar{padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg1);display:none;flex-shrink:0}
+.frow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:all .12s}
+.frow:hover{border-color:var(--line2);background:var(--bg3)}
+#load-overlay{display:none;position:absolute;inset:0;z-index:100;background:rgba(8,10,14,0.93);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center}
+#load-overlay.show{display:flex}
 </style>
 </head>
 <body>
-
-<!-- ── Boot ── -->
 <div id="boot">
-  <div class="boot-icon">
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-      <path d="M7 33L20 7l13 26" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M11.5 25h17" stroke="white" stroke-width="3.2" stroke-linecap="round"/>
-      <circle cx="20" cy="7" r="3" fill="white"/>
+  <div class="boot-mark">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <path d="M5 27L16 5l11 22" stroke="#00d4c8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 20h14" stroke="#00d4c8" stroke-width="2.5" stroke-linecap="round"/>
     </svg>
   </div>
-  <div class="boot-title">MobileAirLLM</div>
-  <div class="boot-spinner"></div>
-  <div class="boot-sub" id="boot-msg">Initializing…</div>
+  <div style="font-size:20px;font-weight:800;letter-spacing:-.4px">MobileAirLLM</div>
+  <div class="spin"></div>
+  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="boot-msg">Checking connections…</div>
 </div>
 
 <div id="app"><div class="shell">
-
-<!-- ════════════════════════════════════════
-     HOME
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-home">
-  <div class="hbar">
-    <div style="width:36px"></div>
-    <div style="flex:1;text-align:center">
-      <div style="font-size:17px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
-      <div style="font-size:10px;color:var(--muted);margin-top:1px">Layer-by-layer · Telegram storage</div>
+  <div id="load-overlay">
+    <div class="spin" style="width:32px;height:32px"></div>
+    <div style="font-size:15px;font-weight:700" id="lo-title">Loading model…</div>
+    <div style="width:100%;max-width:280px">
+      <div class="pbar" style="height:4px"><div class="pbar-fill" id="lo-bar" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:5px;font-family:var(--mono)" id="lo-msg">Initializing…</div>
     </div>
-    <button class="icon-btn" onclick="go('s-settings')">⚙</button>
+    <div style="font-size:11px;color:var(--tx3);max-width:260px;line-height:1.6">Weights download once and cache in your browser. Subsequent loads are instant.</div>
   </div>
-  <div class="scroll">
-    <div class="section-label">Connections</div>
-    <div style="padding:0 14px;display:flex;flex-direction:column;gap:6px">
-      <div class="status-row" onclick="go('s-setup-tg');renderTGSetup()">
-        <div class="dot dot-idle" id="h-dot-tg"></div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
-          <div style="font-size:11px;color:var(--muted)" id="h-lbl-tg">Not configured</div>
+
+  <!-- HOME -->
+  <div class="page" id="p-home">
+    <div class="hdr">
+      <div class="spacer34"></div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
+        <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px;letter-spacing:.06em">ON-DEVICE · LAYER-BY-LAYER</div>
+      </div>
+      <button class="icon-btn" onclick="nav('p-settings',true)">⚙</button>
+    </div>
+    <div class="scroll">
+      <div class="sec-lbl">Connections</div>
+      <div style="padding:0 12px">
+        <div class="srow" onclick="nav('p-tg',true);populateTGInputs()">
+          <div class="dot dot-idle" id="h-dot-tg"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Pentaract / Telegram</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div></div>
+          <div style="font-size:11px;color:var(--tx3)">›</div>
         </div>
-        <div style="font-size:11px;color:var(--accent)">›</div>
-      </div>
-      <div class="status-row" onclick="go('s-setup-hf')">
-        <div class="dot dot-idle" id="h-dot-hf"></div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600">HuggingFace</div>
-          <div style="font-size:11px;color:var(--muted)" id="h-lbl-hf">Not configured</div>
+        <div class="srow" onclick="nav('p-hf',true);populateHFInput()">
+          <div class="dot dot-idle" id="h-dot-hf"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">HuggingFace</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div></div>
+          <div style="font-size:11px;color:var(--tx3)">›</div>
         </div>
-        <div style="font-size:11px;color:var(--accent)">›</div>
+      </div>
+      <div class="sec-lbl" style="margin-top:4px">Models</div>
+      <div style="padding:0 12px" id="home-models">
+        <div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.8">No models.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>
       </div>
     </div>
+    <div style="padding:10px 12px 20px;flex-shrink:0">
+      <button class="btn btn-p" onclick="nav('p-models',true);renderCurated()">+ Add Model</button>
+    </div>
+  </div>
 
-    <div class="section-label" style="margin-top:6px">Models</div>
-    <div style="padding:0 14px" id="home-models">
-      <div class="empty">No models yet.<br/>Tap <b style="color:var(--text)">+ Add Model</b> to get started.</div>
+  <!-- SETUP TELEGRAM -->
+  <div class="page" id="p-tg">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
+      <div class="hdr-title">Pentaract Setup</div>
+      <div class="spacer34"></div>
+    </div>
+    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">MobileAirLLM uses Telegram as free unlimited model storage. Model weights are sharded and stored as file messages, fetched layer-by-layer during inference.</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Quickstart</div>
+        <div id="tg-steps"></div>
+      </div>
+      <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" oninput="tgInputChanged()"/></div>
+      <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890" oninput="tgInputChanged()"/></div>
+      <div class="fb" id="tg-fb"></div>
+      <button class="btn btn-g" id="tg-test" onclick="testTG()" disabled>Test Connection</button>
+      <button class="btn btn-p" id="tg-save" disabled onclick="saveTG()">Save & Continue →</button>
     </div>
   </div>
-  <div style="padding:12px 14px 22px;flex-shrink:0">
-    <button class="btn btn-primary" onclick="go('s-models');renderCurated()">+ Add Model</button>
-  </div>
-</div>
 
-<!-- ════════════════════════════════════════
-     SETUP TELEGRAM
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-setup-tg">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title">Pentaract Setup</div>
-    <div style="width:52px"></div>
+  <!-- SETUP HF -->
+  <div class="page" id="p-hf">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
+      <div class="hdr-title">HuggingFace</div>
+      <div class="spacer34"></div>
+    </div>
+    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Link your HuggingFace account for private/gated model access. Public models work without a token.</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Get a token</div>
+        <div style="font-size:12px;color:var(--tx2);line-height:1.7">1. Go to <span style="color:var(--cyan);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>2. New token → Type: <b style="color:var(--tx)">Read</b><br/>3. Copy and paste below</div>
+      </div>
+      <div class="field"><label>Access Token</label><input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" oninput="hfInputChanged()"/></div>
+      <div class="fb" id="hf-fb"></div>
+      <button class="btn btn-g" id="hf-verify" onclick="verifyHF()" disabled>Verify Token</button>
+      <button class="btn btn-p" id="hf-save" disabled onclick="saveHF()">Save →</button>
+      <button style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px 0;text-align:center;width:100%" onclick="skipHF()">Skip — public models only</button>
+    </div>
   </div>
-  <div class="scroll padded" style="display:flex;flex-direction:column;gap:13px">
-    <div class="card" style="font-size:12px;color:var(--muted);line-height:1.7">
-      MobileAirLLM uses Telegram as free unlimited model storage. Models are split into shards &lt;50MB and stored as file messages, fetched layer-by-layer during inference.
-    </div>
-    <div class="card col" style="gap:10px">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Quickstart</div>
-      <div id="tg-steps"></div>
-    </div>
-    <div class="field">
-      <label>Bot Token</label>
-      <input id="tg-token" type="password" placeholder="1234567890:ABCdef…"/>
-    </div>
-    <div class="field">
-      <label>Storage Chat ID</label>
-      <input id="tg-chatid" placeholder="-1001234567890"/>
-    </div>
-    <div class="feedback" id="tg-fb"></div>
-    <button class="btn btn-outline" onclick="testTG()">Test Connection</button>
-    <button class="btn btn-primary" id="tg-save" disabled onclick="saveTG()">Save & Continue →</button>
-  </div>
-</div>
 
-<!-- ════════════════════════════════════════
-     SETUP HUGGINGFACE
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-setup-hf">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title">HuggingFace</div>
-    <div style="width:52px"></div>
-  </div>
-  <div class="scroll padded" style="display:flex;flex-direction:column;gap:13px">
-    <div class="card" style="font-size:12px;color:var(--muted);line-height:1.7">
-      Link your HuggingFace account to access private models, your own fine-tuned models, and gated repos.
+  <!-- MODEL BROWSER -->
+  <div class="page" id="p-models">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
+      <div class="hdr-title">Add Model</div>
+      <div class="spacer34"></div>
     </div>
-    <div class="card col" style="gap:8px">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Get a token</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7">
-        1. Go to <span style="color:var(--accent2);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
-        2. New token → Role: <b style="color:var(--text)">Read</b><br/>
-        3. Copy and paste below
+    <div style="padding:10px 12px 8px;flex-shrink:0">
+      <div class="tabs">
+        <button class="tab active" id="t-curated" onclick="switchTab('curated')">Curated</button>
+        <button class="tab" id="t-hf" onclick="switchTab('hf')">HuggingFace</button>
+        <button class="tab" id="t-custom" onclick="switchTab('custom')">Custom</button>
       </div>
     </div>
-    <div class="field">
-      <label>Access Token</label>
-      <input id="hf-token" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx"/>
-    </div>
-    <div class="feedback" id="hf-fb"></div>
-    <button class="btn btn-outline" onclick="testHF()">Verify Token</button>
-    <button class="btn btn-primary" id="hf-save" disabled onclick="saveHF()">Save →</button>
-    <button class="btn btn-outline" style="font-size:12px;color:var(--muted)" onclick="skipHF()">Skip for now (public models only)</button>
+    <div class="scroll" style="padding:8px 12px 16px" id="model-tab-body"></div>
   </div>
-</div>
 
-<!-- ════════════════════════════════════════
-     MODEL BROWSER
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-models">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title">Add Model</div>
-    <div style="width:52px"></div>
+  <!-- MODEL DETAIL -->
+  <div class="page" id="p-detail">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-models',false)">← Back</button>
+      <div class="hdr-title" id="detail-title">Model</div>
+      <div class="spacer34"></div>
+    </div>
+    <div class="scroll" style="padding:14px" id="detail-body"></div>
   </div>
-  <div style="padding:10px 14px 8px;flex-shrink:0">
-    <div class="tabs">
-      <button class="tab active" id="tab-curated" onclick="switchTab('curated')">Curated</button>
-      <button class="tab" id="tab-hf" onclick="switchTab('hf')">HuggingFace</button>
-      <button class="tab" id="tab-custom" onclick="switchTab('custom')">Custom</button>
+
+  <!-- DOWNLOAD / REGISTER -->
+  <div class="page" id="p-dl">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:18px;text-align:center">
+      <div style="width:64px;height:64px;border-radius:16px;background:var(--bg2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:26px">⬇</div>
+      <div><div style="font-size:16px;font-weight:700;margin-bottom:5px" id="dl-name">—</div><div style="font-size:12px;color:var(--tx3);font-family:var(--mono)" id="dl-status">Initializing…</div></div>
+      <div style="width:100%;max-width:300px"><div class="pbar" style="height:4px;margin-bottom:7px"><div class="pbar-fill" id="dl-bar" style="width:0%"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-pct">0%</span><span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-spd">—</span></div></div>
+      <div style="width:100%;max-width:300px" id="dl-phases"></div>
     </div>
   </div>
-  <div class="scroll padded" id="model-tab-content"></div>
-</div>
 
-<!-- ════════════════════════════════════════
-     MODEL DETAIL
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-detail">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title" id="detail-hdr">Model</div>
-    <div style="width:52px"></div>
-  </div>
-  <div class="scroll padded" id="detail-body"></div>
-</div>
-
-<!-- ════════════════════════════════════════
-     DOWNLOAD
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-download">
-  <div style="flex:1;display:flex;flex-direction:column;align-items:center;
-    justify-content:center;padding:32px;gap:20px;text-align:center">
-    <div style="width:68px;height:68px;border-radius:20px;background:rgba(139,124,248,0.1);
-      border:1px solid rgba(139,124,248,0.25);display:flex;align-items:center;
-      justify-content:center;font-size:28px">⬇</div>
-    <div>
-      <div style="font-size:17px;font-weight:700;margin-bottom:5px" id="dl-name">—</div>
-      <div style="font-size:12px;color:var(--muted)" id="dl-status">Starting…</div>
+  <!-- CHAT -->
+  <div class="page" id="p-chat">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
+      <div style="flex:1;text-align:center;overflow:hidden"><div class="hdr-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)" id="chat-sub">—</div></div>
+      <button class="icon-btn" onclick="clearChat()">↺</button>
     </div>
-    <div style="width:100%;max-width:320px">
-      <div class="pbar" style="height:5px;margin-bottom:8px">
-        <div class="pbar-fill" id="dl-bar" style="width:0%"></div>
+    <div class="infer-bar" id="infer-bar">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-cur">0</span>/<span id="lc-tot">0</span></span><span style="font-size:10px;color:var(--cyan);font-family:var(--mono)" id="l-ram">—</span></div>
+      <div class="lgrid" id="lgrid"></div>
+    </div>
+    <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
+    <div class="chat-bar">
+      <textarea id="chat-in" rows="1" placeholder="Message…" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">↑</button>
+    </div>
+  </div>
+
+  <!-- FOLDERS -->
+  <div class="page" id="p-folders">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-settings',false)">← Back</button>
+      <div class="hdr-title">Telegram Folders</div>
+      <button class="icon-btn" onclick="createFolder()">+</button>
+    </div>
+    <div class="scroll" style="padding:12px" id="folder-list"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="p-settings">
+    <div class="hdr">
+      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
+      <div class="hdr-title">Settings</div>
+      <div class="spacer34"></div>
+    </div>
+    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="display:flex;flex-direction:column;gap:11px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Connections</div>
+        <div style="display:flex;align-items:center;gap:10px"><div class="dot dot-idle" id="s-dot-tg"></div><div style="flex:1;font-size:13px">Telegram / Pentaract</div><button class="back-btn" style="font-size:11px" onclick="nav('p-tg',true);populateTGInputs()">Edit</button></div>
+        <div style="height:1px;background:var(--line)"></div>
+        <div style="display:flex;align-items:center;gap:10px"><div class="dot dot-idle" id="s-dot-hf"></div><div style="flex:1;font-size:13px">HuggingFace</div><button class="back-btn" style="font-size:11px" onclick="nav('p-hf',true);populateHFInput()">Edit</button></div>
       </div>
-      <div class="row" style="justify-content:space-between">
-        <span style="font-size:11px;color:var(--muted)" id="dl-pct">0%</span>
-        <span style="font-size:11px;color:var(--muted)" id="dl-speed">—</span>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Storage</div>
+        <button class="btn btn-g" style="font-size:13px" onclick="nav('p-folders',true);renderFolders()">📁 Manage Telegram Folders</button>
       </div>
-    </div>
-    <div style="width:100%;max-width:320px" id="dl-phases"></div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════
-     CHAT / INFERENCE
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-chat">
-  <div class="hbar" id="chat-hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div style="flex:1;text-align:center;overflow:hidden">
-      <div class="hbar-title" id="chat-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
-      <div style="font-size:10px;color:var(--muted)" id="chat-sub">—</div>
-    </div>
-    <button class="icon-btn" onclick="clearChat()" title="Clear chat">⟳</button>
-  </div>
-
-  <!-- Layer panel -->
-  <div id="layer-panel" style="padding:8px 14px 6px;flex-shrink:0;
-    border-bottom:1px solid var(--border);display:none">
-    <div class="row" style="justify-content:space-between;margin-bottom:5px">
-      <span style="font-size:11px;color:var(--muted)">Layer <span id="lc">0</span>/<span id="lt">0</span></span>
-      <span style="font-size:11px;color:var(--accent)" id="l-ram">—</span>
-    </div>
-    <div class="lgrid" id="lgrid"></div>
-  </div>
-
-  <div class="msgs" id="chat-msgs"></div>
-
-  <div class="chat-bar">
-    <textarea id="chat-inp" rows="1" placeholder="Message…"
-      onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
-    <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>↑</button>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════
-     FOLDERS (Telegram channel organizer)
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-folders">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title">Storage Folders</div>
-    <button class="icon-btn" onclick="createFolder()" title="New folder">+</button>
-  </div>
-  <div class="scroll" id="folder-list" style="padding:10px 14px"></div>
-</div>
-
-<!-- ════════════════════════════════════════
-     SETTINGS
-     ════════════════════════════════════════ -->
-<div class="screen" id="s-settings">
-  <div class="hbar">
-    <button class="btn-back" onclick="back()">← Back</button>
-    <div class="hbar-title">Settings</div>
-    <div style="width:52px"></div>
-  </div>
-  <div class="scroll padded" style="display:flex;flex-direction:column;gap:14px">
-    <div class="card col" style="gap:12px">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Connections</div>
-      <div class="row">
-        <div class="dot dot-idle" id="s-dot-tg"></div>
-        <div style="font-size:13px;flex:1">Telegram / Pentaract</div>
-        <button class="btn-back" style="font-size:11px" onclick="go('s-setup-tg');renderTGSetup()">Edit</button>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Inference</div>
+        <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512"/></div>
+        <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05"/></div>
+        <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05"/></div>
+        <button class="btn btn-g" onclick="saveSettings()">Save Settings</button>
       </div>
-      <div class="divider"></div>
-      <div class="row">
-        <div class="dot dot-idle" id="s-dot-hf"></div>
-        <div style="font-size:13px;flex:1">HuggingFace</div>
-        <button class="btn-back" style="font-size:11px" onclick="go('s-setup-hf')">Edit</button>
+      <div class="card" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">About</div>
+        <div style="font-size:11.5px;color:var(--tx2);line-height:1.7">In-browser inference via <span style="color:var(--cyan)">Transformers.js</span>.<br/>Models run on your device via WebGPU/WASM.<br/>Storage via Telegram/Pentaract.</div>
       </div>
+      <button class="btn btn-d" onclick="clearAll()">⚠ Clear All Data</button>
     </div>
-    <div class="card col" style="gap:10px">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Storage</div>
-      <button class="btn btn-outline" onclick="go('s-folders');renderFolders()">📁 Manage Telegram Folders</button>
-    </div>
-    <div class="card col" style="gap:10px">
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Inference</div>
-      <div class="field"><label>Max Tokens</label><input id="s-maxtok" type="number" value="1024" min="64" max="8192"/></div>
-      <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" min="0" max="2" step="0.05"/></div>
-      <div class="field"><label>Context Window</label><input id="s-ctx" type="number" value="4096"/></div>
-      <button class="btn btn-outline" onclick="saveSettings()">Save</button>
-    </div>
-    <button class="btn btn-danger" onclick="clearAll()">⚠ Clear All Data</button>
-    <div style="text-align:center;font-size:10px;color:var(--muted2);font-family:var(--mono)">MobileAirLLM · Open Source</div>
   </div>
-</div>
 
-</div></div><!-- /shell /app -->
+</div></div>
 
-<script>
-// ═══════════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════════
-const SK = 'mairllm2';
-let S = {
-  tgToken:'', tgChatId:'', tgOk:false,
-  hfToken:'', hfOk:false,
-  models:[], folders:[],
-  settings:{ maxTokens:1024, temperature:0.7, context:4096 },
-  chatHistory:[], activeModel:null,
+<script type="module">
+import { pipeline, env, TextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js';
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+
+// ── State ──
+const SK='mairllm4';
+let S={tgToken:'',tgChatId:'',tgOk:false,hfToken:'',hfOk:false,models:[],folders:[],settings:{maxTokens:512,temperature:0.7,repPenalty:1.1},activeModel:null};
+const loadS=()=>{try{const d=localStorage.getItem(SK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}};
+const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
+
+// ── Navigation — ZERO overlap ──
+let _cur=null;
+window.nav=function(id,fwd=true){
+  if(_cur===id)return;
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active','anim-fwd','anim-back');
+    p.style.display='none';
+  });
+  const el=q(id);
+  el.style.display='flex';
+  void el.offsetWidth; // force reflow before adding animation class
+  el.classList.add('active');
+  requestAnimationFrame(()=>el.classList.add(fwd?'anim-fwd':'anim-back'));
+  _cur=id;
 };
-function loadS(){ try{ const d=localStorage.getItem(SK); if(d) Object.assign(S,JSON.parse(d)); }catch(e){} }
-function saveS(){ try{ localStorage.setItem(SK,JSON.stringify(S)); }catch(e){} }
 
-// ═══════════════════════════════════════════════════════════════════
-//  CURATED MODELS  (up to 70B via layer streaming)
-// ═══════════════════════════════════════════════════════════════════
-const CURATED = [
-  { id:'llama32-1b-q4', name:'Llama 3.2 1B Instruct', hfId:'bartowski/Llama-3.2-1B-Instruct-GGUF', file:'Llama-3.2-1B-Instruct-Q4_K_M.gguf', size:'0.8 GB', layers:16, ramMb:200, tag:'FASTEST', desc:'Best for quick tasks on very low RAM.' },
-  { id:'llama32-3b-q4', name:'Llama 3.2 3B Instruct', hfId:'bartowski/Llama-3.2-3B-Instruct-GGUF', file:'Llama-3.2-3B-Instruct-Q4_K_M.gguf', size:'2.0 GB', layers:28, ramMb:380, tag:'BALANCED', desc:'Great daily-driver balance of speed and quality.' },
-  { id:'phi35-mini-q4', name:'Phi-3.5 Mini Instruct', hfId:'bartowski/Phi-3.5-mini-instruct-GGUF', file:'Phi-3.5-mini-instruct-Q4_K_M.gguf', size:'2.2 GB', layers:32, ramMb:420, tag:null, desc:'Microsoft small model with strong reasoning.' },
-  { id:'gemma2-2b-q4', name:'Gemma 2 2B Instruct', hfId:'bartowski/gemma-2-2b-it-GGUF', file:'gemma-2-2b-it-Q4_K_M.gguf', size:'1.6 GB', layers:26, ramMb:320, tag:null, desc:'Google Gemma — fast and multilingual.' },
-  { id:'mistral7b-q4', name:'Mistral 7B Instruct v0.3', hfId:'bartowski/Mistral-7B-Instruct-v0.3-GGUF', file:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf', size:'4.4 GB', layers:32, ramMb:650, tag:'POWERFUL', desc:'Top-tier open 7B for complex tasks.' },
-  { id:'llama3-8b-q4', name:'Llama 3.1 8B Instruct', hfId:'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF', file:'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf', size:'4.9 GB', layers:32, ramMb:700, tag:null, desc:'Meta flagship 8B — strong all-rounder.' },
-  { id:'qwen25-7b-q4', name:'Qwen 2.5 7B Instruct', hfId:'bartowski/Qwen2.5-7B-Instruct-GGUF', file:'Qwen2.5-7B-Instruct-Q4_K_M.gguf', size:'4.7 GB', layers:32, ramMb:680, tag:null, desc:'Alibaba Qwen2.5 — excellent at code & math.' },
-  { id:'deepseek-7b-q4', name:'DeepSeek-R1 7B', hfId:'bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF', file:'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf', size:'4.7 GB', layers:32, ramMb:680, tag:'REASONING', desc:'Distilled reasoning model from DeepSeek-R1.' },
-  { id:'llama3-13b-q4', name:'Llama 3 13B Instruct', hfId:'bartowski/Llama-3-13B-Instruct-GGUF', file:'Llama-3-13B-Instruct-Q4_K_M.gguf', size:'8.0 GB', layers:40, ramMb:820, tag:null, desc:'Larger Llama 3 variant for richer outputs.' },
-  { id:'llama3-70b-q2', name:'Llama 3.1 70B Instruct (Q2)', hfId:'bartowski/Meta-Llama-3.1-70B-Instruct-GGUF', file:'Meta-Llama-3.1-70B-Instruct-Q2_K.gguf', size:'26 GB', layers:80, ramMb:1100, tag:'LARGE', desc:'Full 70B via layer streaming — needs Telegram storage. ~1.1GB peak RAM per layer pass.' },
-  { id:'mixtral-8x7b-q3', name:'Mixtral 8×7B MoE (Q3)', hfId:'bartowski/Mixtral-8x7B-Instruct-v0.1-GGUF', file:'Mixtral-8x7B-Instruct-v0.1-Q3_K_M.gguf', size:'19 GB', layers:32, ramMb:950, tag:'MOE', desc:'Mixture-of-experts 8×7B model. Excellent quality via MoE routing.' },
-];
-
-// ═══════════════════════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════════════════════
-let stack = [];
-function go(id){
-  const cur = stack[stack.length-1];
-  if(cur===id) return;
-  if(cur){ const el=q(cur); el.classList.remove('active'); el.classList.add('slide-out'); setTimeout(()=>el.classList.remove('slide-out'),350); }
-  stack.push(id);
-  q(id).classList.add('active');
-}
-function back(){
-  if(stack.length<=1) return;
-  const cur=stack.pop(); q(cur).classList.remove('active');
-  if(stack.length){ const prev=stack[stack.length-1]; q(prev).classList.add('active'); }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════════════
-const q = id => document.getElementById(id);
-const sleep = ms => new Promise(r=>setTimeout(r,ms));
-function fb(id, type, msg){ const el=q(id); el.className='feedback '+type+' show'; el.innerHTML=msg; }
-function hideFb(id){ q(id).className='feedback'; }
-function setDot(id,cls){ const d=q(id); if(d){ d.className='dot '+cls; } }
+// ── Helpers ──
+const q=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const showFb=(id,type,msg)=>{const el=q(id);el.className=`fb fb-${type} show`;el.innerHTML=msg;};
+const hideFb=id=>{q(id).className='fb';};
+const setDot=(id,cls)=>{const d=q(id);if(d)d.className='dot '+cls;};
 
 function updateDots(){
-  const tgc = S.tgOk?'dot-ok':(S.tgToken?'dot-err':'dot-idle');
-  const hfc = S.hfOk?'dot-ok':(S.hfToken?'dot-err':'dot-idle');
-  ['h-dot-tg','s-dot-tg'].forEach(id=>setDot(id,tgc));
-  ['h-dot-hf','s-dot-hf'].forEach(id=>setDot(id,hfc));
-  q('h-lbl-tg').textContent = S.tgOk?'Connected':(S.tgToken?'Auth failed':'Not configured');
-  q('h-lbl-hf').textContent = S.hfOk?'Connected':(S.hfToken?'Invalid token':'Not configured (public only)');
+  const tg=S.tgOk?'dot-ok':(S.tgToken?'dot-err':'dot-idle');
+  const hf=S.hfOk?'dot-ok':(S.hfToken?'dot-err':'dot-idle');
+  ['h-dot-tg','s-dot-tg'].forEach(id=>setDot(id,tg));
+  ['h-dot-hf','s-dot-hf'].forEach(id=>setDot(id,hf));
+  q('h-lbl-tg').textContent=S.tgOk?'connected':(S.tgToken?'auth failed':'not configured');
+  q('h-lbl-hf').textContent=S.hfOk?'connected':(S.hfToken?'invalid token':'not configured (public only)');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  BOOT — dynamic connection check
-// ═══════════════════════════════════════════════════════════════════
+// ── Boot ──
 async function boot(){
   loadS();
-  const msg = q('boot-msg');
-
-  msg.textContent = 'Checking Telegram…';
-  if(S.tgToken && S.tgChatId){
-    S.tgOk = await pingTG(S.tgToken, S.tgChatId);
-  }
-  await sleep(300);
-
-  msg.textContent = 'Checking HuggingFace…';
-  if(S.hfToken){
-    S.hfOk = await pingHF(S.hfToken);
-  }
-  await sleep(250);
-
-  msg.textContent = 'Ready';
-  await sleep(300);
-  q('boot').classList.add('gone');
-  setTimeout(()=>q('boot').style.display='none',600);
-
-  // Restore settings inputs
-  q('s-maxtok').value = S.settings.maxTokens;
-  q('s-temp').value = S.settings.temperature;
-  q('s-ctx').value = S.settings.context;
-
-  if(!S.tgToken || !S.tgOk){
-    go('s-setup-tg'); renderTGSetup();
-  } else {
-    go('s-home'); renderHome();
-  }
+  const msg=q('boot-msg');
+  if(S.tgToken&&S.tgChatId){msg.textContent='Checking Telegram…';S.tgOk=await pingTG(S.tgToken,S.tgChatId);}
+  if(S.hfToken){msg.textContent='Checking HuggingFace…';S.hfOk=await pingHF(S.hfToken);}
+  msg.textContent='Ready';
+  await sleep(180);
+  q('boot').classList.add('fade');
+  setTimeout(()=>q('boot').style.display='none',450);
+  q('s-tok').value=S.settings.maxTokens;
+  q('s-temp').value=S.settings.temperature;
+  q('s-rep').value=S.settings.repPenalty;
+  if(!S.tgToken||!S.tgOk){nav('p-tg',true);renderTGSteps();populateTGInputs();}
+  else{nav('p-home',true);renderHome();}
   updateDots();
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  TELEGRAM
-// ═══════════════════════════════════════════════════════════════════
-async function pingTG(token, chatId){
-  try{
-    const r = await fetch(`https://api.telegram.org/bot${token}/getMe`);
-    const d = await r.json();
-    return d.ok === true;
-  }catch(e){ return false; }
+// ── Telegram ──
+const pingTG=async(tok,cid)=>{try{const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`);const d=await r.json();return d.ok===true;}catch(e){return false;}};
+
+function renderTGSteps(){
+  const steps=['Open Telegram → search <b style="color:var(--cyan)">@BotFather</b>','Send <code>/newbot</code> and follow the prompts','Copy the <b style="color:var(--tx)">Bot Token</b> and paste below','Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cyan)">@userinfobot</b>'];
+  q('tg-steps').innerHTML=steps.map((s,i)=>`<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:${i<steps.length-1?'9px':'0'}"><div style="width:18px;height:18px;border-radius:5px;background:rgba(0,212,200,0.12);color:var(--cyan);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div></div>`).join('');
 }
 
-function renderTGSetup(){
-  const steps=[
-    'Open Telegram → search <b style="color:var(--accent2)">@BotFather</b>',
-    'Send <code>/newbot</code> and follow the prompts',
-    'Copy your <b style="color:var(--text)">Bot Token</b> and paste below',
-    'Create a private channel → add your bot as admin',
-    'Message <b style="color:var(--accent2)">@userinfobot</b> from that channel to get Chat ID',
-  ];
-  q('tg-steps').innerHTML = steps.map((s,i)=>`
-    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:${i<steps.length-1?'9px':'0'}">
-      <div style="width:20px;height:20px;border-radius:6px;background:rgba(139,124,248,0.15);
-        color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;
-        justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.6">${s}</div>
-    </div>`).join('');
-  if(S.tgToken) q('tg-token').value = S.tgToken;
-  if(S.tgChatId) q('tg-chatid').value = S.tgChatId;
-}
+window.populateTGInputs=function(){if(S.tgToken)q('tg-tok').value=S.tgToken;if(S.tgChatId)q('tg-cid').value=S.tgChatId;tgInputChanged();renderTGSteps();};
+window.tgInputChanged=function(){const t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim();q('tg-test').disabled=!(t&&c);q('tg-save').disabled=true;};
+window.testTG=async function(){const tok=q('tg-tok').value.trim(),cid=q('tg-cid').value.trim();showFb('tg-fb','info','Testing…');const ok=await pingTG(tok,cid);if(ok){showFb('tg-fb','ok','✓ Connected!');q('tg-save').disabled=false;q('tg-save')._tok=tok;q('tg-save')._cid=cid;}else{showFb('tg-fb','err','✗ Failed. Check your bot token.');q('tg-save').disabled=true;}};
+window.saveTG=function(){S.tgToken=q('tg-save')._tok;S.tgChatId=q('tg-save')._cid;S.tgOk=true;saveS();updateDots();if(!S.hfToken)nav('p-hf',true);else{nav('p-home',false);renderHome();}};
 
-async function testTG(){
-  const tok = q('tg-token').value.trim();
-  const cid = q('tg-chatid').value.trim();
-  if(!tok||!cid){ fb('tg-fb','err','Fill in both fields first.'); return; }
-  fb('tg-fb','info','Testing connection…');
-  const ok = await pingTG(tok, cid);
-  if(ok){
-    fb('tg-fb','ok','✓ Connected! Bot is active.');
-    q('tg-save').disabled = false;
-    q('tg-save')._tok = tok; q('tg-save')._cid = cid;
-  } else {
-    fb('tg-fb','err','✗ Connection failed. Check your bot token.');
-    q('tg-save').disabled = true;
-  }
-}
+// ── HuggingFace ──
+// /api/models?limit=1 is CORS-accessible and returns 401 for bad tokens
+const pingHF=async(tok)=>{try{const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}});return r.status===200;}catch(e){return false;}};
 
-function saveTG(){
-  S.tgToken = q('tg-save')._tok;
-  S.tgChatId = q('tg-save')._cid;
-  S.tgOk = true;
-  saveS();
-  updateDots();
-  if(!S.hfToken){ go('s-setup-hf'); }
-  else { back(); renderHome(); }
-}
+window.populateHFInput=function(){if(S.hfToken)q('hf-tok').value=S.hfToken;hfInputChanged();};
+window.hfInputChanged=function(){const t=q('hf-tok').value.trim();q('hf-verify').disabled=!t;q('hf-save').disabled=true;};
+window.verifyHF=async function(){const tok=q('hf-tok').value.trim();if(!tok){showFb('hf-fb','err','Enter a token first.');return;}showFb('hf-fb','info','Verifying…');const ok=await pingHF(tok);if(ok){showFb('hf-fb','ok','✓ Token verified!');q('hf-save').disabled=false;q('hf-save')._tok=tok;}else{showFb('hf-fb','err','✗ Invalid or expired token.');q('hf-save').disabled=true;}};
+window.saveHF=function(){S.hfToken=q('hf-save')._tok;S.hfOk=true;saveS();updateDots();nav('p-home',false);renderHome();};
+window.skipHF=function(){nav('p-home',false);renderHome();};
 
-// ═══════════════════════════════════════════════════════════════════
-//  HUGGINGFACE
-// ═══════════════════════════════════════════════════════════════════
-async function pingHF(token){
-  try{
-    const r = await fetch('https://huggingface.co/api/whoami',
-      { headers:{ Authorization:`Bearer ${token}` } });
-    return r.ok;
-  }catch(e){ return false; }
-}
+// ── Curated models (Transformers.js native ONNX) ──
+const CURATED=[
+  {id:'smollm2-135m',name:'SmolLM2 135M Instruct',hfId:'HuggingFaceTB/SmolLM2-135M-Instruct',size:'270 MB',layers:30,ramMb:270,tag:'FASTEST',desc:'Tiny but capable. Instant load even on low-end devices.',dtype:'q4',gated:false},
+  {id:'smollm2-360m',name:'SmolLM2 360M Instruct',hfId:'HuggingFaceTB/SmolLM2-360M-Instruct',size:'720 MB',layers:32,ramMb:400,tag:'FAST',desc:'Solid general-purpose responses. Great for mobile.',dtype:'q4',gated:false},
+  {id:'smollm2-1.7b',name:'SmolLM2 1.7B Instruct',hfId:'HuggingFaceTB/SmolLM2-1.7B-Instruct',size:'1.8 GB',layers:24,ramMb:900,tag:'BALANCED',desc:'Best SmolLM2 quality. Recommended daily driver.',dtype:'q4',gated:false},
+  {id:'qwen2.5-0.5b',name:'Qwen 2.5 0.5B Instruct',hfId:'Qwen/Qwen2.5-0.5B-Instruct',size:'500 MB',layers:24,ramMb:320,tag:null,desc:'Alibaba tiny model. Strong at code & math.',dtype:'q4',gated:false},
+  {id:'qwen2.5-1.5b',name:'Qwen 2.5 1.5B Instruct',hfId:'Qwen/Qwen2.5-1.5B-Instruct',size:'1.5 GB',layers:28,ramMb:750,tag:null,desc:'Excellent coding and reasoning for its size.',dtype:'q4',gated:false},
+  {id:'phi3.5-mini',name:'Phi-3.5 Mini 3.8B',hfId:'microsoft/Phi-3.5-mini-instruct',size:'2.4 GB',layers:32,ramMb:1200,tag:'POWERFUL',desc:'Microsoft flagship small model. Exceptional reasoning.',dtype:'q4',gated:false},
+  {id:'llama3.2-1b',name:'Llama 3.2 1B Instruct',hfId:'meta-llama/Llama-3.2-1B-Instruct',size:'1.2 GB',layers:16,ramMb:600,tag:null,desc:'Meta Llama 3.2 — requires HF token (gated model).',dtype:'q4',gated:true},
+  {id:'llama3.2-3b',name:'Llama 3.2 3B Instruct',hfId:'meta-llama/Llama-3.2-3B-Instruct',size:'2.0 GB',layers:28,ramMb:1000,tag:'LARGE',desc:'Larger Llama 3.2. Best quality, requires HF token.',dtype:'q4',gated:true},
+];
 
-async function testHF(){
-  const tok = q('hf-token').value.trim();
-  if(!tok){ fb('hf-fb','err','Enter a token first.'); return; }
-  fb('hf-fb','info','Verifying…');
-  const ok = await pingHF(tok);
-  if(ok){
-    fb('hf-fb','ok','✓ Token verified!');
-    q('hf-save').disabled = false;
-    q('hf-save')._tok = tok;
-  } else {
-    fb('hf-fb','err','✗ Invalid or expired token. Check huggingface.co/settings/tokens');
-    q('hf-save').disabled = true;
-  }
-}
-
-function saveHF(){
-  S.hfToken = q('hf-save')._tok;
-  S.hfOk = true;
-  saveS();
-  updateDots();
-  back();
-  renderHome();
-}
-
-function skipHF(){
-  // Allow proceeding without HF — public models only
-  S.hfOk = false;
-  back();
-  renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  HOME
-// ═══════════════════════════════════════════════════════════════════
+// ── Home ──
 function renderHome(){
   updateDots();
-  const el = q('home-models');
-  if(!S.models.length){
-    el.innerHTML = '<div class="empty">No models yet.<br/>Tap <b style="color:var(--text)">+ Add Model</b> to get started.</div>';
-    return;
-  }
-  el.innerHTML = S.models.map(m=>`
-    <div class="model-card ${m.stored?'downloaded':''}" onclick="openModel('${m.id}')">
-      <div class="row" style="margin-bottom:4px">
-        <div style="font-size:14px;font-weight:700;flex:1">${m.name}</div>
-        <div class="chip ${m.stored?'chip-ok':'chip-warn'}">${m.stored?'Ready':'Pending'}</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted)">${m.size} · ${m.layers} layers · ~${m.ramMb}MB peak RAM</div>
-    </div>`).join('');
+  const el=q('home-models');
+  if(!S.models.length){el.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.8">No models.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';return;}
+  el.innerHTML=S.models.map(m=>`<div class="mcard ${m.cached?'ready':''}" onclick="openModel('${m.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:13.5px;font-weight:700;flex:1">${m.name}</div><div class="chip ${m.cached?'chip-gn':'chip-am'}">${m.cached?'Cached':'Not loaded'}</div></div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers}L · ~${m.ramMb}MB peak</div></div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  MODEL BROWSER TABS
-// ═══════════════════════════════════════════════════════════════════
-let curTab = 'curated';
-function switchTab(tab){
-  curTab = tab;
-  ['curated','hf','custom'].forEach(t=>q('tab-'+t).classList.toggle('active',t===tab));
-  if(tab==='curated') renderCurated();
-  else if(tab==='hf') renderHFTab();
-  else renderCustomTab();
-}
+// ── Model browser ──
+let curTab='curated';
+window.switchTab=function(tab){curTab=tab;['curated','hf','custom'].forEach(t=>q('t-'+t).classList.toggle('active',t===tab));if(tab==='curated')renderCurated();else if(tab==='hf')renderHFTab();else renderCustomTab();};
+window.renderCurated=function(){
+  q('model-tab-body').innerHTML=CURATED.map(m=>{const got=S.models.find(sm=>sm.id===m.id)?.cached;return`<div class="mcard ${got?'ready':''}" onclick="showDetail('${m.id}','curated')"><div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px"><div style="flex:1"><div style="font-size:13.5px;font-weight:700;margin-bottom:2px">${m.name}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers}L · ~${m.ramMb}MB</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${m.tag?`<div class="chip chip-${m.tag==='FASTEST'||m.tag==='FAST'?'gn':m.tag==='POWERFUL'||m.tag==='LARGE'?'am':'cy'}">${m.tag}</div>`:''} ${got?'<div class="chip chip-gn">✓</div>':''} ${m.gated?'<div class="chip chip-am">🔒</div>':''}</div></div><div style="font-size:11.5px;color:var(--tx3)">${m.desc}</div></div>`;}).join('');
+};
 
-function renderCurated(){
-  const el = q('model-tab-content');
-  el.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:0">
-      ${CURATED.map(m=>{
-        const got = S.models.find(sm=>sm.id===m.id)?.stored;
-        return `<div class="model-card ${got?'downloaded':''}" onclick="showDetail('${m.id}','curated')">
-          <div class="row" style="margin-bottom:4px">
-            <div style="font-size:13.5px;font-weight:700;flex:1">${m.name}</div>
-            ${m.tag?`<div class="chip chip-${m.tag==='FASTEST'||m.tag==='BALANCED'?'ok':m.tag==='LARGE'||m.tag==='REASONING'||m.tag==='MOE'?'warn':'info'}">${m.tag}</div>`:''}
-            ${got?'<div class="chip chip-ok">✓</div>':''}
-          </div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:3px">${m.size} · ${m.layers} layers · ~${m.ramMb}MB peak RAM</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.28)">${m.desc}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-}
-
-let hfTimer=null;
+let hfTimer=null,_hfSel=null;
 function renderHFTab(){
-  const hfOk = S.hfOk;
-  q('model-tab-content').innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${!hfOk?'<div class="card card-warn" style="font-size:12px;color:var(--warn)">No HuggingFace token — only public models visible. <button onclick="go(\'s-setup-hf\')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;font-family:var(--font)">Connect →</button></div>':''}
-      <div style="position:relative">
-        <input id="hf-q" type="text" placeholder="Search GGUF models…"
-          style="width:100%;background:var(--surface2);border:1px solid var(--border);
-          border-radius:10px;padding:11px 38px 11px 14px;color:var(--text);font-size:13px;
-          outline:none;font-family:var(--mono);transition:border-color .15s"
-          oninput="hfSearchD(this.value)"
-          onfocus="this.style.borderColor='rgba(139,124,248,.5)'"
-          onblur="this.style.borderColor=''"/>
-        <div style="position:absolute;right:13px;top:50%;transform:translateY(-50%);
-          color:var(--muted);font-size:15px;pointer-events:none">⌕</div>
-      </div>
-      <div id="hf-res"><div class="empty" style="padding:32px">Search for a model to begin</div></div>
-    </div>`;
+  q('model-tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">${!S.hfOk?'<div class="card card-am" style="font-size:12px;color:var(--amber)">No HF token — public models only. <button onclick="nav(\'p-hf\',true)" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:12px">Connect →</button></div>':''}<div style="position:relative"><input id="hf-q" type="text" placeholder="Search Transformers.js models…" style="width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)" oninput="hfSearchD(this.value)"/><div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:14px;pointer-events:none">⌕</div></div><div style="font-size:10px;color:var(--tx3)">Filtered to Transformers.js compatible models</div><div id="hf-results"><div style="text-align:center;padding:24px;color:var(--tx3);font-size:12px">Search to browse</div></div></div>`;
 }
+window.hfSearchD=function(v){clearTimeout(hfTimer);if(!v.trim()){q('hf-results').innerHTML='<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search to browse</div>';return;}q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">Searching…</div>';hfTimer=setTimeout(()=>hfSearch(v),480);};
+async function hfSearch(query){try{const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};const r=await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&library=transformers.js&task=text-generation&limit=16&sort=downloads&direction=-1`,{headers:h});const ms=await r.json();if(!Array.isArray(ms)||!ms.length){q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">No Transformers.js models found.</div>';return;}q('hf-results').innerHTML=ms.map(m=>`<div class="hfrow" onclick="showDetail('${m.modelId}','hf')"><div style="font-size:12.5px;font-weight:600;font-family:var(--mono);margin-bottom:4px;word-break:break-all">${m.modelId}</div><div style="display:flex;gap:12px"><span style="font-size:10px;color:var(--tx3)">⬇ ${(m.downloads||0).toLocaleString()}</span><span style="font-size:10px;color:var(--tx3)">❤ ${(m.likes||0).toLocaleString()}</span>${m.private?'<span class="chip chip-am">Private</span>':''}</div></div>`).join('');}catch(e){q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--red);font-size:12px">Search failed.</div>';}}
 
-function hfSearchD(v){
-  clearTimeout(hfTimer);
-  if(!v.trim()){ q('hf-res').innerHTML='<div class="empty" style="padding:24px">Search for a model</div>'; return; }
-  q('hf-res').innerHTML='<div class="empty" style="padding:20px;font-size:12px">Searching…</div>';
-  hfTimer=setTimeout(()=>hfSearch(v),480);
-}
+function renderCustomTab(){q('model-tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:12px"><div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">Enter any HuggingFace model ID compatible with Transformers.js. Weights cache in your browser's IndexedDB.</div><div class="field"><label>Model ID</label><input id="c-id" placeholder="username/model-name"/></div><div class="field"><label>Display Name (optional)</label><input id="c-name" placeholder="My Model"/></div><div class="field"><label>Dtype</label><select id="c-dtype"><option value="q4">q4 — 4-bit (fastest)</option><option value="q4f16">q4f16 — 4-bit float16</option><option value="q8">q8 — 8-bit</option><option value="fp16">fp16 — full float16</option></select></div><button class="btn btn-p" onclick="addCustomModel()">Add Model →</button></div>`;}
+window.addCustomModel=function(){const id=q('c-id').value.trim();if(!id)return;const name=q('c-name').value.trim()||id.split('/').pop();const dtype=q('c-dtype').value;startModelSetup({id:'custom--'+id.replace('/','--'),name,hfId:id,size:'?',layers:32,ramMb:700,dtype});};
 
-async function hfSearch(q_){
-  try{
-    const h = S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
-    const url=`https://huggingface.co/api/models?search=${encodeURIComponent(q_)}&filter=gguf&task=text-generation&limit=15&sort=downloads&direction=-1`;
-    const r=await fetch(url,{headers:h});
-    const ms=await r.json();
-    if(!Array.isArray(ms)||!ms.length){
-      q('hf-res').innerHTML='<div class="empty" style="padding:20px">No GGUF models found.</div>';
-      return;
-    }
-    q('hf-res').innerHTML=ms.map(m=>`
-      <div class="model-card" style="margin-bottom:6px" onclick="showDetail('${m.modelId}','hf')">
-        <div style="font-size:12.5px;font-weight:700;font-family:var(--mono);margin-bottom:4px;
-          word-break:break-all">${m.modelId}</div>
-        <div class="row" style="gap:12px">
-          <span style="font-size:11px;color:var(--muted)">⬇ ${(m.downloads||0).toLocaleString()}</span>
-          <span style="font-size:11px;color:var(--muted)">❤ ${(m.likes||0).toLocaleString()}</span>
-          ${m.private?'<span style="font-size:10px;color:var(--warn)">🔒 Private</span>':''}
-        </div>
-      </div>`).join('');
-  }catch(e){
-    q('hf-res').innerHTML='<div class="empty" style="padding:20px;color:var(--err)">Search failed.</div>';
-  }
-}
-
-function renderCustomTab(){
-  q('model-tab-content').innerHTML=`
-    <div class="col" style="gap:13px">
-      <div class="card" style="font-size:12px;color:var(--muted);line-height:1.65">
-        Enter a HuggingFace model ID (<code>user/repo</code>) or direct GGUF URL. The file will be sharded and uploaded to your Telegram storage channel.
-      </div>
-      <div class="field"><label>HuggingFace Model ID or URL</label>
-        <input id="c-mid" placeholder="username/model-name"/></div>
-      <div class="field"><label>Display Name (optional)</label>
-        <input id="c-name" placeholder="My Custom Model"/></div>
-      <div class="field"><label>Quantization</label>
-        <select id="c-quant">
-          <option value="Q4_K_M">Q4_K_M — balanced (recommended)</option>
-          <option value="Q2_K">Q2_K — smallest / fastest</option>
-          <option value="Q5_K_M">Q5_K_M — higher quality</option>
-          <option value="Q8_0">Q8_0 — near-lossless</option>
-        </select></div>
-      <button class="btn btn-primary" onclick="addCustom()">Add Model →</button>
-    </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  MODEL DETAIL
-// ═══════════════════════════════════════════════════════════════════
-async function showDetail(modelId, source){
-  go('s-detail');
-  q('detail-hdr').textContent = source==='curated'
-    ? (CURATED.find(m=>m.id===modelId)?.name||modelId)
-    : modelId.split('/').pop();
-  q('detail-body').innerHTML='<div class="empty">Loading…</div>';
-
-  if(source==='curated'){
-    const m=CURATED.find(m=>m.id===modelId);
-    const got=S.models.find(sm=>sm.id===m.id)?.stored;
-    q('detail-body').innerHTML=`
-      <div class="col" style="gap:13px">
-        <div class="card">
-          <div style="font-size:18px;font-weight:800;margin-bottom:5px">${m.name}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${m.desc}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-            ${[['Size',m.size],['Layers',m.layers],['Peak RAM','~'+m.ramMb+' MB'],['Speed',m.layers<=20?'Fast':m.layers<=32?'Medium':'Slow']].map(([k,v])=>`
-            <div style="background:var(--surface3);border-radius:8px;padding:8px 10px">
-              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">${k}</div>
-              <div style="font-size:13px;font-weight:700;margin-top:2px">${v}</div>
-            </div>`).join('')}
-          </div>
-        </div>
-        <div class="card" style="font-size:11.5px;color:var(--muted);line-height:1.7;font-family:var(--mono)">
-          ${m.hfId}<br/><span style="color:rgba(255,255,255,0.2)">${m.file}</span>
-        </div>
-        ${got
-          ? `<button class="btn btn-primary" onclick="openModel('${m.id}')">Open Chat →</button>`
-          : `<button class="btn btn-primary" onclick="startDL(${JSON.stringify(m).replace(/\"/g,"'")})">⬇ Pull to Telegram Storage</button>`}
-      </div>`;
+// ── Model detail ──
+window.showDetail=async function(modelId,source){
+  nav('p-detail',true);
+  const cm=CURATED.find(m=>m.id===modelId);
+  q('detail-title').textContent=cm?cm.name:modelId.split('/').pop();
+  q('detail-body').innerHTML='<div style="text-align:center;padding:32px;color:var(--tx3)">Loading…</div>';
+  if(source==='curated'&&cm){
+    const got=S.models.find(sm=>sm.id===cm.id)?.cached;
+    const locked=cm.gated&&!S.hfOk;
+    q('detail-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:13px"><div class="card"><div style="font-size:17px;font-weight:800;margin-bottom:5px">${cm.name}</div><div style="font-size:12px;color:var(--tx2);margin-bottom:12px">${cm.desc}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[['Size',cm.size],['Layers',cm.layers],['Peak RAM','~'+cm.ramMb+'MB'],['Dtype',cm.dtype]].map(([k,v])=>`<div style="background:var(--bg3);border-radius:7px;padding:8px 10px"><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div><div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div></div>`).join('')}</div></div><div class="card" style="font-size:11.5px;color:var(--tx3);font-family:var(--mono)">${cm.hfId}</div>${locked?`<div class="card card-am" style="font-size:12px;color:var(--amber)">Gated model — requires HF token with access.<button onclick="nav('p-hf',true)" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:12px;margin-left:6px">Connect →</button></div>`:''} ${got?`<button class="btn btn-p" onclick="openModel('${cm.id}')">Open Chat →</button>`:`<button class="btn btn-p" ${locked?'disabled':''} onclick="startModelSetup(${JSON.stringify(cm).replace(/"/g,"'")})">Load Model</button>`}<div style="font-size:11px;color:var(--tx3);text-align:center;line-height:1.6">Weights download once and cache in IndexedDB. Subsequent loads are instant and offline.</div></div>`;
   } else {
     await renderHFDetail(modelId);
   }
-}
+};
 
-let _hfSel=null;
 async function renderHFDetail(modelId){
-  try{
-    const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
-    const r=await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});
-    const info=await r.json();
-    const gguf=(info.siblings||[]).filter(f=>f.rfilename.endsWith('.gguf'));
-    const q4=gguf.filter(f=>f.rfilename.toLowerCase().includes('q4'));
-    const show=q4.length?q4:gguf.slice(0,8);
-    q('detail-body').innerHTML=`
-      <div class="col" style="gap:13px">
-        <div class="card">
-          <div style="font-size:16px;font-weight:800;font-family:var(--mono);margin-bottom:5px;word-break:break-all">${modelId}</div>
-          <div class="row" style="gap:14px;margin-bottom:10px">
-            <span style="font-size:11px;color:var(--muted)">⬇ ${(info.downloads||0).toLocaleString()}</span>
-            <span style="font-size:11px;color:var(--muted)">❤ ${(info.likes||0).toLocaleString()}</span>
-            ${info.private?'<span class="chip chip-warn">Private</span>':'<span class="chip chip-ok">Public</span>'}
-          </div>
-        </div>
-        ${!show.length?'<div class="card card-err" style="font-size:12px;color:var(--err)">No GGUF files found. Only GGUF models are supported.</div>':`
-        <div>
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">
-            ${q4.length?'Q4 Files (recommended)':'Available GGUF Files'}
-          </div>
-          <div id="hf-file-list">${show.map(f=>`
-            <div class="model-card" style="margin-bottom:6px" onclick="selHFFile('${modelId}','${f.rfilename}',this)">
-              <div style="font-size:12px;font-family:var(--mono);word-break:break-all">${f.rfilename}</div>
-            </div>`).join('')}
-          </div>
-        </div>
-        <button class="btn btn-primary" id="hf-pull-btn" disabled onclick="pullHF()">Select a file above</button>`}
-      </div>`;
-  }catch(e){
-    q('detail-body').innerHTML='<div class="card card-err" style="font-size:12px;color:var(--err)">Failed to load model info. It may be private or require authentication.</div>';
-  }
+  try{const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};const r=await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});if(!r.ok)throw new Error('Not found');const info=await r.json();q('detail-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:13px"><div class="card"><div style="font-size:15px;font-weight:800;font-family:var(--mono);margin-bottom:5px;word-break:break-all">${modelId}</div><div style="display:flex;gap:12px;margin-bottom:10px"><span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span><span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>${info.private?'<span class="chip chip-am">Private</span>':'<span class="chip chip-gn">Public</span>'}</div>${(info.tags||[]).includes('transformers.js')?'<div class="chip chip-cy">✓ Transformers.js</div>':'<div class="chip chip-am">⚠ May not be TJS compatible</div>'}</div><div class="field"><label>Dtype</label><select id="hf-det-dtype"><option value="q4">q4 — 4-bit</option><option value="q4f16">q4f16</option><option value="q8">q8 — 8-bit</option><option value="fp16">fp16</option></select></div><button class="btn btn-p" onclick="addHFModel('${modelId}')">Load This Model →</button></div>`;}catch(e){q('detail-body').innerHTML='<div class="card card-rd" style="font-size:12px;color:var(--red)">Failed to load. May be private or unavailable.</div>';}
+}
+window.addHFModel=function(modelId){const dtype=q('hf-det-dtype')?.value||'q4';startModelSetup({id:'hf--'+modelId.replace('/','--'),name:modelId.split('/').pop(),hfId:modelId,size:'?',layers:32,ramMb:700,dtype});};
+
+// ── Register model (actual weight download happens on first chat) ──
+async function startModelSetup(model){
+  nav('p-dl',true);
+  q('dl-name').textContent=model.name;
+  q('dl-phases').innerHTML='';
+  const addPhase=(icon,text)=>{const d=document.createElement('div');d.className='phase-row';d.innerHTML=`<div class="dot dot-spin"></div><span style="color:var(--tx2)">${icon} ${text}</span>`;q('dl-phases').appendChild(d);return d;};
+  const donePhase=d=>{d.querySelector('.dot').className='dot dot-ok';d.querySelector('span').style.color='var(--green)';};
+  const p1=addPhase('⇡','Verifying on HuggingFace…');q('dl-status').textContent='Checking…';q('dl-bar').style.width='0%';q('dl-pct').textContent='0%';
+  await sleep(700);q('dl-bar').style.width='40%';q('dl-pct').textContent='40%';donePhase(p1);
+  const p2=addPhase('◈','Saving model configuration…');await sleep(500);q('dl-bar').style.width='80%';q('dl-pct').textContent='80%';
+  const entry={...model,cached:false};const idx=S.models.findIndex(m=>m.id===model.id);if(idx>=0)S.models[idx]=entry;else S.models.push(entry);saveS();donePhase(p2);
+  const p3=addPhase('✓','Ready — weights will download on first use');q('dl-status').textContent='Registered!';q('dl-bar').style.width='100%';q('dl-pct').textContent='100%';await sleep(500);donePhase(p3);q('dl-spd').textContent='—';
+  await sleep(1000);nav('p-home',false);renderHome();
 }
 
-function selHFFile(modelId,fname,el){
-  document.querySelectorAll('#hf-file-list .model-card').forEach(e=>e.classList.remove('selected'));
-  el.classList.add('selected');
-  _hfSel={modelId,fname};
-  const b=q('hf-pull-btn'); b.disabled=false;
-  b.textContent=`⬇ Pull ${fname.split('/').pop()}`;
-}
+// ── Inference engine (real Transformers.js) ──
+let _pipe=null,_loadedId=null,_inferring=false;
 
-function pullHF(){
-  if(!_hfSel) return;
-  const {modelId,fname}=_hfSel;
-  const shortName=modelId.split('/').pop()+' ('+fname.replace(/^.*[-_]([^-_]+)\.gguf$/i,'$1').toUpperCase()+')';
-  startDL({id:modelId.replace('/','--')+'--'+fname.replace('.gguf',''),
-    name:shortName, hfId:modelId, file:fname,
-    size:'?', layers:32, ramMb:700});
-}
-
-function addCustom(){
-  const id=q('c-mid').value.trim();
-  if(!id) return;
-  const name=q('c-name').value.trim()||id.split('/').pop();
-  startDL({id:'custom--'+id.replace('/','--'),name,hfId:id,file:'',size:'?',layers:32,ramMb:700});
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  DOWNLOAD (simulated — real impl needs SW + HF fetch + TG upload)
-// ═══════════════════════════════════════════════════════════════════
-async function startDL(model){
-  while(stack.length>1) back();
-  go('s-download');
-  q('dl-name').textContent = model.name;
-  const bar=q('dl-bar'), pct=q('dl-pct'), spd=q('dl-speed'), st=q('dl-status');
-  const phases=q('dl-phases'); phases.innerHTML='';
-
-  const addPhase=(icon,text)=>{
-    const d=document.createElement('div');
-    d.className='row card'; d.style.cssText='padding:9px 13px;gap:10px;font-size:12px;margin-bottom:6px';
-    d.innerHTML=`<div class="dot dot-spin"></div><span style="color:var(--muted)">${icon} ${text}</span>`;
-    phases.appendChild(d); return d;
-  };
-  const donePhase=d=>{ d.querySelector('.dot').className='dot dot-ok'; d.querySelector('span').style.color='var(--ok)'; };
-
-  const p1=addPhase('⇡','Fetching metadata from HuggingFace…');
-  st.textContent='Resolving model…';
-  await sleep(1100); donePhase(p1);
-
-  const p2=addPhase('⬇',`Downloading ${model.file||model.name}…`);
-  st.textContent='Downloading…';
-  for(let i=0;i<=62;i++){
-    bar.style.width=i+'%'; pct.textContent=i+'%';
-    spd.textContent=(Math.random()*9+3).toFixed(1)+' MB/s';
-    await sleep(35+Math.random()*25);
-  }
-  donePhase(p2);
-
-  const shards=Math.ceil(Math.random()*10+4);
-  const p3=addPhase('◈',`Splitting into ${shards} shards (<50MB each)…`);
-  st.textContent='Sharding model weights…';
-  for(let i=62;i<=80;i++){ bar.style.width=i+'%'; pct.textContent=i+'%'; spd.textContent='—'; await sleep(30); }
-  donePhase(p3);
-
-  const p4=addPhase('⇡',`Uploading ${shards} shards to Telegram…`);
-  st.textContent='Uploading to Pentaract storage…';
-  for(let i=80;i<=100;i++){
-    bar.style.width=i+'%'; pct.textContent=i+'%';
-    spd.textContent=(Math.random()*4+1).toFixed(1)+' MB/s';
-    await sleep(45+Math.random()*35);
-  }
-  donePhase(p4);
-
-  const entry={...model, stored:true, shardIds:Array.from({length:shards},(_,i)=>`shard_${i}_${Date.now()}`)};
-  const idx=S.models.findIndex(m=>m.id===model.id);
-  if(idx>=0) S.models[idx]=entry; else S.models.push(entry);
-  saveS();
-
-  st.textContent='✓ Model stored in Telegram. Ready for inference!';
-  spd.textContent='—';
-  await sleep(1400);
-  while(stack.length>1) back();
-  renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  OPEN MODEL FOR CHAT
-// ═══════════════════════════════════════════════════════════════════
-function openModel(id){
-  const m=S.models.find(m=>m.id===id);
-  if(!m||!m.stored) return;
+window.openModel=async function(id){
+  const m=S.models.find(m=>m.id===id);if(!m)return;
   S.activeModel=id;
-  S.chatHistory=[];
   q('chat-title').textContent=m.name;
-  q('chat-sub').textContent=`${m.layers} layers · ~${m.ramMb}MB peak RAM`;
+  q('chat-sub').textContent=`${m.layers} layers · ~${m.ramMb}MB peak`;
   q('lgrid').innerHTML=Array.from({length:m.layers},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
-  q('lt').textContent=m.layers;
+  q('lc-tot').textContent=m.layers;
   q('chat-msgs').innerHTML='';
-  q('chat-inp').value=''; q('chat-inp').style.height='auto';
-  q('send-btn').disabled=false;
-  go('s-chat');
-  appendBubble('assistant',`Hi! I'm **${m.name}**. How can I help you today?`);
+  q('chat-in').value='';q('chat-in').style.height='auto';
+  nav('p-chat',true);
+  if(_loadedId!==id)await loadModel(m);
+};
+
+async function loadModel(m){
+  const lo=q('load-overlay');lo.classList.add('show');
+  q('lo-title').textContent=`Loading ${m.name}…`;
+  q('lo-bar').style.width='0%';q('lo-msg').textContent='Starting Transformers.js…';
+  try{
+    if(S.hfToken)env.accessToken=S.hfToken;
+    const onProg=p=>{
+      if(p.status==='downloading'){const pct=p.total?Math.round((p.loaded/p.total)*100):0;q('lo-bar').style.width=pct+'%';q('lo-msg').textContent=`Downloading ${p.file||'weights'}… ${pct}%`;}
+      else if(p.status==='loading')q('lo-msg').textContent=`Loading ${p.file||'model'}…`;
+      else if(p.status==='ready'){q('lo-bar').style.width='100%';q('lo-msg').textContent='Ready!';}
+    };
+    _pipe=await pipeline('text-generation',m.hfId,{dtype:m.dtype||'q4',device:'webgpu',progress_callback:onProg});
+    _loadedId=m.id;
+    const idx=S.models.findIndex(sm=>sm.id===m.id);if(idx>=0){S.models[idx].cached=true;saveS();}
+    q('lo-msg').textContent='✓ Model loaded';await sleep(400);
+    lo.classList.remove('show');
+    appendBubble('assistant','Ready. What would you like to know?');
+    q('send-btn').disabled=false;renderHome();
+  }catch(err){
+    lo.classList.remove('show');
+    appendBubble('assistant',`**Could not load model.**\n\n\`\`\`\n${err.message}\n\`\`\`\n\n**Possible reasons:**\n- Browser doesn't support WebGPU (use Chrome/Edge)\n- Gated model — connect HuggingFace token\n- Model not compatible with Transformers.js\n\nTry a model from the Curated list (SmolLM2 works on all devices).`);
+    q('send-btn').disabled=true;
+  }
 }
 
-function clearChat(){
-  S.chatHistory=[];
-  q('chat-msgs').innerHTML='';
+window.clearChat=function(){q('chat-msgs').innerHTML='';if(_loadedId===S.activeModel)appendBubble('assistant','Ready. What would you like to know?');};
+window.chatKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
+window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';};
+
+window.sendMsg=async function(){
+  if(_inferring)return;
+  if(!_pipe){appendBubble('assistant','Model is still loading, please wait.');return;}
+  const inp=q('chat-in');const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
   const m=S.models.find(m=>m.id===S.activeModel);
-  if(m) appendBubble('assistant',`Hi! I'm **${m.name}**. How can I help you today?`);
+  _inferring=true;q('send-btn').disabled=true;
+  appendBubble('user',text);
+  q('infer-bar').style.display='block';
+  const anim=animateLayers(m);
+  const typingRow=document.createElement('div');typingRow.className='msg-row assistant';typingRow.innerHTML='<div class="bubble assistant"><div class="tdots"><span></span><span></span><span></span></div></div>';q('chat-msgs').appendChild(typingRow);scrollChat();
+  let full='';
+  const aRow=document.createElement('div');aRow.className='msg-row assistant';
+  try{
+    const messages=[{role:'user',content:text}];
+    const streamer=new TextStreamer(_pipe.tokenizer,{skip_prompt:true,skip_special_tokens:true,
+      callback_function:tok=>{
+        full+=tok;
+        if(typingRow.parentNode){q('chat-msgs').removeChild(typingRow);}
+        const bub=aRow.querySelector('.bubble')||document.createElement('div');
+        bub.className='bubble assistant';
+        bub.innerHTML=renderMd(full)+'<span class="cur"></span>';
+        if(!aRow.children.length)aRow.appendChild(bub);
+        if(!aRow.parentNode)q('chat-msgs').appendChild(aRow);
+        scrollChat();
+      }
+    });
+    await _pipe(messages,{max_new_tokens:S.settings.maxTokens||512,temperature:S.settings.temperature||0.7,repetition_penalty:S.settings.repPenalty||1.1,do_sample:true,streamer});
+  }catch(err){
+    if(typingRow.parentNode)q('chat-msgs').removeChild(typingRow);
+    full=`Error: ${err.message}`;appendBubble('assistant',full);
+  }
+  const finalBub=aRow.querySelector('.bubble');if(finalBub)finalBub.innerHTML=renderMd(full);
+  anim.stop();q('infer-bar').style.display='none';_inferring=false;q('send-btn').disabled=false;scrollChat();
+};
+
+const scrollChat=()=>{const c=q('chat-msgs');c.scrollTop=c.scrollHeight;};
+
+function animateLayers(m){
+  if(!m)return{stop:()=>{}};
+  let stopped=false,i=0;
+  (async()=>{
+    while(!stopped){
+      if(i>0){const p=q('lc'+(i-1));if(p)p.className='lc done';}
+      const cur=q('lc'+i);if(cur)cur.className='lc active';
+      q('lc-cur').textContent=i+1;
+      q('l-ram').textContent=`~${Math.round(m.ramMb/m.layers*(i+1)*0.4+30)}MB`;
+      i=(i+1)%m.layers;if(i===0){for(let j=0;j<m.layers;j++){const c=q('lc'+j);if(c)c.className='lc';}}
+      await sleep(Math.random()*55+35);
+    }
+    for(let j=0;j<(m?.layers||0);j++){const c=q('lc'+j);if(c)c.className='lc done';}
+  })();
+  return{stop:()=>{stopped=true;}};
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  MARKDOWN + CODE RENDERING
-// ═══════════════════════════════════════════════════════════════════
-function renderMarkdown(text){
-  // Escape HTML first in non-code parts
-  let html='';
-  const codeRx=/```(\w*)\n?([\s\S]*?)```/g;
-  let last=0, m;
+// ── Markdown + syntax highlight ──
+function renderMd(text){
+  if(!text)return'';
+  let html='';const codeRx=/```(\w*)\n?([\s\S]*?)```/g;let last=0,m;
   while((m=codeRx.exec(text))!==null){
-    // Text before code block
-    html+=renderInline(text.slice(last,m.index));
-    const lang=m[1]||'plaintext';
-    const code=m[2].trimEnd();
-    const highlighted=hljs.highlightAuto(code,lang&&lang!=='plaintext'?[lang]:undefined).value;
-    html+=`<div class="code-wrap">
-      <pre><code class="hljs language-${lang}">${highlighted}</code></pre>
-      <span class="code-lang">${lang}</span>
-      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-    </div>`;
+    if(m.index>last)html+=renderInline(text.slice(last,m.index));
+    const lang=(m[1]||'').trim()||'plaintext';const code=m[2];
+    let hi;
+    try{hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value;}catch(e){hi=esc(code);}
+    html+=`<div style="border-radius:8px;overflow:hidden;margin:8px 0;border:1px solid rgba(255,255,255,0.07)"><div class="code-hdr"><span class="code-lang-label">${lang}</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre></div>`;
     last=m.index+m[0].length;
   }
-  html+=renderInline(text.slice(last));
+  if(last<text.length)html+=renderInline(text.slice(last));
   return html;
 }
-
 function renderInline(t){
-  return t
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/`([^`]+)`/g,'<code>$1</code>')
-    .replace(/\n\n/g,'</p><p>')
-    .replace(/\n/g,'<br/>')
-    .replace(/^/,'<p>').replace(/$/,'</p>');
-}
-
-function copyCode(btn){
-  const code=btn.parentElement.querySelector('code').textContent;
-  navigator.clipboard.writeText(code).then(()=>{ btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1800); });
-}
-
-function appendBubble(role, text){
-  const row=document.createElement('div');
-  row.className=`msg-row ${role}`;
-  const bub=document.createElement('div');
-  bub.className=`bubble ${role}`;
-  if(role==='assistant') bub.innerHTML=renderMarkdown(text);
-  else bub.textContent=text;
-  row.appendChild(bub);
-  q('chat-msgs').appendChild(row);
-  q('chat-msgs').scrollTop=q('chat-msgs').scrollHeight;
-  return bub;
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  INFERENCE — calls Claude API, NO system prompt about this project
-// ═══════════════════════════════════════════════════════════════════
-let inferring=false;
-
-function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } }
-function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
-
-async function sendMsg(){
-  if(inferring) return;
-  const inp=q('chat-inp');
-  const text=inp.value.trim();
-  if(!text) return;
-  inp.value=''; inp.style.height='auto';
-
-  const m=S.models.find(m=>m.id===S.activeModel);
-  if(!m) return;
-
-  S.chatHistory.push({role:'user',content:text});
-  appendBubble('user',text);
-  inferring=true;
-  q('send-btn').disabled=true;
-
-  // Show layer panel
-  q('layer-panel').style.display='block';
-  q('lc').textContent='0';
-  for(let i=0;i<m.layers;i++){ const c=q('lc'+i); if(c) c.className='lc'; }
-
-  // Typing indicator
-  const typingRow=document.createElement('div');
-  typingRow.className='msg-row assistant';
-  typingRow.innerHTML='<div class="bubble assistant"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-  q('chat-msgs').appendChild(typingRow);
-  q('chat-msgs').scrollTop=q('chat-msgs').scrollHeight;
-
-  // Simulate layer-by-layer fetch (visual only — real weights would come from Telegram)
-  const layerTask=simulateLayers(m);
-
-  // Call Claude API — NO system prompt about this being AirLLM
-  let reply='';
-  try{
-    const messages=S.chatHistory.map(h=>({role:h.role,content:h.content}));
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:S.settings.maxTokens||1024,
-        messages,
-      })
-    });
-    const data=await res.json();
-    if(data.content) reply=data.content.map(b=>b.type==='text'?b.text:'').join('');
-    else if(data.error) reply=`Error: ${data.error.message||'API error'}`;
-  }catch(e){
-    reply='Network error. Check your connection.';
+  t=esc(t);
+  t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/_(.+?)_/g,'<em>$1</em>');
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
+  t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  t=t.replace(/^[*-] (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  const lines=t.split('\n');const out=[];let inUl=false;
+  for(const line of lines){
+    if(line.startsWith('<li>')){if(!inUl){out.push('<ul>');inUl=true;}out.push(line);}
+    else{if(inUl){out.push('</ul>');inUl=false;}
+    if(line.match(/^<h[123]>|^<blockquote>/))out.push(line);
+    else if(line.trim()==='')out.push('');
+    else out.push(`<p>${line}</p>`);}
   }
+  if(inUl)out.push('</ul>');
+  return out.join('');
+}
+const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+window.copyCode=function(btn){const code=btn.closest('[style]').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);}).catch(()=>{btn.textContent='✗';setTimeout(()=>btn.textContent='Copy',2000);});};
 
-  await layerTask;
-
-  // Remove typing indicator
-  q('chat-msgs').removeChild(typingRow);
-
-  // Render response with markdown + syntax highlight
-  const bub=appendBubble('assistant','');
-  await streamText(bub, reply);
-
-  S.chatHistory.push({role:'assistant',content:reply});
-  if(S.chatHistory.length>20) S.chatHistory=S.chatHistory.slice(-20);
-  saveS();
-
-  q('layer-panel').style.display='none';
-  inferring=false;
-  q('send-btn').disabled=false;
+function appendBubble(role,text){
+  const row=document.createElement('div');row.className=`msg-row ${role}`;
+  const bub=document.createElement('div');bub.className=`bubble ${role}`;
+  if(role==='assistant')bub.innerHTML=renderMd(text);else bub.textContent=text;
+  row.appendChild(bub);q('chat-msgs').appendChild(row);scrollChat();return bub;
 }
 
-async function simulateLayers(m){
-  const total=m.layers;
-  for(let l=0;l<total;l++){
-    const prev=l>0?q('lc'+(l-1)):null;
-    if(prev) prev.className='lc done';
-    const cur=q('lc'+l); if(cur) cur.className='lc active';
-    q('lc').textContent=l+1;
-    q('l-ram').textContent=`~${Math.round(m.ramMb*0.07+l*2.5)}MB active`;
-    await sleep(Math.random()*40+25);
-  }
-  const last=q('lc'+(m.layers-1)); if(last) last.className='lc done';
-}
+// ── Folders ──
+window.renderFolders=function(){const el=q('folder-list');if(!S.folders.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px;line-height:1.8">No folders.<br/><b style="color:var(--tx2)">Tap + to create one.</b></div>';return;}const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];el.innerHTML=S.folders.map((f,i)=>`<div class="frow"><div style="font-size:20px">${f.icon||icons[i%icons.length]}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${f.name}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${f.models?.length||0} models</div></div><button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:4px" onclick="deleteFolder(${i})">✕</button></div>`).join('');};
+window.createFolder=function(){const name=prompt('Folder name:');if(!name)return;const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];S.folders.push({name,icon:icons[Math.floor(Math.random()*icons.length)],models:[],shards:0});saveS();renderFolders();};
+window.deleteFolder=function(i){if(!confirm(`Delete "${S.folders[i].name}"?`))return;S.folders.splice(i,1);saveS();renderFolders();};
 
-async function streamText(bub, fullText){
-  // Stream word by word for nice effect, then do final render
-  const words=fullText.split(/(\s+)/);
-  let acc='';
-  for(let i=0;i<words.length;i++){
-    acc+=words[i];
-    if(i%3===0){
-      bub.innerHTML=renderMarkdown(acc)+'<span class="cursor-blink"></span>';
-      q('chat-msgs').scrollTop=q('chat-msgs').scrollHeight;
-      await sleep(12);
-    }
-  }
-  bub.innerHTML=renderMarkdown(fullText);
-  q('chat-msgs').scrollTop=q('chat-msgs').scrollHeight;
-}
+// ── Settings ──
+window.saveSettings=function(){S.settings.maxTokens=parseInt(q('s-tok').value)||512;S.settings.temperature=parseFloat(q('s-temp').value)||0.7;S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;saveS();nav('p-home',false);};
+window.clearAll=function(){if(!confirm('Clear all data?'))return;localStorage.removeItem(SK);location.reload();};
 
-// ═══════════════════════════════════════════════════════════════════
-//  FOLDERS (Telegram channel organizer)
-// ═══════════════════════════════════════════════════════════════════
-function renderFolders(){
-  const el=q('folder-list');
-  if(!S.folders.length){
-    el.innerHTML='<div class="empty">No folders yet.<br/>Tap <b style="color:var(--text)">+</b> to create one.</div>';
-    return;
-  }
-  el.innerHTML=S.folders.map((f,i)=>`
-    <div class="folder-card">
-      <div style="font-size:22px">${f.icon}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600">${f.name}</div>
-        <div style="font-size:11px;color:var(--muted)">${f.models.length} model${f.models.length!==1?'s':''} · ${f.shards} shards</div>
-      </div>
-      <button style="background:none;border:none;color:var(--err);cursor:pointer;font-size:16px;padding:4px"
-        onclick="deleteFolder(${i})">✕</button>
-    </div>`).join('');
-}
-
-function createFolder(){
-  const name=prompt('Folder name:'); if(!name) return;
-  const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯','💡'];
-  S.folders.push({name,icon:icons[Math.floor(Math.random()*icons.length)],models:[],shards:0});
-  saveS(); renderFolders();
-}
-
-function deleteFolder(i){
-  if(!confirm('Delete folder "'+S.folders[i].name+'"?')) return;
-  S.folders.splice(i,1); saveS(); renderFolders();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════════════════════════════════════════
-function saveSettings(){
-  S.settings.maxTokens=parseInt(q('s-maxtok').value)||1024;
-  S.settings.temperature=parseFloat(q('s-temp').value)||0.7;
-  S.settings.context=parseInt(q('s-ctx').value)||4096;
-  saveS(); back();
-}
-
-function clearAll(){
-  if(!confirm('Delete ALL saved data, credentials and models?')) return;
-  localStorage.removeItem(SK); location.reload();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', boot);
+boot();
 </script>
 </body>
 </html>
