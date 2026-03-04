@@ -9,9 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
 :root{
-  --bg:#07090d;--s1:#0c0f16;--s2:#11151e;--s3:#171c27;--s4:#1c2130;
-  --ln:rgba(255,255,255,0.055);--ln2:rgba(255,255,255,0.10);
-  --tx:#cdd5e0;--tx2:rgba(205,213,224,0.6);--tx3:rgba(205,213,224,0.3);
+  --bg:#07090d;--s1:#0c0f16;--s2:#11151e;--s3:#171c27;
+  --ln:rgba(255,255,255,.055);--ln2:rgba(255,255,255,.10);
+  --tx:#cdd5e0;--tx2:rgba(205,213,224,.6);--tx3:rgba(205,213,224,.3);
   --cy:#00d2c8;--am:#f0a228;--gn:#22c47a;--rd:#e04f4f;--pu:#a78bfa;
   --cy0:rgba(0,210,200,.10);--am0:rgba(240,162,40,.10);
   --gn0:rgba(34,196,122,.10);--rd0:rgba(224,79,79,.10);--pu0:rgba(167,139,250,.10);
@@ -24,190 +24,121 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   background:radial-gradient(ellipse 55% 35% at 15% 0%,rgba(0,210,200,.06),transparent 65%),
   radial-gradient(ellipse 40% 25% at 85% 100%,rgba(240,162,40,.05),transparent 65%),var(--bg)}
 .shell{position:relative;width:100%;max-width:430px;height:100%;max-height:900px;overflow:hidden;background:var(--s1)}
-@media(min-width:480px){.shell{border-radius:22px;border:1px solid var(--ln2);
-  box-shadow:0 40px 100px rgba(0,0,0,.92),0 0 0 1px rgba(0,210,200,.03)}}
-
-/* ── PAGES ── */
+@media(min-width:480px){.shell{border-radius:22px;border:1px solid var(--ln2);box-shadow:0 40px 100px rgba(0,0,0,.92)}}
 .pg{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
 .pg.on{display:flex}
 @keyframes pgIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
 @keyframes pgBk{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 .pg.af{animation:pgIn .17s cubic-bezier(.16,1,.3,1) both}
 .pg.ab{animation:pgBk .17s cubic-bezier(.16,1,.3,1) both}
-
-/* ── BOOT ── */
 #boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:16px;background:var(--bg);transition:opacity .3s}
 #boot.fade{opacity:0;pointer-events:none}
-.boot-logo{width:64px;height:64px;border-radius:16px;background:var(--s2);border:1px solid var(--ln2);
-  display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,210,200,.18)}
 .spin{border-radius:50%;border:2.5px solid var(--ln2);border-top-color:var(--cy);animation:sp .65s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* ── HEADER ── */
 .hdr{display:flex;align-items:center;gap:8px;padding:12px 13px;border-bottom:1px solid var(--ln);flex-shrink:0}
 .htitle{font-size:14px;font-weight:700;flex:1;text-align:center}
-
-/* ── BTNS ── */
 .btn{width:100%;padding:13px 16px;border-radius:var(--r);border:none;font-family:var(--font);
-  font-weight:600;font-size:13.5px;cursor:pointer;transition:all .12s;text-align:center}
-.bp{background:var(--cy);color:#030808;box-shadow:0 4px 18px rgba(0,210,200,.22)}
-.bp:hover:not(:disabled){filter:brightness(1.09)}
-.bp:disabled{background:var(--s3);color:var(--tx3);box-shadow:none;cursor:default}
+  font-weight:600;font-size:13.5px;cursor:pointer;transition:all .12s;display:block;text-align:center}
+.bp{background:var(--cy);color:#030808;box-shadow:0 4px 18px rgba(0,210,200,.2)}
+.bp:hover:not([disabled]){filter:brightness(1.08)}
+.bp[disabled]{background:var(--s3);color:var(--tx3);box-shadow:none;cursor:default}
 .bg{background:var(--s2);border:1px solid var(--ln2);color:var(--tx2)}
-.bg:hover:not(:disabled){background:var(--s3);color:var(--tx)}
-.bg:disabled{opacity:.45;cursor:default}
+.bg:hover:not([disabled]){background:var(--s3);color:var(--tx)}
+.bg[disabled]{opacity:.4;cursor:default}
 .bd{background:var(--rd0);border:1px solid rgba(224,79,79,.25);color:var(--rd)}
-.bk{display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--ln);
+.bk{display:inline-flex;align-items:center;background:var(--s2);border:1px solid var(--ln);
   border-radius:8px;padding:6px 10px;color:var(--tx3);font-size:12px;cursor:pointer;
   font-family:var(--font);font-weight:600;transition:all .12s;flex-shrink:0}
 .bk:hover{color:var(--tx);background:var(--s3)}
 .ib{width:34px;height:34px;border-radius:8px;background:var(--s2);border:1px solid var(--ln);
   color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:14px;transition:all .12s;flex-shrink:0}
+  font-size:15px;transition:all .12s;flex-shrink:0}
 .ib:hover{color:var(--tx);background:var(--s3)}
 .sp34{width:34px;flex-shrink:0}
-
-/* ── FIELDS ── */
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
-.field input,.field select,.field textarea{background:var(--s2);border:1px solid var(--ln);
-  border-radius:var(--r);padding:11px 13px;color:var(--tx);font-family:var(--mono);
-  font-size:13px;outline:none;transition:border-color .12s;width:100%}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(0,210,200,.45)}
+.field input{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:11px 13px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none;
+  transition:border-color .12s;width:100%}
+.field input:focus{border-color:rgba(0,210,200,.45)}
 .field input::placeholder{color:var(--tx3)}
-.field select option{background:var(--s2)}
-.field textarea{resize:none}
-
-/* ── CARDS ── */
 .card{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px}
-.ccy{border-color:rgba(0,210,200,.22);background:var(--cy0)}
-.cgn{border-color:rgba(34,196,122,.22);background:var(--gn0)}
 .crd{border-color:rgba(224,79,79,.22);background:var(--rd0)}
 .cam{border-color:rgba(240,162,40,.22);background:var(--am0)}
-.cpu{border-color:rgba(167,139,250,.22);background:var(--pu0)}
-
-/* ── DOTS ── */
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all .2s}
-.dok{background:var(--gn);box-shadow:0 0 6px var(--gn)}
-.derr{background:var(--rd)}
-.didle{background:var(--tx3)}
-.dspin{background:var(--cy);animation:dp .9s ease-in-out infinite}
-@keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* ── CHIPS ── */
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dok{background:var(--gn);box-shadow:0 0 6px var(--gn)}.derr{background:var(--rd)}.didle{background:var(--tx3)}
 .chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;
-  font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+  font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;flex-shrink:0}
 .cgc{background:var(--gn0);color:var(--gn);border:1px solid rgba(34,196,122,.2)}
 .cac{background:var(--am0);color:var(--am);border:1px solid rgba(240,162,40,.2)}
 .ccc{background:var(--cy0);color:var(--cy);border:1px solid rgba(0,210,200,.2)}
 .crc{background:var(--rd0);color:var(--rd);border:1px solid rgba(224,79,79,.2)}
 .cmc{background:var(--s3);color:var(--tx3);border:1px solid var(--ln)}
 .cpc{background:var(--pu0);color:var(--pu);border:1px solid rgba(167,139,250,.2)}
-
-/* ── PROGRESS ── */
-.pbar{height:3px;background:var(--ln);border-radius:3px;overflow:hidden}
-.pfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cy),rgba(0,210,200,.7));transition:width .15s}
-
-/* ── TABS ── */
 .tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;gap:2px}
-.tab{flex:1;padding:7px 4px;border:none;background:none;border-radius:6px;
-  color:var(--tx3);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s}
-.tab.on{background:var(--s3);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-
-/* ── MISC ── */
+.tab{flex:1;padding:6px 3px;border:none;background:none;border-radius:6px;
+  color:var(--tx3);font-family:var(--font);font-size:10.5px;font-weight:600;cursor:pointer;transition:all .12s}
+.tab.on{background:var(--s3);color:var(--tx)}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.slbl{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;padding:14px 13px 6px}
+.slbl{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;padding:12px 13px 6px}
 .fb{padding:10px 13px;border-radius:var(--r);font-size:12px;line-height:1.55;border:1px solid;display:none}
 .fb.show{display:block}
 .fb-ok{background:var(--gn0);border-color:rgba(34,196,122,.3);color:var(--gn)}
 .fb-err{background:var(--rd0);border-color:rgba(224,79,79,.3);color:var(--rd)}
 .fb-info{background:var(--cy0);border-color:rgba(0,210,200,.3);color:var(--cy)}
-
-/* ── ROWS ── */
 .srow{display:flex;align-items:center;gap:11px;background:var(--s2);border:1px solid var(--ln);
   border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
 .srow:hover{border-color:var(--ln2);background:var(--s3)}
+.mc{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:11px 13px;cursor:pointer;transition:all .12s;margin-bottom:7px}
+.mc:hover{border-color:var(--ln2);background:var(--s3)}
+.mc.rdy{border-color:rgba(34,196,122,.22)}
 .hrow{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
   padding:11px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
 .hrow:hover{border-color:var(--ln2);background:var(--s3)}
 .hrow.sel{border-color:rgba(0,210,200,.45);background:var(--cy0)}
-.mc{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
-  padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:7px}
-.mc:hover{border-color:var(--ln2);background:var(--s3)}
-.mc.rdy{border-color:rgba(34,196,122,.22)}
-
-/* ── LAYER VIZ ── */
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(8px,1fr));gap:2px}
-.lc{height:6px;border-radius:2px;background:var(--s3);transition:background .08s}
+.lc{height:6px;border-radius:2px;background:var(--s3)}
 .lc.done{background:rgba(0,210,200,.25)}
-.lc.act{background:var(--cy);box-shadow:0 0 5px var(--cy);animation:lp .4s ease-in-out infinite}
+.lc.act{background:var(--cy);animation:lp .4s ease-in-out infinite}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* ── CHAT ── */
 .mrow{display:flex;margin-bottom:9px}
-.mrow.user{justify-content:flex-end}
-.mrow.asst{justify-content:flex-start}
+.mrow.user{justify-content:flex-end}.mrow.asst{justify-content:flex-start}
 .bub{max-width:89%;padding:10px 13px;font-size:13.5px;line-height:1.7;word-break:break-word}
 .bub.user{background:linear-gradient(135deg,rgba(0,210,200,.5),rgba(0,210,200,.28));
-  border:1px solid rgba(0,210,200,.2);border-radius:14px 14px 3px 14px;color:var(--tx)}
+  border:1px solid rgba(0,210,200,.2);border-radius:14px 14px 3px 14px}
 .bub.asst{background:var(--s2);border:1px solid var(--ln);border-radius:14px 14px 14px 3px}
 .bub p{margin-bottom:7px}.bub p:last-child{margin:0}
-.bub strong{font-weight:700;color:var(--tx)}
-.bub em{font-style:italic}
-.bub code{background:var(--s3);border:1px solid var(--ln);border-radius:4px;
-  padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cy)}
+.bub strong{font-weight:700;color:var(--tx)}.bub em{font-style:italic}
+.bub code{background:var(--s3);border:1px solid var(--ln);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cy)}
 .bub pre{margin:7px 0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
 .bub pre code{background:none;border:none;padding:0;color:inherit;font-size:11.5px!important;line-height:1.55!important}
-.bub ul,.bub ol{padding-left:18px;margin-bottom:7px}
-.bub li{margin-bottom:3px}
-.bub h1{font-size:16px;font-weight:700;margin-bottom:5px}
-.bub h2{font-size:14px;font-weight:700;margin-bottom:4px}
-.bub h3{font-size:13px;font-weight:700;margin-bottom:3px}
+.bub ul,.bub ol{padding-left:18px;margin-bottom:7px}.bub li{margin-bottom:3px}
+.bub h1{font-size:16px;font-weight:700;margin-bottom:5px}.bub h2{font-size:14px;font-weight:700;margin-bottom:4px}.bub h3{font-size:13px;font-weight:700;margin-bottom:3px}
 .bub blockquote{border-left:2px solid var(--cy);padding-left:10px;color:var(--tx2);margin:5px 0}
-.bub a{color:var(--cy);text-decoration:none}
-.bub hr{border:none;border-top:1px solid var(--ln);margin:7px 0}
-.code-hdr{display:flex;align-items:center;justify-content:space-between;
-  background:#161b22;padding:5px 11px;border-radius:8px 8px 0 0}
+.bub a{color:var(--cy);text-decoration:none}.bub hr{border:none;border-top:1px solid var(--ln);margin:7px 0}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;background:#161b22;padding:5px 11px;border-radius:8px 8px 0 0}
 .clbl{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em}
-.cpbtn{background:rgba(255,255,255,.05);border:none;border-radius:4px;color:rgba(255,255,255,.38);
-  padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font);transition:all .12s}
+.cpbtn{background:rgba(255,255,255,.05);border:none;border-radius:4px;color:rgba(255,255,255,.38);padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font)}
 .cpbtn:hover{background:rgba(255,255,255,.1);color:var(--tx)}
-.tdots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cy);margin:0 2px;
-  animation:td 1.1s ease-in-out infinite}
+.tdots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cy);margin:0 2px;animation:td 1.1s ease-in-out infinite}
 .tdots span:nth-child(2){animation-delay:.17s}.tdots span:nth-child(3){animation-delay:.34s}
 @keyframes td{0%,80%,100%{transform:scale(.4);opacity:.2}40%{transform:scale(1);opacity:1}}
-.cur{display:inline-block;width:2px;height:13px;background:var(--cy);
-  margin-left:1px;vertical-align:text-bottom;animation:bl 1s step-end infinite}
+.cur{display:inline-block;width:2px;height:13px;background:var(--cy);margin-left:1px;vertical-align:text-bottom;animation:bl 1s step-end infinite}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
-.cbar{display:flex;gap:8px;align-items:flex-end;padding:9px 12px 18px;
-  border-top:1px solid var(--ln);flex-shrink:0}
-.cbar textarea{flex:1;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
-  padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);
-  resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto;transition:border-color .12s}
-.cbar textarea:focus{border-color:rgba(0,210,200,.32)}
+.cbar{display:flex;gap:8px;align-items:flex-end;padding:9px 12px 18px;border-top:1px solid var(--ln);flex-shrink:0}
+.cbar textarea{flex:1;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto}
 .cbar textarea::placeholder{color:var(--tx3)}
-.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;
-  background:var(--cy);color:#040808;cursor:pointer;font-size:17px;
-  display:flex;align-items:center;justify-content:center;transition:all .12s}
-.sbtn:disabled{background:var(--s2);border:1px solid var(--ln);color:var(--tx3);cursor:default}
-.ibar{padding:8px 13px;border-bottom:1px solid var(--ln);display:none;flex-shrink:0;background:var(--s1)}
-
-/* ── DOWNLOAD ── */
-.dlrow{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--tx3);
-  font-family:var(--mono);margin-bottom:4px}
-.dlbar{flex:1;height:2px;background:var(--ln);border-radius:2px;overflow:hidden}
-.dlbar-f{height:100%;background:var(--cy);border-radius:2px;transition:width .15s}
-
-/* ── WARNING BANNER ── */
-.warn-banner{background:rgba(240,162,40,.08);border:1px solid rgba(240,162,40,.2);
-  border-radius:var(--r);padding:10px 12px;font-size:11.5px;color:var(--am);line-height:1.6}
+.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;background:var(--cy);color:#040808;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center}
+.sbtn[disabled]{background:var(--s2);border:1px solid var(--ln);color:var(--tx3);cursor:default}
+.ibar{padding:8px 13px;border-bottom:1px solid var(--ln);display:none;flex-shrink:0}
+.warn{background:rgba(240,162,40,.08);border:1px solid rgba(240,162,40,.2);border-radius:var(--r);padding:10px 12px;font-size:11.5px;color:var(--am);line-height:1.6}
 </style>
 </head>
 <body>
-
 <div id="boot">
-  <div class="boot-logo">
+  <div style="width:64px;height:64px;border-radius:16px;background:var(--s2);border:1px solid var(--ln2);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,210,200,.18)">
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
       <path d="M4 26L15 4l11 22" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M8.5 19h13" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round"/>
@@ -215,917 +146,812 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   </div>
   <div style="font-size:19px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
   <div class="spin" style="width:22px;height:22px"></div>
-  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Starting…</div>
+  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Loading engines…</div>
 </div>
-
 <div id="app"><div class="shell">
 
-  <!-- ══ HOME ══ -->
-  <div class="pg" id="p-home">
-    <div class="hdr">
-      <div class="sp34"></div>
-      <div style="flex:1;text-align:center">
-        <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
-        <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px;letter-spacing:.07em">ANY GGUF · ON-DEVICE · WLLAMA</div>
-      </div>
-      <button class="ib" onclick="go('p-settings',1)">⚙</button>
+<!-- HOME -->
+<div class="pg" id="p-home">
+  <div class="hdr">
+    <div class="sp34"></div>
+    <div style="flex:1;text-align:center">
+      <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
+      <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="eng-lbl">any HF model · on-device</div>
     </div>
-    <div class="scroll">
-      <div class="slbl">Connections</div>
-      <div style="padding:0 12px">
-        <div class="srow" onclick="go('p-tg',1);fillTG()">
-          <div class="dot didle" id="h-dot-tg"></div>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
-            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div>
-          </div>
-          <div style="color:var(--tx3);font-size:12px">›</div>
-        </div>
-        <div class="srow" onclick="go('p-hf',1);fillHF()">
-          <div class="dot didle" id="h-dot-hf"></div>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600">HuggingFace</div>
-            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div>
-          </div>
-          <div style="color:var(--tx3);font-size:12px">›</div>
-        </div>
+    <button class="ib" onclick="go('p-settings',1)">⚙</button>
+  </div>
+  <div class="scroll">
+    <div class="slbl">Connections</div>
+    <div style="padding:0 12px">
+      <div class="srow" onclick="go('p-tg',1);fillTG()">
+        <div class="dot didle" id="h-dot-tg"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div></div>
+        <span style="color:var(--tx3)">›</span>
       </div>
-      <div class="slbl" style="margin-top:4px">My Models</div>
-      <div style="padding:0 12px" id="home-models">
-        <div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">
-          No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span>
-        </div>
+      <div class="srow" onclick="go('p-hf',1);fillHF()">
+        <div class="dot didle" id="h-dot-hf"></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">HuggingFace</div>
+          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div></div>
+        <span style="color:var(--tx3)">›</span>
       </div>
     </div>
-    <div style="padding:10px 12px 22px;flex-shrink:0">
-      <button class="btn bp" onclick="go('p-models',1);renderCurated()">+ Add Model</button>
+    <div class="slbl" style="margin-top:4px">My Models</div>
+    <div style="padding:0 12px" id="home-models">
+      <div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>
     </div>
   </div>
+  <div style="padding:10px 12px 22px;flex-shrink:0">
+    <button class="btn bp" onclick="go('p-models',1);renderCurated()">+ Add Model</button>
+  </div>
+</div>
 
-  <!-- ══ TG SETUP ══ -->
-  <div class="pg" id="p-tg">
-    <div class="hdr">
-      <button class="bk" onclick="go('p-home',0)">← Back</button>
-      <div class="htitle">Pentaract Setup</div>
-      <div class="sp34"></div>
-    </div>
-    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">
-        Telegram is used as free unlimited storage for model shards via the Pentaract protocol.
-      </div>
-      <div class="card" style="display:flex;flex-direction:column;gap:9px" id="tg-steps"></div>
-      <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…"/></div>
-      <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890"/></div>
-      <div class="fb" id="tg-fb"></div>
-      <button class="btn bg" id="tg-test" onclick="testTG()" disabled>Test Connection</button>
-      <button class="btn bp" id="tg-save" onclick="saveTG()" disabled>Save & Continue →</button>
-    </div>
+<!-- TG -->
+<div class="pg" id="p-tg">
+  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Pentaract Setup</div><div class="sp34"></div></div>
+  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+    <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Telegram as free unlimited model shard storage via the Pentaract protocol.</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:9px" id="tg-steps"></div>
+    <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" autocomplete="off"/></div>
+    <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890"/></div>
+    <div class="fb" id="tg-fb"></div>
+    <button class="btn bg" id="tg-test-btn" disabled>Test Connection</button>
+    <button class="btn bp" id="tg-save-btn" disabled>Save &amp; Continue →</button>
   </div>
+</div>
 
-  <!-- ══ HF SETUP ══ -->
-  <div class="pg" id="p-hf">
-    <div class="hdr">
-      <button class="bk" onclick="go('p-home',0)">← Back</button>
-      <div class="htitle">HuggingFace</div>
-      <div class="sp34"></div>
+<!-- HF -->
+<div class="pg" id="p-hf">
+  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">HuggingFace</div><div class="sp34"></div></div>
+  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+    <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Optional. Required for gated/private models. All public models work without a token.</div>
+    <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
+      1. Visit <span style="color:var(--cy);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
+      2. Create token → type: <b style="color:var(--tx)">Read</b><br/>3. Paste below and verify
     </div>
-    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">
-        Optional but recommended. Needed for gated/private models. All public models work without a token.
-      </div>
-      <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
-        1. Visit <span style="color:var(--cy);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
-        2. Create token → type: <b style="color:var(--tx)">Read</b><br/>
-        3. Paste below and verify
-      </div>
-      <div class="field"><label>Access Token</label>
-        <input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" oninput="hfChanged()"/></div>
-      <div class="fb" id="hf-fb"></div>
-      <button class="btn bg" id="hf-verify" onclick="verifyHF()" disabled>Verify Token</button>
-      <button class="btn bp" id="hf-save" onclick="saveHF()" disabled>Save →</button>
-      <button style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;
-        font-family:var(--font);padding:4px 0;width:100%;text-align:center" onclick="go('p-home',0)">
-        Skip — public models only
-      </button>
-    </div>
+    <div class="field"><label>Access Token</label><input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/></div>
+    <div class="fb" id="hf-fb"></div>
+    <button class="btn bg" id="hf-verify-btn" disabled>Verify Token</button>
+    <button class="btn bp" id="hf-save-btn" disabled>Save →</button>
+    <button class="btn bg" style="margin-top:-4px" onclick="go('p-home',0)">Skip — public models only</button>
   </div>
+</div>
 
-  <!-- ══ MODEL BROWSER ══ -->
-  <div class="pg" id="p-models">
-    <div class="hdr">
-      <button class="bk" onclick="go('p-home',0)">← Back</button>
-      <div class="htitle">Add Model</div>
-      <div class="sp34"></div>
+<!-- MODEL BROWSER -->
+<div class="pg" id="p-models">
+  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Add Model</div><div class="sp34"></div></div>
+  <div style="padding:10px 12px 8px;flex-shrink:0">
+    <div class="tabs">
+      <button class="tab on" id="t-curated"    onclick="switchTab('curated')">Curated</button>
+      <button class="tab"   id="t-abliterated" onclick="switchTab('abliterated')">Abliterated</button>
+      <button class="tab"   id="t-hf"          onclick="switchTab('hf')">Browse HF</button>
+      <button class="tab"   id="t-custom"      onclick="switchTab('custom')">Custom</button>
     </div>
-    <div style="padding:10px 12px 8px;flex-shrink:0">
-      <div class="tabs">
-        <button class="tab on" id="t-curated" onclick="switchTab('curated')">Curated</button>
-        <button class="tab" id="t-abliterated" onclick="switchTab('abliterated')">Abliterated</button>
-        <button class="tab" id="t-hf" onclick="switchTab('hf')">Browse HF</button>
-        <button class="tab" id="t-custom" onclick="switchTab('custom')">Custom</button>
-      </div>
-    </div>
-    <div class="scroll" style="padding:8px 12px 16px" id="tab-body"></div>
   </div>
+  <div class="scroll" style="padding:8px 12px 16px" id="tab-body"></div>
+</div>
 
-  <!-- ══ MODEL DETAIL ══ -->
-  <div class="pg" id="p-detail">
-    <div class="hdr">
-      <button class="bk" id="det-back" onclick="go('p-models',0)">← Back</button>
-      <div class="htitle" id="det-title">Model</div>
-      <div class="sp34"></div>
-    </div>
-    <div class="scroll" style="padding:13px" id="det-body"></div>
-  </div>
+<!-- DETAIL -->
+<div class="pg" id="p-detail">
+  <div class="hdr"><button class="bk" onclick="go('p-models',0)">← Back</button><div class="htitle" id="det-title">Model</div><div class="sp34"></div></div>
+  <div class="scroll" style="padding:13px" id="det-body"></div>
+</div>
 
-  <!-- ══ CHAT ══ -->
-  <div class="pg" id="p-chat">
-    <div class="hdr">
-      <button class="bk" onclick="go('p-home',0)">← Back</button>
-      <div style="flex:1;text-align:center;overflow:hidden;min-width:0">
-        <div class="htitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div>
-        <div style="font-size:9.5px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="chat-sub">—</div>
-      </div>
-      <button class="ib" onclick="clearChat()" title="Clear chat">↺</button>
+<!-- CHAT -->
+<div class="pg" id="p-chat">
+  <div class="hdr">
+    <button class="bk" onclick="go('p-home',0)">← Back</button>
+    <div style="flex:1;text-align:center;overflow:hidden;min-width:0">
+      <div class="htitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div>
+      <div style="font-size:9.5px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="chat-sub">—</div>
     </div>
-    <!-- Inference progress bar -->
-    <div id="infer-bar" style="display:none;flex-shrink:0;padding:0 13px 5px">
-      <div class="pbar"><div class="pfill" id="infer-fill" style="width:0%"></div></div>
-    </div>
-    <!-- Layer viz -->
-    <div class="ibar" id="ibar">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-        <span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-c">0</span>/<span id="lc-t">0</span></span>
-        <span style="font-size:10px;color:var(--cy);font-family:var(--mono)" id="l-ram">—</span>
-      </div>
-      <div class="lgrid" id="lgrid"></div>
-    </div>
-    <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
-    <div class="cbar">
-      <textarea id="chat-in" rows="1" placeholder="Message…"
-        onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="sbtn" id="sbtn" onclick="sendMsg()" disabled>↑</button>
-    </div>
+    <button class="ib" onclick="clearChat()">↺</button>
   </div>
+  <div class="ibar" id="ibar">
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+      <span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-c">0</span>/<span id="lc-t">0</span></span>
+      <span style="font-size:10px;color:var(--cy);font-family:var(--mono)" id="l-ram">—</span>
+    </div>
+    <div class="lgrid" id="lgrid"></div>
+  </div>
+  <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
+  <div class="cbar">
+    <textarea id="chat-in" rows="1" placeholder="Message…" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="sbtn" id="sbtn" onclick="sendMsg()" disabled>↑</button>
+  </div>
+</div>
 
-  <!-- ══ SETTINGS ══ -->
-  <div class="pg" id="p-settings">
-    <div class="hdr">
-      <button class="bk" onclick="go('p-home',0)">← Back</button>
-      <div class="htitle">Settings</div>
-      <div class="sp34"></div>
+<!-- SETTINGS -->
+<div class="pg" id="p-settings">
+  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Settings</div><div class="sp34"></div></div>
+  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+    <div class="card" style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Connections</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="dot didle" id="s-dot-tg"></div><div style="flex:1;font-size:13px">Telegram</div><button class="bk" onclick="go('p-tg',1);fillTG()">Edit</button></div>
+      <div style="height:1px;background:var(--ln)"></div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="dot didle" id="s-dot-hf"></div><div style="flex:1;font-size:13px">HuggingFace</div><button class="bk" onclick="go('p-hf',1);fillHF()">Edit</button></div>
     </div>
-    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-      <div class="card" style="display:flex;flex-direction:column;gap:11px">
-        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Connections</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="dot didle" id="s-dot-tg"></div>
-          <div style="flex:1;font-size:13px">Telegram / Pentaract</div>
-          <button class="bk" onclick="go('p-tg',1);fillTG()">Edit</button>
-        </div>
-        <div style="height:1px;background:var(--ln)"></div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="dot didle" id="s-dot-hf"></div>
-          <div style="flex:1;font-size:13px">HuggingFace</div>
-          <button class="bk" onclick="go('p-hf',1);fillHF()">Edit</button>
-        </div>
-      </div>
-      <div class="card" style="display:flex;flex-direction:column;gap:10px">
-        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Inference</div>
-        <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512" min="64" max="8192"/></div>
-        <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05" min="0" max="2"/></div>
-        <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05" min="1" max="2"/></div>
-        <div class="field"><label>Top-P</label><input id="s-topp" type="number" value="0.9" step="0.05" min="0" max="1"/></div>
-        <button class="btn bg" onclick="saveSettings()">Save Settings</button>
-      </div>
-      <div class="card cpu" style="font-size:11.5px;color:var(--tx2);line-height:1.75">
-        <b style="color:var(--pu)">Engine: wllama (llama.cpp → WASM)</b><br/>
-        Runs any GGUF in-browser. No WebGPU required.<br/>
-        Split GGUFs (30B–70B+) load all shards in parallel.<br/>
-        Models cache in IndexedDB after first download.
-      </div>
-      <button class="btn bd" onclick="clearAll()">⚠ Clear All Data</button>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Engines</div>
+      <div id="eng-status" style="font-size:11.5px;color:var(--tx2);font-family:var(--mono);line-height:1.9;white-space:pre">Detecting…</div>
     </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Inference</div>
+      <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512" min="64" max="8192"/></div>
+      <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05" min="0" max="2"/></div>
+      <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05" min="1" max="2"/></div>
+      <div class="field"><label>Top-P</label><input id="s-topp" type="number" value="0.9" step="0.05" min="0" max="1"/></div>
+      <button class="btn bg" onclick="saveSettings()">Save Settings</button>
+    </div>
+    <button class="btn bd" onclick="clearAll()">⚠ Clear All Data</button>
   </div>
+</div>
 
 </div></div>
 
-<script type="module">
-// ══════════════════════════════════════════════════════════════
-//  ENGINE: wllama v2 — llama.cpp WASM
-//  • loadModelFromHF(repo, firstFile) auto-loads all split shards
-//  • parallelDownloads: 5  ← speeds up large multi-part GGUFs
-//  • WasmFromCDN ← no local WASM files needed
-// ══════════════════════════════════════════════════════════════
-import { Wllama, LoggerWithoutDebug } from 'https://esm.sh/@wllama/wllama@2.3.2/esm/index.js';
-import WasmFromCDN from 'https://esm.sh/@wllama/wllama@2.3.2/esm/wasm-from-cdn.js';
+<!--
+  WLLAMA FIX — The root cause of "Importing a module script failed":
+  =================================================================
+  wllama must be imported from cdn.jsdelivr.net/npm/... NOT from esm.sh.
+  esm.sh bundles everything into one file, which breaks wllama's internal
+  Worker() constructor — it spawns workers by fetching sibling .js files
+  relative to its own URL. When bundled by esm.sh those relative paths
+  are destroyed.
 
-// ── State ──
-const SK = 'mairllm6';
+  With jsdelivr, the full package directory structure is preserved:
+    /esm/index.js  (imports)
+    /esm/single-thread/wllama.js   ← Worker script
+    /esm/single-thread/wllama.wasm ← WASM binary
+    /esm/multi-thread/wllama.js
+    /esm/multi-thread/wllama.wasm
+    /esm/multi-thread/wllama.worker.mjs
+
+  We pass ONLY the 2 .wasm paths. wllama auto-derives the .js worker
+  path from the WASM URL by swapping the extension: .wasm → .js
+  Since both live at the same jsdelivr URL base, resolution succeeds.
+-->
+<script type="module">
+// ── wllama from jsdelivr (full package structure preserved, workers resolve correctly)
+import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/index.js';
+import WasmFromCDN from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/wasm-from-cdn.js';
+
+// ── Transformers.js for ONNX / any non-GGUF HF model
+import { pipeline, env as TJSEnv } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+
+TJSEnv.allowLocalModels = false;
+TJSEnv.useBrowserCache  = true;
+
+// ── wllama WASM config
+// WasmFromCDN is the ONLY officially supported way to use wllama from a CDN
+// (imported above — it's a pre-built object with all WASM + worker JS URLs)
+// Do NOT manually specify paths; wasm-from-cdn.js handles versioning correctly
+
+// ── Capability detection
+const hasSharedMem = typeof SharedArrayBuffer !== 'undefined';
+const isCOI        = !!self.crossOriginIsolated;
+const hasWebGPU    = !!navigator.gpu;
+const threadMode   = (hasSharedMem && isCOI) ? 'multi-thread' : 'single-thread';
+
+// ── State
+const SK = 'mairllm9';
 let S = {
-  tgToken:'', tgChatId:'', tgOk:false,
-  hfToken:'', hfOk:false,
-  models:[], folders:[],
-  settings:{ maxTokens:512, temperature:0.7, repPenalty:1.1, topP:0.9 },
+  tgToken:'',tgChatId:'',tgOk:false,
+  hfToken:'',hfOk:false,
+  models:[],
+  settings:{maxTokens:512,temperature:0.7,repPenalty:1.1,topP:0.9},
   activeModel:null,
 };
-const loadS  = () => { try { const d=localStorage.getItem(SK); if(d) Object.assign(S, JSON.parse(d)); } catch(e){} };
-const saveS  = () => { try { localStorage.setItem(SK, JSON.stringify(S)); } catch(e){} };
-const sleep  = ms => new Promise(r => setTimeout(r, ms));
-const q      = id => document.getElementById(id);
-const esc    = t  => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const loadS=()=>{try{const d=localStorage.getItem(SK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}};
+const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const q=id=>document.getElementById(id);
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// ── Nav — strictly one page at a time ──
-let _cur = null;
-window.go = (id, fwd=1) => {
-  if(_cur === id) return;
-  document.querySelectorAll('.pg').forEach(p => {
-    p.classList.remove('on','af','ab');
-    p.style.display = 'none';
-  });
-  const el = q(id);
-  el.style.display = 'flex';
-  void el.offsetWidth;
-  el.classList.add('on', fwd ? 'af' : 'ab');
-  _cur = id;
-};
+// ── Engine runtime state
+let _wllama    = null;
+let _tjsPipe   = null;
+let _loadedId  = null;
+let _engUsed   = null;   // 'wllama' | 'transformers'
+let _inferring = false;
+let _hist      = [];
 
-const showFb = (id, t, msg) => { const e=q(id); e.className=`fb fb-${t} show`; e.innerHTML=msg; };
-const setDot = (id, cls) => { const d=q(id); if(d) d.className='dot '+cls; };
-
-function updateDots() {
-  const tCls = S.tgOk?'dok': S.tgToken?'derr':'didle';
-  const hCls = S.hfOk?'dok': S.hfToken?'derr':'didle';
-  ['h-dot-tg','s-dot-tg'].forEach(id => setDot(id, tCls));
-  ['h-dot-hf','s-dot-hf'].forEach(id => setDot(id, hCls));
-  q('h-lbl-tg').textContent = S.tgOk ? 'connected' : S.tgToken ? 'auth failed' : 'not configured';
-  q('h-lbl-hf').textContent = S.hfOk ? 'connected' : S.hfToken ? 'invalid token' : 'not configured (public models only)';
+// ── Nav
+let _cur=null;
+function go(id,fwd=1){
+  if(_cur===id)return;
+  document.querySelectorAll('.pg').forEach(p=>{p.classList.remove('on','af','ab');p.style.display='none';});
+  const el=q(id);el.style.display='flex';void el.offsetWidth;
+  el.classList.add('on',fwd?'af':'ab');_cur=id;
+}
+const showFb=(id,t,msg)=>{const e=q(id);e.className=`fb fb-${t} show`;e.innerHTML=msg;};
+const setDot=(id,cls)=>{const d=q(id);if(d)d.className='dot '+cls;};
+function updateDots(){
+  const tc=S.tgOk?'dok':S.tgToken?'derr':'didle';
+  const hc=S.hfOk?'dok':S.hfToken?'derr':'didle';
+  ['h-dot-tg','s-dot-tg'].forEach(id=>setDot(id,tc));
+  ['h-dot-hf','s-dot-hf'].forEach(id=>setDot(id,hc));
+  q('h-lbl-tg').textContent=S.tgOk?'connected':S.tgToken?'auth failed':'not configured';
+  q('h-lbl-hf').textContent=S.hfOk?'connected':S.hfToken?'invalid token':'not configured (public only)';
+}
+function updateEngUI(){
+  if(q('eng-lbl'))q('eng-lbl').textContent=`wllama(GGUF) + transformers.js(ONNX) · ${threadMode}`;
+  if(q('eng-status'))q('eng-status').textContent=
+    `wllama (llama.cpp WASM): ✓\n  mode: ${threadMode}\n  SharedArrayBuffer: ${hasSharedMem}\n  CrossOriginIsolated: ${isCOI}\ntransformers.js v3: ✓\n  WebGPU: ${hasWebGPU?'✓ available':'✗ WASM fallback'}\n\nEngine auto-selected per model type.`;
 }
 
-// ── Boot ──
-async function boot() {
+// ── Boot
+async function boot(){
   loadS();
-  const bm = q('bmsg');
-  if(S.tgToken && S.tgChatId) { bm.textContent='Checking Telegram…'; S.tgOk = await pingTG(S.tgToken); }
-  if(S.hfToken)                { bm.textContent='Checking HuggingFace…'; S.hfOk = await pingHF(S.hfToken); }
-  bm.textContent = 'Ready';
-  await sleep(140);
+  updateEngUI();
+  const bm=q('bmsg');
+  if(S.tgToken&&S.tgChatId){bm.textContent='Checking Telegram…';S.tgOk=await pingTG(S.tgToken);}
+  if(S.hfToken){bm.textContent='Checking HuggingFace…';S.hfOk=await pingHF(S.hfToken);}
+  bm.textContent='Ready';
+  await sleep(100);
   q('boot').classList.add('fade');
-  setTimeout(() => q('boot').style.display='none', 380);
-  // restore settings inputs
-  q('s-tok').value  = S.settings.maxTokens;
-  q('s-temp').value = S.settings.temperature;
-  q('s-rep').value  = S.settings.repPenalty;
-  q('s-topp').value = S.settings.topP;
-  if(!S.tgToken || !S.tgOk) { renderTGSteps(); go('p-tg',1); fillTG(); }
-  else { go('p-home',1); renderHome(); }
+  setTimeout(()=>q('boot').style.display='none',350);
+  q('s-tok').value=S.settings.maxTokens;q('s-temp').value=S.settings.temperature;
+  q('s-rep').value=S.settings.repPenalty;q('s-topp').value=S.settings.topP;
+  if(!S.tgToken){renderTGSteps();fillTG();go('p-tg',1);}
+  else{go('p-home',1);renderHome();}
   updateDots();
 }
 
-// ── Telegram ──
-const pingTG = async tok => {
-  try { const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`); const d=await r.json(); return !!d.ok; }
-  catch(e) { return false; }
-};
-function renderTGSteps() {
-  const steps = ['Open Telegram → search <b style="color:var(--cy)">@BotFather</b>',
-    'Send <code>/newbot</code> → follow the prompts','Copy the <b>Bot Token</b> → paste below',
-    'Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cy)">@userinfobot</b>'];
-  q('tg-steps').innerHTML = '<div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:7px">Quickstart</div>'
-    + steps.map((s,i)=>`<div style="display:flex;gap:9px;align-items:flex-start${i<steps.length-1?';margin-bottom:7px':''}">
-    <div style="width:16px;height:16px;border-radius:4px;background:var(--cy0);color:var(--cy);
-      font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div>
-    <div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div></div>`).join('');
+// ── TG
+const pingTG=async tok=>{try{const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`);const d=await r.json();return!!d.ok;}catch(e){return false;}};
+function renderTGSteps(){
+  q('tg-steps').innerHTML='<div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:7px">Quickstart</div>'
+    +['Open Telegram → search <b style="color:var(--cy)">@BotFather</b>','Send <code>/newbot</code> → follow prompts','Copy the <b>Bot Token</b> → paste below','Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cy)">@userinfobot</b>']
+    .map((s,i)=>`<div style="display:flex;gap:9px;align-items:flex-start${i?';margin-top:7px':''}"><div style="width:16px;height:16px;border-radius:4px;background:var(--cy0);color:var(--cy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div></div>`).join('');
 }
-window.fillTG = () => {
-  if(!q('tg-steps').children.length) renderTGSteps();
-  if(S.tgToken) q('tg-tok').value = S.tgToken;
-  if(S.tgChatId) q('tg-cid').value = S.tgChatId;
-  q('tg-tok').oninput = q('tg-cid').oninput = tgChanged;
-  tgChanged();
-};
-function tgChanged() {
-  const t=q('tg-tok').value.trim(), c=q('tg-cid').value.trim();
-  q('tg-test').disabled = !(t&&c);
-  q('tg-save').disabled = true;
+function fillTG(){
+  if(!q('tg-steps').children.length)renderTGSteps();
+  q('tg-tok').value=S.tgToken||'';q('tg-cid').value=S.tgChatId||'';
+  const chk=()=>{const t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim();q('tg-test-btn').disabled=!(t&&c);q('tg-save-btn').disabled=true;};
+  q('tg-tok').oninput=chk;q('tg-cid').oninput=chk;
+  q('tg-test-btn').onclick=async()=>{
+    const tok=q('tg-tok').value.trim(),cid=q('tg-cid').value.trim();
+    showFb('tg-fb','info','Testing…');
+    const ok=await pingTG(tok);
+    if(ok){showFb('tg-fb','ok','✓ Connected!');q('tg-save-btn').disabled=false;q('tg-save-btn')._v={tok,cid};}
+    else{showFb('tg-fb','err','✗ Failed — check your bot token.');q('tg-save-btn').disabled=true;}
+  };
+  q('tg-save-btn').onclick=()=>{
+    const v=q('tg-save-btn')._v||{tok:q('tg-tok').value.trim(),cid:q('tg-cid').value.trim()};
+    S.tgToken=v.tok;S.tgChatId=v.cid;S.tgOk=true;saveS();updateDots();
+    if(!S.hfToken)go('p-hf',1);else{go('p-home',0);renderHome();}
+  };
+  chk();
 }
-window.tgChanged = tgChanged;
-window.testTG = async () => {
-  const tok=q('tg-tok').value.trim(), cid=q('tg-cid').value.trim();
-  showFb('tg-fb','info','Testing connection…');
-  const ok = await pingTG(tok);
-  if(ok) {
-    showFb('tg-fb','ok','✓ Connected!');
-    q('tg-save').disabled = false;
-    q('tg-save').dataset.tok = tok;
-    q('tg-save').dataset.cid = cid;
-  } else {
-    showFb('tg-fb','err','✗ Failed — check your bot token.');
-    q('tg-save').disabled = true;
-  }
-};
-window.saveTG = () => {
-  const btn = q('tg-save');
-  S.tgToken  = btn.dataset.tok || q('tg-tok').value.trim();
-  S.tgChatId = btn.dataset.cid || q('tg-cid').value.trim();
-  S.tgOk = true; saveS(); updateDots();
-  if(!S.hfToken) { go('p-hf',1); } else { go('p-home',0); renderHome(); }
-};
 
-// ── HuggingFace ──
-const pingHF = async tok => {
-  try { const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}}); return r.status===200; }
-  catch(e) { return false; }
-};
-window.fillHF  = () => { if(S.hfToken) q('hf-tok').value=S.hfToken; hfChanged(); };
-window.hfChanged = () => { const t=q('hf-tok').value.trim(); q('hf-verify').disabled=!t; q('hf-save').disabled=true; };
-window.verifyHF = async () => {
-  const tok=q('hf-tok').value.trim();
-  showFb('hf-fb','info','Verifying…');
-  const ok = await pingHF(tok);
-  if(ok) {
-    showFb('hf-fb','ok','✓ Token verified!');
-    q('hf-save').disabled = false;
-    q('hf-save').dataset.tok = tok;
-  } else {
-    showFb('hf-fb','err','✗ Invalid token. Check huggingface.co/settings/tokens');
-    q('hf-save').disabled = true;
-  }
-};
-window.saveHF = () => {
-  S.hfToken = q('hf-save').dataset.tok || q('hf-tok').value.trim();
-  S.hfOk = true; saveS(); updateDots(); go('p-home',0); renderHome();
-};
+// ── HF
+const pingHF=async tok=>{try{const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}});return r.status===200;}catch(e){return false;}};
+function fillHF(){
+  q('hf-tok').value=S.hfToken||'';
+  const chk=()=>{const t=q('hf-tok').value.trim();q('hf-verify-btn').disabled=!t;q('hf-save-btn').disabled=true;};
+  q('hf-tok').oninput=chk;
+  q('hf-verify-btn').onclick=async()=>{
+    const tok=q('hf-tok').value.trim();showFb('hf-fb','info','Verifying…');
+    const ok=await pingHF(tok);
+    if(ok){showFb('hf-fb','ok','✓ Token valid!');q('hf-save-btn').disabled=false;q('hf-save-btn')._tok=tok;}
+    else{showFb('hf-fb','err','✗ Invalid token. Check huggingface.co/settings/tokens');q('hf-save-btn').disabled=true;}
+  };
+  q('hf-save-btn').onclick=()=>{
+    S.hfToken=q('hf-save-btn')._tok||q('hf-tok').value.trim();
+    S.hfOk=true;saveS();updateDots();go('p-home',0);renderHome();
+  };
+  chk();
+}
 
 // ══════════════════════════════════════════════════════════════
-//  MODEL CATALOGUE
-//  All use bartowski/mradermacher GGUF repos — split files
-//  for large models, wllama auto-loads all shards.
-//  For >2GB models: use the first shard filename (-00001-of-XXXXX.gguf)
+//  CATALOGUES
 // ══════════════════════════════════════════════════════════════
-const MODELS = [
-  // ── SmolLM2 ──
-  { id:'smol-135m', name:'SmolLM2 135M', hfRepo:'bartowski/SmolLM2-135M-Instruct-GGUF', hfFile:'SmolLM2-135M-Instruct-Q4_K_M.gguf', size:'90 MB', layers:30, ramMb:180, tag:'INSTANT' },
-  { id:'smol-1.7b', name:'SmolLM2 1.7B', hfRepo:'bartowski/SmolLM2-1.7B-Instruct-GGUF', hfFile:'SmolLM2-1.7B-Instruct-Q4_K_M.gguf', size:'1.1 GB', layers:24, ramMb:750, tag:'FAST' },
-  // ── Qwen 2.5 ──
-  { id:'qwen2.5-0.5b', name:'Qwen 2.5 0.5B', hfRepo:'Qwen/Qwen2.5-0.5B-Instruct-GGUF', hfFile:'qwen2.5-0.5b-instruct-q4_k_m.gguf', size:'400 MB', layers:24, ramMb:340, tag:null },
-  { id:'qwen2.5-7b',   name:'Qwen 2.5 7B',   hfRepo:'bartowski/Qwen2.5-7B-Instruct-GGUF', hfFile:'Qwen2.5-7B-Instruct-Q4_K_M.gguf', size:'4.7 GB', layers:28, ramMb:2800, tag:'BALANCED' },
-  { id:'qwen2.5-14b',  name:'Qwen 2.5 14B',  hfRepo:'bartowski/Qwen2.5-14B-Instruct-GGUF', hfFile:'Qwen2.5-14B-Instruct-Q4_K_M.gguf', size:'8.9 GB', layers:48, ramMb:5600, tag:null },
-  { id:'qwen2.5-32b',  name:'Qwen 2.5 32B',  hfRepo:'bartowski/Qwen2.5-32B-Instruct-GGUF', hfFile:'Qwen2.5-32B-Instruct-Q4_K_M-00001-of-00002.gguf', size:'19.0 GB', layers:64, ramMb:11000, tag:'LARGE', split:true },
-  { id:'qwen2.5-72b',  name:'Qwen 2.5 72B',  hfRepo:'bartowski/Qwen2.5-72B-Instruct-GGUF', hfFile:'Qwen2.5-72B-Instruct-Q4_K_M-00001-of-00009.gguf', size:'43 GB', layers:80, ramMb:26000, tag:'HUGE', split:true },
-  // ── Llama 3 ──
-  { id:'llama3.2-1b',  name:'Llama 3.2 1B',  hfRepo:'bartowski/Llama-3.2-1B-Instruct-GGUF', hfFile:'Llama-3.2-1B-Instruct-Q4_K_M.gguf', size:'810 MB', layers:16, ramMb:550, tag:null },
-  { id:'llama3.2-3b',  name:'Llama 3.2 3B',  hfRepo:'bartowski/Llama-3.2-3B-Instruct-GGUF', hfFile:'Llama-3.2-3B-Instruct-Q4_K_M.gguf', size:'2.0 GB', layers:28, ramMb:1100, tag:null },
-  { id:'llama3.1-8b',  name:'Llama 3.1 8B',  hfRepo:'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF', hfFile:'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf', size:'4.9 GB', layers:32, ramMb:3200, tag:null },
-  { id:'llama3.3-70b', name:'Llama 3.3 70B',  hfRepo:'bartowski/Llama-3.3-70B-Instruct-GGUF', hfFile:'Llama-3.3-70B-Instruct-Q4_K_M-00001-of-00009.gguf', size:'42 GB', layers:80, ramMb:25000, tag:'HUGE', split:true },
-  // ── Phi ──
-  { id:'phi3.5',  name:'Phi-3.5 Mini',  hfRepo:'bartowski/Phi-3.5-mini-instruct-GGUF', hfFile:'Phi-3.5-mini-instruct-Q4_K_M.gguf', size:'2.3 GB', layers:32, ramMb:1400, tag:null },
-  { id:'phi4-14b', name:'Phi-4 14B',    hfRepo:'bartowski/phi-4-GGUF', hfFile:'phi-4-Q4_K_M.gguf', size:'8.8 GB', layers:40, ramMb:5500, tag:null },
-  // ── Gemma 2 ──
-  { id:'gemma2-2b', name:'Gemma 2 2B',  hfRepo:'bartowski/gemma-2-2b-it-GGUF', hfFile:'gemma-2-2b-it-Q4_K_M.gguf', size:'1.7 GB', layers:26, ramMb:950, tag:null },
-  { id:'gemma2-9b', name:'Gemma 2 9B',  hfRepo:'bartowski/gemma-2-9b-it-GGUF', hfFile:'gemma-2-9b-it-Q4_K_M.gguf', size:'5.8 GB', layers:42, ramMb:3600, tag:null },
-  { id:'gemma2-27b', name:'Gemma 2 27B', hfRepo:'bartowski/gemma-2-27b-it-GGUF', hfFile:'gemma-2-27b-it-Q4_K_M-00001-of-00002.gguf', size:'16.6 GB', layers:46, ramMb:9500, tag:'LARGE', split:true },
-  // ── Mistral ──
-  { id:'mistral-7b', name:'Mistral 7B v0.3', hfRepo:'bartowski/Mistral-7B-Instruct-v0.3-GGUF', hfFile:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf', size:'4.4 GB', layers:32, ramMb:2800, tag:null },
-  { id:'mixtral-8x7b', name:'Mixtral 8×7B MoE', hfRepo:'bartowski/Mixtral-8x7B-Instruct-v0.1-GGUF', hfFile:'Mixtral-8x7B-Instruct-v0.1-Q4_K_M-00001-of-00002.gguf', size:'25 GB', layers:32, ramMb:15000, tag:'LARGE', split:true },
-  // ── DeepSeek ──
-  { id:'deepseek-r1-1.5b', name:'DeepSeek-R1 1.5B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf', size:'1.1 GB', layers:28, ramMb:700, tag:'REASON' },
-  { id:'deepseek-r1-7b',   name:'DeepSeek-R1 7B',   hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF',   hfFile:'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf',   size:'4.7 GB', layers:28, ramMb:2800, tag:'REASON' },
-  { id:'deepseek-r1-14b',  name:'DeepSeek-R1 14B',  hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF',  hfFile:'DeepSeek-R1-Distill-Qwen-14B-Q4_K_M-00001-of-00002.gguf', size:'8.9 GB', layers:48, ramMb:5600, tag:'REASON', split:true },
-  { id:'deepseek-r1-32b',  name:'DeepSeek-R1 32B',  hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF',  hfFile:'DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-00001-of-00003.gguf', size:'19 GB', layers:64, ramMb:11000, tag:'REASON', split:true },
-  { id:'deepseek-r1-70b',  name:'DeepSeek-R1 70B',  hfRepo:'bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF', hfFile:'DeepSeek-R1-Distill-Llama-70B-Q4_K_M-00001-of-00009.gguf', size:'42 GB', layers:80, ramMb:25000, tag:'REASON', split:true },
+const MODELS=[
+  {id:'smol-135m', name:'SmolLM2 135M',    hfRepo:'bartowski/SmolLM2-135M-Instruct-GGUF',        hfFile:'SmolLM2-135M-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'90 MB', L:30,ram:180,  tag:'INSTANT'},
+  {id:'smol-1.7b', name:'SmolLM2 1.7B',    hfRepo:'bartowski/SmolLM2-1.7B-Instruct-GGUF',        hfFile:'SmolLM2-1.7B-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'1.1 GB',L:24,ram:750,  tag:'FAST'},
+  {id:'qwen-0.5b', name:'Qwen 2.5 0.5B',   hfRepo:'Qwen/Qwen2.5-0.5B-Instruct-GGUF',            hfFile:'qwen2.5-0.5b-instruct-q4_k_m.gguf',                       eng:'wllama',size:'400 MB',L:24,ram:340,  tag:null},
+  {id:'qwen-7b',   name:'Qwen 2.5 7B',     hfRepo:'bartowski/Qwen2.5-7B-Instruct-GGUF',          hfFile:'Qwen2.5-7B-Instruct-Q4_K_M.gguf',                        eng:'wllama',size:'4.7 GB',L:28,ram:2800, tag:'BALANCED'},
+  {id:'qwen-14b',  name:'Qwen 2.5 14B',    hfRepo:'bartowski/Qwen2.5-14B-Instruct-GGUF',         hfFile:'Qwen2.5-14B-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'8.9 GB',L:48,ram:5600, tag:null},
+  {id:'qwen-32b',  name:'Qwen 2.5 32B',    hfRepo:'bartowski/Qwen2.5-32B-Instruct-GGUF',         hfFile:'Qwen2.5-32B-Instruct-Q4_K_M-00001-of-00002.gguf',        eng:'wllama',size:'19 GB', L:64,ram:11000,tag:'LARGE',split:true},
+  {id:'qwen-72b',  name:'Qwen 2.5 72B',    hfRepo:'bartowski/Qwen2.5-72B-Instruct-GGUF',         hfFile:'Qwen2.5-72B-Instruct-Q4_K_M-00001-of-00009.gguf',        eng:'wllama',size:'43 GB', L:80,ram:26000,tag:'HUGE', split:true},
+  {id:'llama-1b',  name:'Llama 3.2 1B',    hfRepo:'bartowski/Llama-3.2-1B-Instruct-GGUF',        hfFile:'Llama-3.2-1B-Instruct-Q4_K_M.gguf',                      eng:'wllama',size:'810 MB',L:16,ram:550,  tag:null},
+  {id:'llama-3b',  name:'Llama 3.2 3B',    hfRepo:'bartowski/Llama-3.2-3B-Instruct-GGUF',        hfFile:'Llama-3.2-3B-Instruct-Q4_K_M.gguf',                      eng:'wllama',size:'2.0 GB',L:28,ram:1100, tag:null},
+  {id:'llama-8b',  name:'Llama 3.1 8B',    hfRepo:'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF',   hfFile:'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',                 eng:'wllama',size:'4.9 GB',L:32,ram:3200, tag:null},
+  {id:'llama-70b', name:'Llama 3.3 70B',   hfRepo:'bartowski/Llama-3.3-70B-Instruct-GGUF',       hfFile:'Llama-3.3-70B-Instruct-Q4_K_M-00001-of-00009.gguf',      eng:'wllama',size:'42 GB', L:80,ram:25000,tag:'HUGE', split:true},
+  {id:'phi3.5',    name:'Phi-3.5 Mini',    hfRepo:'bartowski/Phi-3.5-mini-instruct-GGUF',         hfFile:'Phi-3.5-mini-instruct-Q4_K_M.gguf',                      eng:'wllama',size:'2.3 GB',L:32,ram:1400, tag:null},
+  {id:'phi4',      name:'Phi-4 14B',       hfRepo:'bartowski/phi-4-GGUF',                         hfFile:'phi-4-Q4_K_M.gguf',                                      eng:'wllama',size:'8.8 GB',L:40,ram:5500, tag:null},
+  {id:'gemma2-2b', name:'Gemma 2 2B',      hfRepo:'bartowski/gemma-2-2b-it-GGUF',                hfFile:'gemma-2-2b-it-Q4_K_M.gguf',                              eng:'wllama',size:'1.7 GB',L:26,ram:950,  tag:null},
+  {id:'gemma2-9b', name:'Gemma 2 9B',      hfRepo:'bartowski/gemma-2-9b-it-GGUF',                hfFile:'gemma-2-9b-it-Q4_K_M.gguf',                              eng:'wllama',size:'5.8 GB',L:42,ram:3600, tag:null},
+  {id:'gemma2-27b',name:'Gemma 2 27B',     hfRepo:'bartowski/gemma-2-27b-it-GGUF',               hfFile:'gemma-2-27b-it-Q4_K_M-00001-of-00002.gguf',              eng:'wllama',size:'16.6 GB',L:46,ram:9500,tag:'LARGE',split:true},
+  {id:'mistral-7b',name:'Mistral 7B v0.3', hfRepo:'bartowski/Mistral-7B-Instruct-v0.3-GGUF',     hfFile:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf',                  eng:'wllama',size:'4.4 GB',L:32,ram:2800, tag:null},
+  {id:'ds-1.5b',   name:'DeepSeek-R1 1.5B',hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF',hfFile:'DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf',            eng:'wllama',size:'1.1 GB',L:28,ram:700,  tag:'REASON'},
+  {id:'ds-7b',     name:'DeepSeek-R1 7B',  hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF',  hfFile:'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf',               eng:'wllama',size:'4.7 GB',L:28,ram:2800, tag:'REASON'},
+  {id:'ds-14b',    name:'DeepSeek-R1 14B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-14B-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'8.9 GB',L:48,ram:5600,tag:'REASON',split:true},
+  {id:'ds-32b',    name:'DeepSeek-R1 32B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-00001-of-00003.gguf',eng:'wllama',size:'19 GB', L:64,ram:11000,tag:'REASON',split:true},
+  {id:'ds-70b',    name:'DeepSeek-R1 70B', hfRepo:'bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF',hfFile:'DeepSeek-R1-Distill-Llama-70B-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:25000,tag:'REASON',split:true},
+  // Transformers.js ONNX models (no GGUF needed)
+  {id:'tjs-smol135', name:'SmolLM2 135M (ONNX)',  hfRepo:'HuggingFaceTB/SmolLM2-135M-Instruct',eng:'transformers',size:'~270 MB',L:30,ram:350,tag:'INSTANT'},
+  {id:'tjs-smol360', name:'SmolLM2 360M (ONNX)',  hfRepo:'HuggingFaceTB/SmolLM2-360M-Instruct',eng:'transformers',size:'~730 MB',L:32,ram:600, tag:'FAST'},
+  {id:'tjs-phi3.5',  name:'Phi-3.5 Mini (ONNX)',  hfRepo:'onnx-community/Phi-3.5-mini-instruct-onnx-web',eng:'transformers',size:'~2.3 GB',L:32,ram:1600,tag:null},
 ];
 
-// ── huihui abliterated models ──
-const ABLITERATED = [
-  { id:'huihui-qwen3-1.7b', name:'Qwen3 1.7B Abliterated', hfRepo:'bartowski/huihui-ai_Qwen3-1.7B-abliterated-GGUF', hfFile:'huihui-ai_Qwen3-1.7B-abliterated-Q4_K_M.gguf', size:'1.1 GB', layers:28, ramMb:750, tag:'FAST', abliterated:true },
-  { id:'huihui-qwen3-4b',   name:'Qwen3 4B Abliterated',   hfRepo:'bartowski/huihui-ai_Qwen3-4B-abliterated-GGUF',   hfFile:'huihui-ai_Qwen3-4B-abliterated-Q4_K_M.gguf',   size:'2.5 GB', layers:36, ramMb:1600, tag:null, abliterated:true },
-  { id:'huihui-qwen3-8b',   name:'Qwen3 8B Abliterated',   hfRepo:'bartowski/huihui-ai_Qwen3-8B-abliterated-GGUF',   hfFile:'huihui-ai_Qwen3-8B-abliterated-Q4_K_M.gguf',   size:'5.0 GB', layers:36, ramMb:3200, tag:null, abliterated:true },
-  { id:'huihui-qwen3-14b',  name:'Qwen3 14B Abliterated',  hfRepo:'bartowski/huihui-ai_Qwen3-14B-abliterated-GGUF',  hfFile:'huihui-ai_Qwen3-14B-abliterated-Q4_K_M.gguf',  size:'8.9 GB', layers:40, ramMb:5600, tag:null, abliterated:true },
-  { id:'huihui-qwen3-30b',  name:'Qwen3 30B-A3B Abliterated', hfRepo:'bartowski/huihui-ai_Qwen3-30B-A3B-abliterated-GGUF', hfFile:'huihui-ai_Qwen3-30B-A3B-abliterated-Q4_K_M-00001-of-00002.gguf', size:'17.2 GB', layers:48, ramMb:10000, tag:'LARGE', abliterated:true, split:true },
-  { id:'huihui-qwen3-32b',  name:'Qwen3 32B Abliterated',  hfRepo:'bartowski/huihui-ai_Qwen3-32B-abliterated-GGUF',  hfFile:'huihui-ai_Qwen3-32B-abliterated-Q4_K_M-00001-of-00002.gguf',  size:'19 GB',  layers:64, ramMb:11500, tag:'LARGE', abliterated:true, split:true },
-  { id:'huihui-llama3.1-70b', name:'Llama 3.1 70B Abliterated', hfRepo:'bartowski/huihui-ai_Llama-3.1-70B-Instruct-abliterated-GGUF', hfFile:'huihui-ai_Llama-3.1-70B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf', size:'42 GB', layers:80, ramMb:26000, tag:'HUGE', abliterated:true, split:true },
-  { id:'huihui-qwen2.5-14b', name:'Qwen2.5 14B Abliterated', hfRepo:'bartowski/huihui-ai_Qwen2.5-14B-Instruct-abliterated-GGUF', hfFile:'huihui-ai_Qwen2.5-14B-Instruct-abliterated-Q4_K_M.gguf', size:'8.9 GB', layers:48, ramMb:5600, tag:null, abliterated:true },
-  { id:'huihui-qwen2.5-32b', name:'Qwen2.5 32B Abliterated', hfRepo:'bartowski/huihui-ai_Qwen2.5-32B-Instruct-abliterated-GGUF', hfFile:'huihui-ai_Qwen2.5-32B-Instruct-abliterated-Q4_K_M-00001-of-00002.gguf', size:'19 GB', layers:64, ramMb:11000, tag:'LARGE', abliterated:true, split:true },
-  { id:'huihui-qwen2.5-72b', name:'Qwen2.5 72B Abliterated', hfRepo:'bartowski/huihui-ai_Qwen2.5-72B-Instruct-abliterated-GGUF', hfFile:'huihui-ai_Qwen2.5-72B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf', size:'43 GB', layers:80, ramMb:26000, tag:'HUGE', abliterated:true, split:true },
-  { id:'huihui-deepseek-r1-7b', name:'DeepSeek-R1 7B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-GGUF', hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-Q4_K_M.gguf', size:'4.7 GB', layers:28, ramMb:2800, tag:'REASON', abliterated:true },
-  { id:'huihui-deepseek-r1-14b', name:'DeepSeek-R1 14B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-GGUF', hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-Q4_K_M-00001-of-00002.gguf', size:'8.9 GB', layers:48, ramMb:5600, tag:'REASON', abliterated:true, split:true },
-  { id:'huihui-deepseek-r1-32b', name:'DeepSeek-R1 32B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-GGUF', hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-Q4_K_M-00001-of-00003.gguf', size:'19 GB', layers:64, ramMb:11000, tag:'REASON', abliterated:true, split:true },
-  { id:'huihui-deepseek-r1-70b', name:'DeepSeek-R1 70B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-GGUF', hfFile:'huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-Q4_K_M-00001-of-00009.gguf', size:'42 GB', layers:80, ramMb:25000, tag:'REASON', abliterated:true, split:true },
+const ABLITERATED=[
+  {id:'hh-q3-1.7b', name:'Qwen3 1.7B Abliterated',      hfRepo:'bartowski/huihui-ai_Qwen3-1.7B-abliterated-GGUF',                     hfFile:'huihui-ai_Qwen3-1.7B-abliterated-Q4_K_M.gguf',                         eng:'wllama',size:'1.1 GB', L:28,ram:750,  tag:'FAST',  abl:true},
+  {id:'hh-q3-4b',   name:'Qwen3 4B Abliterated',        hfRepo:'bartowski/huihui-ai_Qwen3-4B-abliterated-GGUF',                       hfFile:'huihui-ai_Qwen3-4B-abliterated-Q4_K_M.gguf',                           eng:'wllama',size:'2.5 GB', L:36,ram:1600, tag:null,    abl:true},
+  {id:'hh-q3-8b',   name:'Qwen3 8B Abliterated',        hfRepo:'bartowski/huihui-ai_Qwen3-8B-abliterated-GGUF',                       hfFile:'huihui-ai_Qwen3-8B-abliterated-Q4_K_M.gguf',                           eng:'wllama',size:'5.0 GB', L:36,ram:3200, tag:null,    abl:true},
+  {id:'hh-q3-14b',  name:'Qwen3 14B Abliterated',       hfRepo:'bartowski/huihui-ai_Qwen3-14B-abliterated-GGUF',                      hfFile:'huihui-ai_Qwen3-14B-abliterated-Q4_K_M.gguf',                          eng:'wllama',size:'8.9 GB', L:40,ram:5600, tag:null,    abl:true},
+  {id:'hh-q3-30b',  name:'Qwen3 30B-A3B Abliterated',   hfRepo:'bartowski/huihui-ai_Qwen3-30B-A3B-abliterated-GGUF',                  hfFile:'huihui-ai_Qwen3-30B-A3B-abliterated-Q4_K_M-00001-of-00002.gguf',      eng:'wllama',size:'17.2 GB',L:48,ram:10000,tag:'LARGE',  abl:true,split:true},
+  {id:'hh-q3-32b',  name:'Qwen3 32B Abliterated',       hfRepo:'bartowski/huihui-ai_Qwen3-32B-abliterated-GGUF',                      hfFile:'huihui-ai_Qwen3-32B-abliterated-Q4_K_M-00001-of-00002.gguf',          eng:'wllama',size:'19 GB',  L:64,ram:11500,tag:'LARGE',  abl:true,split:true},
+  {id:'hh-l70b',    name:'Llama 3.1 70B Abliterated',   hfRepo:'bartowski/huihui-ai_Llama-3.1-70B-Instruct-abliterated-GGUF',         hfFile:'huihui-ai_Llama-3.1-70B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:26000,tag:'HUGE',abl:true,split:true},
+  {id:'hh-q25-14b', name:'Qwen2.5 14B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-14B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-14B-Instruct-abliterated-Q4_K_M.gguf',              eng:'wllama',size:'8.9 GB', L:48,ram:5600, tag:null,    abl:true},
+  {id:'hh-q25-32b', name:'Qwen2.5 32B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-32B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-32B-Instruct-abliterated-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'19 GB',L:64,ram:11000,tag:'LARGE',abl:true,split:true},
+  {id:'hh-q25-72b', name:'Qwen2.5 72B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-72B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-72B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'43 GB',L:80,ram:26000,tag:'HUGE',abl:true,split:true},
+  {id:'hh-ds-7b',   name:'DeepSeek-R1 7B Abliterated',  hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-GGUF',    hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-Q4_K_M.gguf',       eng:'wllama',size:'4.7 GB', L:28,ram:2800, tag:'REASON',abl:true},
+  {id:'hh-ds-14b',  name:'DeepSeek-R1 14B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-GGUF',   hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'8.9 GB',L:48,ram:5600,tag:'REASON',abl:true,split:true},
+  {id:'hh-ds-32b',  name:'DeepSeek-R1 32B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-GGUF',   hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-Q4_K_M-00001-of-00003.gguf',eng:'wllama',size:'19 GB',L:64,ram:11000,tag:'REASON',abl:true,split:true},
+  {id:'hh-ds-70b',  name:'DeepSeek-R1 70B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-GGUF',  hfFile:'huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:25000,tag:'REASON',abl:true,split:true},
 ];
 
-const ALL_MODELS = [...MODELS, ...ABLITERATED];
+const ALL=[...MODELS,...ABLITERATED];
+const findM=id=>ALL.find(m=>m.id===id)||S.models.find(m=>m.id===id)||null;
+const tagCls=t=>({INSTANT:'cgc',FAST:'cgc',BALANCED:'ccc',LARGE:'cac',HUGE:'crc',REASON:'cpc'})[t]||'cmc';
 
-function tagClass(tag) {
-  if(!tag) return '';
-  if(tag==='INSTANT'||tag==='FAST') return 'cgc';
-  if(tag==='HUGE'||tag==='LARGE')   return 'cac';
-  if(tag==='REASON')                return 'cpc';
-  return 'ccc';
-}
-
-// ── Home ──
-function renderHome() {
+// ── Home
+function renderHome(){
   updateDots();
-  const el = q('home-models');
-  if(!S.models.length) {
-    el.innerHTML = '<div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';
-    return;
-  }
-  el.innerHTML = S.models.map(m => {
-    const full = ALL_MODELS.find(x=>x.id===m.id) || m;
+  const el=q('home-models');
+  if(!S.models.length){el.innerHTML='<div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';return;}
+  el.innerHTML=S.models.map(m=>{
+    const f=findM(m.id)||m;
     return `<div class="mc ${m.cached?'rdy':''}" onclick="openModel('${m.id}')">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-        <div style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</div>
-        ${full.abliterated?'<div class="chip cpc">ABLITERATED</div>':''}
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <div style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.name)}</div>
+        ${f.abl?'<div class="chip cpc">ABL</div>':''}
         <div class="chip ${m.cached?'cgc':'cmc'}">${m.cached?'cached':'ready'}</div>
       </div>
-      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${full.size||'?'} · ${full.layers||'?'} layers · ~${full.ramMb||'?'}MB${full.split?' · split':''}</div>
+      <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${f.size||'?'} · ${f.L||'?'}L · ${m.eng||f.eng||'auto'}${f.split?' · split':''}</div>
     </div>`;
   }).join('');
 }
 
-// ── Tabs ──
-let _tab = 'curated';
-window.switchTab = t => {
-  _tab = t;
-  ['curated','abliterated','hf','custom'].forEach(x => q('t-'+x).classList.toggle('on', x===t));
-  if(t==='curated')      renderCurated();
-  else if(t==='abliterated') renderAbliterated();
-  else if(t==='hf')      renderHFTab();
-  else                   renderCustomTab();
-};
-window.renderCurated = renderCurated;
-
-function modelCard(m) {
-  const got = S.models.find(x=>x.id===m.id);
+// ── Tabs
+let _tab='curated';
+function switchTab(t){
+  _tab=t;
+  ['curated','abliterated','hf','custom'].forEach(x=>q('t-'+x).classList.toggle('on',x===t));
+  ({curated:renderCurated,abliterated:renderAbliterated,hf:renderHFTab,custom:renderCustomTab})[t]?.();
+}
+function modelCard(m){
+  const got=S.models.find(x=>x.id===m.id);
   return `<div class="mc ${got?.cached?'rdy':''}" onclick="showDetail('${m.id}')">
     <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:2px">
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700">${m.name}</div>
-        <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${m.size} · ${m.layers}L · ~${m.ramMb}MB${m.split?' · multi-part':''}</div>
+        <div style="font-size:13px;font-weight:700">${esc(m.name)}</div>
+        <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${m.size} · ${m.L}L · ${m.eng}${m.split?' · split':''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
-        ${m.tag?`<div class="chip ${tagClass(m.tag)}">${m.tag}</div>`:''}
+        ${m.tag?`<div class="chip ${tagCls(m.tag)}">${m.tag}</div>`:''}
         ${got?.cached?'<div class="chip cgc">✓</div>':''}
       </div>
     </div>
   </div>`;
 }
+function renderCurated(){q('tab-body').innerHTML=MODELS.map(modelCard).join('');}
+function renderAbliterated(){q('tab-body').innerHTML='<div class="warn" style="margin-bottom:10px">⚠ Safety filters removed. Uncensored outputs possible. Use responsibly.</div>'+ABLITERATED.map(modelCard).join('');}
 
-function renderCurated() {
-  q('tab-body').innerHTML = MODELS.map(modelCard).join('');
-}
-function renderAbliterated() {
-  q('tab-body').innerHTML = `
-    <div class="warn-banner" style="margin-bottom:10px">
-      ⚠ Abliterated models have safety filters removed. They may produce uncensored content.
-      Use responsibly and in compliance with local laws.
-    </div>
-    <div style="font-size:10px;color:var(--tx3);margin-bottom:8px">
-      Source: <span style="color:var(--cy);font-family:var(--mono)">huihui-ai</span> — research-focused abliteration by the community
-    </div>
-    ${ABLITERATED.map(modelCard).join('')}`;
-}
-
-// ── HF Search ──
-let _hfTimer = null;
-function renderHFTab() {
-  q('tab-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">
-    ${!S.hfOk?`<div class="card cam" style="font-size:12px;color:var(--am)">No HF token — only public models visible.
-      <button onclick="go('p-hf',1);fillHF()" style="background:none;border:none;color:var(--cy);cursor:pointer;font-size:12px;margin-left:4px">Connect →</button></div>`:''}
+// HF search — searches ALL text-generation models, not just GGUF
+let _hfT=null;
+function renderHFTab(){
+  q('tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">
+    ${!S.hfOk?`<div class="card cam" style="font-size:12px;color:var(--am)">No HF token — public models only. <button onclick="go('p-hf',1);fillHF()" style="background:none;border:none;color:var(--cy);cursor:pointer;font-family:var(--font)">Connect →</button></div>`:''}
+    <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">Searches all text-generation models. GGUF → wllama. ONNX/transformers.js → transformers.js. Engine auto-detected.</div>
     <div style="position:relative">
-      <input id="hf-q" type="text" placeholder="Search GGUF models (llama, qwen, mistral…)"
-        style="width:100%;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
-        padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)"
-        oninput="hfSearchD(this.value)"
-        onfocus="this.style.borderColor='rgba(0,210,200,.4)'"
-        onblur="this.style.borderColor=''"/>
+      <input id="hf-q" type="text" placeholder="Search any HuggingFace model…"
+        style="width:100%;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)"
+        oninput="hfSearchD(this.value)" onfocus="this.style.borderColor='rgba(0,210,200,.4)'" onblur="this.style.borderColor=''"/>
       <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none">⌕</div>
     </div>
-    <div id="hf-res"><div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search to browse 165k+ GGUF models</div></div>
+    <div id="hf-res"><div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search any model on HuggingFace</div></div>
   </div>`;
 }
-window.hfSearchD = v => {
-  clearTimeout(_hfTimer);
-  if(!v.trim()) { q('hf-res').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">Search to browse</div>'; return; }
+function hfSearchD(v){
+  clearTimeout(_hfT);
+  if(!v.trim()){q('hf-res').innerHTML='';return;}
   q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">Searching…</div>';
-  _hfTimer = setTimeout(()=>hfSearch(v), 480);
-};
-async function hfSearch(query) {
-  try {
-    const h = S.hfToken ? {Authorization:`Bearer ${S.hfToken}`} : {};
-    const r = await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&library=gguf&limit=20&sort=downloads&direction=-1`,{headers:h});
-    const ms = await r.json();
-    if(!Array.isArray(ms)||!ms.length) { q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">No results.</div>'; return; }
-    q('hf-res').innerHTML = ms.map(m=>`
-      <div class="hrow" onclick="showDetail('${m.modelId}','hf')">
-        <div style="font-size:12px;font-weight:600;font-family:var(--mono);margin-bottom:3px;word-break:break-all">${m.modelId}</div>
-        <div style="display:flex;gap:12px">
+  _hfT=setTimeout(()=>hfSearch(v),480);
+}
+async function hfSearch(query){
+  try{
+    const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
+    const r=await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&pipeline_tag=text-generation&limit=24&sort=downloads&direction=-1`,{headers:h});
+    const ms=await r.json();
+    if(!Array.isArray(ms)||!ms.length){q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">No results.</div>';return;}
+    q('hf-res').innerHTML=ms.map(m=>{
+      const tags=m.tags||[];
+      const isGGUF=tags.includes('gguf');
+      const isTJS=(m.library_name||'')==='transformers.js'||tags.includes('transformers.js');
+      const eng=isGGUF?'wllama':isTJS?'transformers.js':'auto-detect';
+      return `<div class="hrow" onclick="showDetail('${esc(m.modelId)}')">
+        <div style="font-size:12px;font-weight:600;font-family:var(--mono);margin-bottom:3px;word-break:break-all">${esc(m.modelId)}</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span style="font-size:10px;color:var(--tx3)">⬇ ${(m.downloads||0).toLocaleString()}</span>
           <span style="font-size:10px;color:var(--tx3)">❤ ${(m.likes||0).toLocaleString()}</span>
+          <span class="chip ccc">${eng}</span>
           ${m.private?'<span class="chip cac">private</span>':''}
         </div>
-      </div>`).join('');
-  } catch(e) { q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--rd);font-size:12px">Search failed.</div>'; }
+      </div>`;
+    }).join('');
+  }catch(e){q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--rd);font-size:12px">Search failed.</div>';}
 }
 
-function renderCustomTab() {
-  q('tab-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:12px">
+function renderCustomTab(){
+  q('tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
     <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
-      Load any GGUF. Provide HuggingFace repo + first shard filename, or a direct URL.
-      For split models, wllama automatically downloads all shards from the first file.
+      Load any model. GGUF files → wllama. Transformers/ONNX repos → transformers.js.<br/>For split GGUFs provide the first shard — all chunks auto-downloaded.
     </div>
     <div class="field"><label>HF Repo (user/repo)</label><input id="c-repo" placeholder="bartowski/Llama-3.2-1B-Instruct-GGUF"/></div>
-    <div class="field"><label>Filename (use first shard for split models)</label><input id="c-file" placeholder="model-Q4_K_M.gguf or model-Q4_K_M-00001-of-00004.gguf"/></div>
+    <div class="field"><label>GGUF filename (blank = ONNX/auto)</label><input id="c-file" placeholder="model-Q4_K_M.gguf or first shard"/></div>
     <div style="text-align:center;font-size:11px;color:var(--tx3)">— or direct URL —</div>
-    <div class="field"><label>Direct Download URL</label><input id="c-url" placeholder="https://…/model.gguf"/></div>
+    <div class="field"><label>Direct URL</label><input id="c-url" placeholder="https://…/model.gguf"/></div>
     <div class="field"><label>Display Name</label><input id="c-name" placeholder="My Model"/></div>
     <button class="btn bp" onclick="addCustom()">Add Model →</button>
   </div>`;
 }
-window.addCustom = () => {
-  const repo=q('c-repo').value.trim(), file=q('c-file').value.trim(),
-        url=q('c-url').value.trim(), name=q('c-name').value.trim();
-  if(!((repo&&file)||url)) { alert('Fill in HF repo+file, or a direct URL.'); return; }
-  const id='custom--'+(repo||url).replace(/[^a-z0-9]/gi,'_').slice(0,40)+'--'+Date.now();
-  registerModel({ id, name:name||(file||url.split('/').pop()), hfRepo:repo||null, hfFile:file||null,
-    customUrl:url||null, size:'?', layers:32, ramMb:800, split:file.includes('-of-') });
-};
+function addCustom(){
+  const repo=q('c-repo').value.trim(),file=q('c-file').value.trim(),url=q('c-url').value.trim(),name=q('c-name').value.trim();
+  if(!(repo||url)){alert('Fill in an HF repo or a direct URL.');return;}
+  const isGGUF=(file||url).toLowerCase().endsWith('.gguf');
+  registerAndOpen({id:'custom_'+Date.now(),name:name||(repo||url).split('/').pop(),
+    hfRepo:repo||null,hfFile:file||null,customUrl:url||null,
+    eng:isGGUF?'wllama':'transformers',size:'?',L:32,ram:800,split:file.includes('-of-')});
+}
 
-// ── Detail page ──
-window.showDetail = async (modelId, src='curated') => {
-  const cm = ALL_MODELS.find(m=>m.id===modelId);
-  q('det-title').textContent = cm ? cm.name : modelId.split('/').pop();
-  q('det-body').innerHTML = '<div style="text-align:center;padding:28px;color:var(--tx3)">Loading…</div>';
+// ── Detail
+let _pickedHF=null;
+async function showDetail(modelId){
+  const cm=findM(modelId);
+  q('det-title').textContent=cm?cm.name:modelId.split('/').pop();
+  q('det-body').innerHTML='<div style="text-align:center;padding:28px;color:var(--tx3)">Loading…</div>';
   go('p-detail',1);
 
-  if(cm) {
-    const got = S.models.find(x=>x.id===cm.id);
-    const ramWarning = cm.ramMb > 8000
-      ? `<div class="warn-banner" style="margin-bottom:10px">
-          ⚠ This model requires ~${Math.round(cm.ramMb/1024)}GB RAM. It will download ${cm.size} of data
-          and requires a modern desktop with sufficient memory. Mobile devices are unlikely to support this.
-         </div>` : '';
-    q('det-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:11px">
-      ${ramWarning}
-      ${cm.abliterated?`<div class="warn-banner">⚠ Abliterated model — safety filters removed. Uncensored outputs possible.</div>`:''}
+  if(cm&&(cm.hfRepo||cm.customUrl)&&cm.eng){
+    // Known curated model — show detail immediately
+    const got=S.models.find(x=>x.id===cm.id);
+    const bigWarn=cm.ram>8000?`<div class="warn" style="margin-bottom:10px">⚠ ~${Math.round(cm.ram/1024)}GB RAM · ${cm.size} download · Desktop only</div>`:'';
+    q('det-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:11px">
+      ${bigWarn}${cm.abl?'<div class="warn" style="margin-bottom:0">⚠ Abliterated — safety filters removed.</div>':''}
       <div class="card">
-        <div style="font-size:17px;font-weight:800;margin-bottom:4px">${cm.name}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px">
-          ${[['Size',cm.size],['Layers',cm.layers],['Peak RAM','~'+cm.ramMb+'MB'],['Format','GGUF Q4_K_M'],
-             ['Shards',cm.split?'Multi-part (auto)':'Single file'],['Engine','wllama/llama.cpp']]
-            .map(([k,v])=>`<div style="background:var(--s3);border-radius:7px;padding:7px 10px">
-              <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div>
-              <div style="font-size:12.5px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div>
-            </div>`).join('')}
+        <div style="font-size:17px;font-weight:800;margin-bottom:8px">${esc(cm.name)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+          ${[['Size',cm.size],['Layers',cm.L||'?'],['Peak RAM','~'+cm.ram+'MB'],['Engine',cm.eng],
+             ['Format',cm.hfFile?.endsWith('.gguf')?'GGUF Q4_K_M':'ONNX/auto'],['Shards',cm.split?'Auto (all)':'Single']]
+            .map(([k,v])=>`<div style="background:var(--s3);border-radius:7px;padding:7px 10px"><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div><div style="font-size:12.5px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div></div>`).join('')}
         </div>
       </div>
-      <div class="card" style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);line-height:1.7;word-break:break-all">
-        ${cm.hfRepo}<br/>${cm.hfFile}
-      </div>
-      ${got
-        ? `<button class="btn bp" onclick="openModel('${cm.id}')">Open Chat →</button>
-           <button class="btn bg" onclick="removeModel('${cm.id}')">Remove from list</button>`
-        : `<button class="btn bp" onclick="addAndOpen(${JSON.stringify(cm.id)})">Add &amp; Load →</button>`}
-      <div style="font-size:11px;color:var(--tx3);text-align:center;line-height:1.7">
-        ${cm.split?'Split GGUF: all shards downloaded automatically from the first file.<br/>':''}
-        Model caches in IndexedDB — subsequent loads are instant and offline.
-      </div>
+      <div class="card" style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);line-height:1.7;word-break:break-all">${esc(cm.hfRepo||'')}${cm.hfFile?'<br/>'+esc(cm.hfFile):''}</div>
+      <button class="btn bp" id="det-btn">${got?'Open Chat →':'Add &amp; Load →'}</button>
+      ${got?'<button class="btn bg" id="det-rm">Remove from list</button>':''}
     </div>`;
+    q('det-btn').onclick=()=>{ if(got)openModel(cm.id); else registerAndOpen(cm); };
+    q('det-rm')?.addEventListener('click',()=>removeModel(cm.id));
   } else {
     await renderHFDetail(modelId);
   }
-};
-
-window.addAndOpen = id => {
-  const cm = ALL_MODELS.find(m=>m.id===id);
-  if(!cm) return;
-  registerModel(cm, false);
-  openModel(id);
-};
-window.removeModel = id => {
-  if(!confirm('Remove this model from your list?')) return;
-  S.models = S.models.filter(m=>m.id!==id);
-  saveS(); go('p-home',0); renderHome();
-};
-
-async function renderHFDetail(modelId) {
-  try {
-    const h = S.hfToken ? {Authorization:`Bearer ${S.hfToken}`} : {};
-    const r = await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});
-    if(!r.ok) throw new Error(`HTTP ${r.status}`);
-    const info = await r.json();
-    const gguf = (info.siblings||[]).filter(f=>f.rfilename.endsWith('.gguf'));
-    const q4   = gguf.filter(f=>f.rfilename.toLowerCase().includes('q4_k_m'));
-    const shown= (q4.length?q4:gguf).filter(f=>!f.rfilename.includes('-000') || f.rfilename.includes('-00001-of-')).slice(0,14);
-    _pickedHF = null;
-    q('det-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:11px">
-      <div class="card">
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);word-break:break-all;margin-bottom:5px">${modelId}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span>
-          <span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>
-          ${info.private?'<span class="chip cac">Private</span>':'<span class="chip cgc">Public</span>'}
-        </div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:6px">${gguf.length} GGUF file(s) found</div>
-      </div>
-      ${!shown.length?'<div class="card crd" style="font-size:12px;color:var(--rd)">No GGUF files found.</div>':`
-      <div>
-        <div class="slbl" style="padding:0 0 7px">Select file ${q4.length?'(Q4_K_M recommended)':''}:</div>
-        <div id="hf-file-list">
-          ${shown.map(f=>`
-            <div class="hrow" onclick="pickHFFile('${modelId}','${f.rfilename}',this)">
-              <div style="font-size:11.5px;font-family:var(--mono);word-break:break-all">${f.rfilename}</div>
-              ${f.rfilename.includes('-of-')?'<div style="font-size:10px;color:var(--am);margin-top:3px">⚡ split file — first shard selected</div>':''}
-            </div>`).join('')}
-        </div>
-        <div style="margin-top:8px">
-          <button class="btn bp" id="hf-pick-btn" disabled onclick="loadPickedHF()">Select a file above →</button>
-        </div>
-      </div>`}
-    </div>`;
-  } catch(e) {
-    q('det-body').innerHTML = `<div class="card crd" style="font-size:12px;color:var(--rd)">
-      Failed to load: ${esc(e.message)}<br/>May be private — try adding a HuggingFace token.</div>`;
-  }
 }
 
-let _pickedHF = null;
-window.pickHFFile = (repo, file, el) => {
-  document.querySelectorAll('#hf-file-list .hrow').forEach(e=>e.classList.remove('sel'));
-  el.classList.add('sel');
-  _pickedHF = {repo, file};
-  const b=q('hf-pick-btn'); b.disabled=false;
-  b.textContent = `Load ${file.split('/').pop()} →`;
-};
-window.loadPickedHF = () => {
-  if(!_pickedHF) return;
-  const {repo,file} = _pickedHF;
-  const id = 'hf--'+repo.replace('/','--')+'--'+file.replace('.gguf','').replace(/[^a-z0-9]/gi,'_').slice(0,50);
-  registerModel({ id, name:repo.split('/').pop(), hfRepo:repo, hfFile:file, size:'?', layers:32, ramMb:800, split:file.includes('-of-') }, false);
-  openModel(id);
-};
+async function renderHFDetail(modelId){
+  try{
+    const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
+    const r=await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const info=await r.json();
+    const files=(info.siblings||[]).map(f=>f.rfilename);
+    const gguf=files.filter(f=>f.endsWith('.gguf'));
+    const onnx=files.filter(f=>f.endsWith('.onnx')||f.includes('/onnx/'));
+    const lib=(info.library_name||'');
+    const isTJS=lib==='transformers.js'||(info.tags||[]).includes('transformers.js');
+    const hasGGUF=gguf.length>0;
+    const canTJS=isTJS||onnx.length>0||(lib==='transformers')||(info.tags||[]).includes('text-generation');
 
-function registerModel(m, andOpen=false) {
-  const entry = { ...m, cached:false };
-  const idx = S.models.findIndex(x=>x.id===m.id);
-  if(idx>=0) S.models[idx]=entry; else S.models.push(entry);
-  saveS();
-  renderHome();
-  if(andOpen) openModel(m.id);
-}
+    _pickedHF=null;
+    let fileSection='<div class="warn">No GGUF or ONNX files detected. This model may not be runnable directly in the browser.</div>';
 
-// ══════════════════════════════════════════════════════════════
-//  WLLAMA ENGINE
-//  - loadModelFromHF(repo, firstShardFile) auto-fetches all chunks
-//  - parallelDownloads: 5 for faster multi-shard downloads
-//  - createCompletion() streams real tokens
-// ══════════════════════════════════════════════════════════════
-let _wllama    = null;
-let _loadedId  = null;
-let _inferring = false;
-let _chatHist  = [];  // keep conversation context
-
-window.openModel = async id => {
-  const m = ALL_MODELS.find(x=>x.id===id) || S.models.find(x=>x.id===id);
-  if(!m) return;
-  S.activeModel = id;
-  q('chat-title').textContent = m.name;
-  q('chat-sub').textContent   = `${m.layers||'?'}L · ~${m.ramMb||'?'}MB · wllama${m.split?' · split':''}`;
-  q('lgrid').innerHTML = Array.from({length:m.layers||32},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
-  q('lc-t').textContent = m.layers||32;
-  q('chat-msgs').innerHTML = '';
-  q('chat-in').value = ''; q('chat-in').style.height='auto';
-  _chatHist = [];
-  go('p-chat',1);
-  if(_loadedId !== id) await loadModel(m);
-};
-
-async function loadModel(m) {
-  const msgs = q('chat-msgs');
-  q('sbtn').disabled = true;
-
-  // Show loading bubble
-  const loadBub = appendBubble('asst','');
-  let dots = 0;
-  const dotInterval = setInterval(() => {
-    loadBub.innerHTML = '<div class="tdots"><span></span><span></span><span></span></div>'
-      + `<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:7px">`
-      + `Loading ${m.name}…</div>`;
-  }, 500);
-
-  try {
-    if(_wllama) { try { await _wllama.exit(); } catch(e){} _wllama = null; _loadedId = null; }
-
-    _wllama = new Wllama(WasmFromCDN, {
-      parallelDownloads: 5,
-      logger: LoggerWithoutDebug,
-    });
-
-    const loadOpts = {
-      progressCallback: ({loaded, total}) => {
-        const pct = total ? Math.round(loaded/total*100) : 0;
-        const mb  = (loaded/1024/1024).toFixed(1);
-        const tot = total ? (total/1024/1024/1024).toFixed(2)+'GB' : '?';
-        loadBub.innerHTML = `<div style="font-size:12px;font-weight:600;margin-bottom:8px">⬇ Downloading ${m.name}</div>`
-          + `<div style="width:100%;background:var(--s3);border-radius:3px;height:4px;overflow:hidden;margin-bottom:6px">`
-          + `<div style="height:100%;width:${pct}%;background:var(--cy);border-radius:3px;transition:width .15s"></div></div>`
-          + `<div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${pct}% · ${mb}MB of ${tot}</div>`
-          + (m.split?`<div style="font-size:10px;color:var(--am);margin-top:5px">⚡ Downloading all shards in parallel (5 at a time)</div>`:'')
-          + `<div style="font-size:10px;color:var(--tx3);margin-top:5px">Caches in IndexedDB — instant on next load</div>`;
-        scrollC();
-      },
-    };
-    if(S.hfToken) loadOpts.headers = {Authorization:`Bearer ${S.hfToken}`};
-
-    if(m.hfRepo && m.hfFile) {
-      await _wllama.loadModelFromHF(m.hfRepo, m.hfFile, loadOpts);
-    } else if(m.customUrl) {
-      await _wllama.loadModelFromUrl(m.customUrl, loadOpts);
-    } else {
-      throw new Error('No model source defined');
+    if(hasGGUF){
+      const q4=gguf.filter(f=>f.toLowerCase().includes('q4_k_m'));
+      const shown=(q4.length?q4:gguf).filter(f=>!f.includes('-0000')||f.includes('-00001-of-')).slice(0,14);
+      fileSection=`<div>
+        <div class="slbl" style="padding:0 0 7px">Select GGUF file:</div>
+        <div id="hf-file-list">${shown.map(f=>`
+          <div class="hrow" data-repo="${esc(modelId)}" data-file="${esc(f)}" onclick="pickHFFile(this)">
+            <div style="font-size:11.5px;font-family:var(--mono);word-break:break-all">${esc(f)}</div>
+            ${f.includes('-of-')?'<div style="font-size:10px;color:var(--am);margin-top:3px">⚡ split — first shard, rest auto-downloaded</div>':''}
+          </div>`).join('')}</div>
+        <button class="btn bp" id="hf-pick-btn" disabled style="margin-top:8px">Select a file above →</button>
+      </div>`;
+    } else if(canTJS){
+      fileSection=`<div class="card" style="background:var(--gn0);border-color:rgba(34,196,122,.2);font-size:12.5px;color:var(--gn);margin-bottom:8px">✓ Will load via transformers.js (ONNX pipeline)</div>
+        <button class="btn bp" id="hf-tjs-btn">Load via Transformers.js →</button>`;
     }
 
-    clearInterval(dotInterval);
-    _loadedId = id => m.id;
-    _loadedId = m.id;
+    q('det-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:11px">
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;font-family:var(--mono);word-break:break-all;margin-bottom:5px">${esc(modelId)}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span>
+          <span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>
+          <span class="chip ccc">${hasGGUF?'wllama':canTJS?'transformers.js':'unknown'}</span>
+          ${info.private?'<span class="chip cac">Private</span>':'<span class="chip cgc">Public</span>'}
+        </div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:6px">${gguf.length} GGUF · ${onnx.length} ONNX · lib: ${lib||'unknown'}</div>
+      </div>
+      ${fileSection}
+    </div>`;
 
-    const idx = S.models.findIndex(x=>x.id===m.id);
-    if(idx>=0) { S.models[idx].cached = true; saveS(); renderHome(); }
-
-    loadBub.innerHTML = renderMd(`**${m.name}** loaded and ready.\n\nModel is running locally via llama.cpp WASM — no data leaves your device.`);
-    q('sbtn').disabled = false;
-
-  } catch(err) {
-    clearInterval(dotInterval);
-    const e = err?.message || String(err);
-    loadBub.innerHTML = renderMd(`**Failed to load model.**\n\n\`\`\`\n${e}\n\`\`\`\n\n**Tips:**\n- Check the HF repo and filename are correct\n- Gated models need a HuggingFace token (Settings → HuggingFace)\n- Large models need substantial RAM — try a smaller quantized version\n- Use Chrome or Edge for best compatibility`);
-    q('sbtn').disabled = true;
+    if(hasGGUF){
+      q('hf-pick-btn').onclick=loadPickedHF;
+    } else if(canTJS){
+      q('hf-tjs-btn')?.addEventListener('click',()=>{
+        registerAndOpen({id:'tjs_'+Date.now(),name:modelId.split('/').pop(),hfRepo:modelId,hfFile:null,eng:'transformers',size:'?',L:32,ram:1000});
+      });
+    }
+  }catch(e){
+    q('det-body').innerHTML=`<div class="card crd" style="font-size:12px;color:var(--rd)">Failed: ${esc(e.message)}<br/>Model may be private — add a HuggingFace token in Settings.</div>`;
   }
 }
 
-window.clearChat = () => {
-  q('chat-msgs').innerHTML = ''; _chatHist = [];
-  if(_loadedId === S.activeModel) {
-    const m = ALL_MODELS.find(x=>x.id===S.activeModel)||S.models.find(x=>x.id===S.activeModel);
-    appendBubble('asst', renderMd(`**${m?.name||'Model'}** ready. Chat history cleared.`), true);
+function pickHFFile(el){
+  document.querySelectorAll('#hf-file-list .hrow').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  _pickedHF={repo:el.dataset.repo,file:el.dataset.file};
+  const b=q('hf-pick-btn');b.disabled=false;
+  b.textContent=`Load ${_pickedHF.file.split('/').pop()} →`;
+}
+function loadPickedHF(){
+  if(!_pickedHF)return;
+  const{repo,file}=_pickedHF;
+  registerAndOpen({id:'hf_'+Date.now(),name:repo.split('/').pop(),hfRepo:repo,hfFile:file,
+    eng:'wllama',size:'?',L:32,ram:800,split:file.includes('-of-')});
+}
+
+function registerAndOpen(m){
+  const entry={...m,cached:false};
+  const idx=S.models.findIndex(x=>x.id===m.id);
+  if(idx>=0)S.models[idx]=entry;else S.models.push(entry);
+  saveS();renderHome();openModel(m.id);
+}
+function removeModel(id){
+  if(!confirm('Remove this model?'))return;
+  S.models=S.models.filter(m=>m.id!==id);saveS();go('p-home',0);renderHome();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INFERENCE
+// ══════════════════════════════════════════════════════════════
+async function openModel(id){
+  const m=findM(id);
+  if(!m){console.error('Model not found:',id);return;}
+  S.activeModel=id;saveS();
+  const L=m.L||m.layers||32;
+  q('chat-title').textContent=m.name;
+  q('chat-sub').textContent=`${L}L · ~${m.ram||m.ramMb||'?'}MB · ${m.eng||'auto'}${m.split?' · split':''}`;
+  q('lgrid').innerHTML=Array.from({length:L},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
+  q('lc-t').textContent=L;
+  q('chat-msgs').innerHTML='';q('chat-in').value='';q('chat-in').style.height='auto';
+  _hist=[];
+  go('p-chat',1);
+  if(_loadedId!==id)await loadModel(m);
+}
+
+async function loadModel(m){
+  q('sbtn').setAttribute('disabled','');
+  // Tear down previous
+  if(_wllama){try{await _wllama.exit();}catch(e){}  _wllama=null;}
+  _tjsPipe=null;_loadedId=null;_engUsed=null;
+
+  const bub=appendBubble('asst','');
+  const setMsg=html=>{bub.innerHTML=html;scrollC();};
+
+  const eng=m.eng||'wllama';
+  setMsg(`<div style="display:flex;align-items:center;gap:9px">
+    <div class="spin" style="width:14px;height:14px;flex-shrink:0"></div>
+    <span style="font-size:12.5px">Loading <b>${esc(m.name)}</b> via <b>${eng}</b>…</span></div>`);
+
+  try{
+    if(eng==='wllama'){
+      await loadWllama(m,setMsg);
+    } else {
+      await loadTransformers(m,setMsg);
+    }
+    _loadedId=m.id;
+    const idx=S.models.findIndex(x=>x.id===m.id);
+    if(idx>=0){S.models[idx].cached=true;saveS();renderHome();}
+    q('sbtn').removeAttribute('disabled');
+  }catch(err){
+    const msg=String(err?.message||err);
+    console.error('Load failed:',err);
+    setMsg(renderMd(`**Failed to load ${m.name}**\n\n\`\`\`\n${msg}\n\`\`\`\n\n**Tips:**\n- Check the HF repo and filename are correct\n- For gated models: add a HuggingFace token in Settings\n- Large models need lots of RAM — try a smaller one\n- Check browser console (F12) for the full error`));
+    q('sbtn').setAttribute('disabled','');
   }
-};
-window.chatKey    = e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} };
-window.autoResize = el => { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; };
+}
 
-window.sendMsg = async () => {
-  if(_inferring || !_wllama) return;
-  const inp = q('chat-in');
-  const text = inp.value.trim();
-  if(!text) return;
-  inp.value=''; inp.style.height='auto';
+async function loadWllama(m,setMsg){
+  // WasmFromCDN is the officially supported CDN config object
+  // It already contains all correct WASM + worker JS paths from unpkg
+  _wllama = new Wllama(WasmFromCDN, { parallelDownloads: 5 });
 
-  const m = ALL_MODELS.find(x=>x.id===S.activeModel) || S.models.find(x=>x.id===S.activeModel);
-  _inferring = true;
-  q('sbtn').disabled = true;
-  appendBubble('user', text);
-  _chatHist.push({role:'user', content:text});
+  const opts={
+    progressCallback:({loaded,total})=>{
+      const pct=total?Math.round(loaded/total*100):0;
+      const mb=(loaded/1024/1024).toFixed(1);
+      const tot=total?(total/1024/1024/1024).toFixed(2)+'GB':'?';
+      setMsg(`<div style="font-size:12px;font-weight:600;margin-bottom:8px">⬇ ${esc(m.name)}</div>
+        <div style="width:100%;background:var(--s3);border-radius:3px;height:4px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${pct}%;background:var(--cy);border-radius:3px;transition:width .2s"></div></div>
+        <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${pct}% · ${mb}MB / ${tot}</div>
+        ${m.split?'<div style="font-size:10px;color:var(--am);margin-top:4px">⚡ All shards downloading (5 parallel)</div>':''}
+        <div style="font-size:10px;color:var(--tx3);margin-top:4px">Caches in IndexedDB — instant on next load</div>`);
+    },
+  };
+  if(S.hfToken)opts.headers={Authorization:`Bearer ${S.hfToken}`};
 
-  // Animate layers
-  q('ibar').style.display = 'block';
-  const anim = animLayers(m);
+  if(m.hfRepo&&m.hfFile) await _wllama.loadModelFromHF(m.hfRepo,m.hfFile,opts);
+  else if(m.customUrl)   await _wllama.loadModelFromUrl(m.customUrl,opts);
+  else throw new Error('No model source defined (need hfRepo+hfFile or customUrl)');
 
-  // Thinking dots
-  const trow = document.createElement('div');
-  trow.className = 'mrow asst';
-  trow.innerHTML = '<div class="bub asst"><div class="tdots"><span></span><span></span><span></span></div></div>';
-  q('chat-msgs').appendChild(trow); scrollC();
+  _engUsed='wllama';
+  setMsg(renderMd(`**${m.name}** ready\n\n🔧 wllama · llama.cpp WASM · ${threadMode}\n✓ Fully on-device — no data leaves your browser`));
+}
 
-  let full = '';
-  const arow = document.createElement('div'); arow.className = 'mrow asst';
-  const abub = document.createElement('div'); abub.className = 'bub asst';
+async function loadTransformers(m,setMsg){
+  if(S.hfToken)TJSEnv.accessToken=S.hfToken;
+  const device=hasWebGPU?'webgpu':'wasm';
+  _tjsPipe=await pipeline('text-generation',m.hfRepo,{
+    dtype:'q4',device,
+    progress_callback:(prog)=>{
+      if(prog.status==='downloading'&&prog.total){
+        const pct=Math.round(prog.loaded/prog.total*100);
+        setMsg(`<div style="font-size:12px;font-weight:600;margin-bottom:8px">⬇ ${esc(m.name)} — transformers.js</div>
+          <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-bottom:6px">${prog.file||''}</div>
+          <div style="width:100%;background:var(--s3);border-radius:3px;height:4px;overflow:hidden;margin-bottom:5px">
+            <div style="height:100%;width:${pct}%;background:var(--cy);border-radius:3px;transition:width .2s"></div></div>
+          <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${pct}%</div>`);
+      }
+    },
+  });
+  _engUsed='transformers';
+  setMsg(renderMd(`**${m.name}** ready\n\n🔧 Transformers.js${hasWebGPU?' · WebGPU':' · WASM'}\n✓ Fully on-device`));
+}
+
+// ── Chat
+function clearChat(){q('chat-msgs').innerHTML='';_hist=[];const m=findM(S.activeModel);if(m&&_loadedId===S.activeModel){const b=appendBubble('asst','');b.innerHTML=renderMd(`**${m.name}** — cleared.`);}}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+
+async function sendMsg(){
+  if(_inferring||(!_wllama&&!_tjsPipe))return;
+  const inp=q('chat-in');const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  const m=findM(S.activeModel);
+  _inferring=true;q('sbtn').setAttribute('disabled','');
+  appendBubble('user',text);
+  _hist.push({role:'user',content:text});
+
+  q('ibar').style.display='block';
+  const anim=animLayers(m);
+
+  const trow=document.createElement('div');trow.className='mrow asst';
+  trow.innerHTML='<div class="bub asst"><div class="tdots"><span></span><span></span><span></span></div></div>';
+  q('chat-msgs').appendChild(trow);scrollC();
+
+  let full='';
+  const arow=document.createElement('div');arow.className='mrow asst';
+  const abub=document.createElement('div');abub.className='bub asst';
   arow.appendChild(abub);
 
-  try {
-    // Build prompt from history
-    const promptText = _chatHist.map(h=>`${h.role==='user'?'User':'Assistant'}: ${h.content}`).join('\n') + '\nAssistant:';
-
-    await _wllama.createCompletion(promptText, {
-      nPredict:    S.settings.maxTokens || 512,
-      temperature: S.settings.temperature || 0.7,
-      repeatPenalty: S.settings.repPenalty || 1.1,
-      topP:        S.settings.topP || 0.9,
-      onNewToken: (_tok, _piece, cur) => {
-        full = cur;
-        if(trow.parentNode) q('chat-msgs').removeChild(trow);
-        abub.innerHTML = renderMd(full) + '<span class="cur"></span>';
-        if(!arow.parentNode) q('chat-msgs').appendChild(arow);
-        scrollC();
-      },
-    });
-  } catch(e) {
-    if(trow.parentNode) q('chat-msgs').removeChild(trow);
-    full = `Error during inference: ${e?.message||e}`;
-    appendBubble('asst', full);
+  try{
+    if(_engUsed==='wllama'){
+      const prompt=_hist.map(h=>`${h.role==='user'?'User':'Assistant'}: ${h.content}`).join('\n')+'\nAssistant:';
+      await _wllama.createCompletion(prompt,{
+        nPredict:S.settings.maxTokens||512,
+        temperature:S.settings.temperature||0.7,
+        repeatPenalty:S.settings.repPenalty||1.1,
+        topP:S.settings.topP||0.9,
+        onNewToken:(_t,_p,cur)=>{
+          full=cur;
+          if(trow.parentNode)q('chat-msgs').removeChild(trow);
+          abub.innerHTML=renderMd(full)+'<span class="cur"></span>';
+          if(!arow.parentNode)q('chat-msgs').appendChild(arow);
+          scrollC();
+        },
+      });
+    } else {
+      if(trow.parentNode)q('chat-msgs').removeChild(trow);
+      const out=await _tjsPipe(_hist.map(h=>({role:h.role,content:h.content})),{
+        max_new_tokens:S.settings.maxTokens||512,
+        temperature:S.settings.temperature||0.7,
+        repetition_penalty:S.settings.repPenalty||1.1,
+        top_p:S.settings.topP||0.9,
+        do_sample:true,
+        callback_function:(t)=>{
+          full+=t;
+          abub.innerHTML=renderMd(full)+'<span class="cur"></span>';
+          if(!arow.parentNode)q('chat-msgs').appendChild(arow);
+          scrollC();
+        },
+      });
+      if(!full)full=out?.[0]?.generated_text?.at(-1)?.content||'(no output)';
+    }
+  }catch(e){
+    if(trow.parentNode)q('chat-msgs').removeChild(trow);
+    appendBubble('asst',`Error: ${e?.message||e}`);
   }
 
-  // Finalize
-  if(arow.parentNode) abub.innerHTML = renderMd(full);
-  _chatHist.push({role:'assistant', content:full});
-  // Cap history to last 10 turns to avoid context overflow
-  if(_chatHist.length > 20) _chatHist = _chatHist.slice(-20);
-
-  anim.stop();
-  q('ibar').style.display = 'none';
-  _inferring = false;
-  q('sbtn').disabled = false;
+  if(arow.parentNode)abub.innerHTML=renderMd(full);
+  _hist.push({role:'assistant',content:full});
+  if(_hist.length>20)_hist=_hist.slice(-20);
+  anim.stop();q('ibar').style.display='none';
+  _inferring=false;q('sbtn').removeAttribute('disabled');
   scrollC();
-};
+}
 
-const scrollC = () => { const c=q('chat-msgs'); c.scrollTop=c.scrollHeight; };
-
-function animLayers(m) {
-  const L = m?.layers||32;
-  let stopped=false, i=0;
+const scrollC=()=>{const c=q('chat-msgs');c.scrollTop=c.scrollHeight;};
+function animLayers(m){
+  const L=m?.L||m?.layers||32;let stopped=false,i=0;
   (async()=>{
-    while(!stopped) {
-      if(i>0) { const p=q('lc'+(i-1)); if(p) p.className='lc done'; }
-      const cur=q('lc'+i); if(cur) cur.className='lc act';
-      q('lc-c').textContent = i+1;
-      q('l-ram').textContent = `~${Math.round((m?.ramMb||800)/L*(i+1)*0.38+20)}MB`;
-      i=(i+1)%L;
-      if(i===0){ for(let j=0;j<L;j++){const c=q('lc'+j);if(c)c.className='lc';} }
+    while(!stopped){
+      if(i>0){const p=q('lc'+(i-1));if(p)p.className='lc done';}
+      const cur=q('lc'+i);if(cur)cur.className='lc act';
+      q('lc-c').textContent=i+1;
+      q('l-ram').textContent=`~${Math.round((m?.ram||m?.ramMb||800)/L*(i+1)*0.38+20)}MB`;
+      i=(i+1)%L;if(i===0){for(let j=0;j<L;j++){const c=q('lc'+j);if(c)c.className='lc';}}
       await sleep(Math.random()*45+28);
     }
     for(let j=0;j<L;j++){const c=q('lc'+j);if(c)c.className='lc done';}
   })();
-  return { stop(){ stopped=true; } };
+  return{stop(){stopped=true;}};
 }
 
-// ── Markdown renderer ──
-function renderMd(text) {
-  if(!text) return '';
-  let html='', last=0;
-  const rx = /```(\w*)\n?([\s\S]*?)```/g;
-  let m;
-  while((m=rx.exec(text))!==null) {
-    if(m.index>last) html+=renderInline(text.slice(last,m.index));
-    const lang=(m[1]||'').trim()||'plaintext';
-    const code=m[2];
-    let hi;
-    try { hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value; }
-    catch(e){ hi=esc(code); }
-    html+=`<div style="border-radius:8px;overflow:hidden;margin:7px 0">
-      <div class="code-hdr"><span class="clbl">${esc(lang)}</span><button class="cpbtn" onclick="cpy(this)">Copy</button></div>
-      <pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre></div>`;
+// ── Markdown
+function renderMd(text){
+  if(!text)return'';
+  let html='',last=0;const rx=/```(\w*)\n?([\s\S]*?)```/g;let m;
+  while((m=rx.exec(text))!==null){
+    if(m.index>last)html+=renderInline(text.slice(last,m.index));
+    const lang=(m[1]||'').trim()||'plaintext',code=m[2];
+    let hi;try{hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value;}catch(e){hi=esc(code);}
+    html+=`<div style="border-radius:8px;overflow:hidden;margin:7px 0"><div class="code-hdr"><span class="clbl">${esc(lang)}</span><button class="cpbtn" onclick="cpy(this)">Copy</button></div><pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre></div>`;
     last=m.index+m[0].length;
   }
-  if(last<text.length) html+=renderInline(text.slice(last));
+  if(last<text.length)html+=renderInline(text.slice(last));
   return html;
 }
-function renderInline(t) {
-  t = esc(t);
-  t = t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
-  t = t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  t = t.replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/_([^_\n]+)_/g,'<em>$1</em>');
-  t = t.replace(/`([^`]+)`/g,'<code>$1</code>');
-  t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-  t = t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
-  t = t.replace(/^---$/gm,'<hr/>');
-  t = t.replace(/^\* (.+)$/gm,'<li>$1</li>').replace(/^- (.+)$/gm,'<li>$1</li>');
-  t = t.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  const lines=t.split('\n'); const out=[]; let inUl=false;
-  for(const line of lines) {
-    if(line.startsWith('<li>')) { if(!inUl){out.push('<ul>');inUl=true;} out.push(line); }
-    else { if(inUl){out.push('</ul>');inUl=false;}
-      if(line.match(/^<h[123]>|^<blockquote>|^<hr/)) out.push(line);
-      else if(line.trim()==='') out.push('');
-      else out.push(`<p>${line}</p>`); }
-  }
-  if(inUl) out.push('</ul>');
-  return out.join('');
+function renderInline(t){
+  t=esc(t);
+  t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/_([^_\n]+)_/g,'<em>$1</em>');
+  t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>').replace(/^---$/gm,'<hr/>');
+  t=t.replace(/^\* (.+)$/gm,'<li>$1</li>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  const lines=t.split('\n'),out=[];let inUl=false;
+  for(const line of lines){if(line.startsWith('<li>')){if(!inUl){out.push('<ul>');inUl=true;}out.push(line);}else{if(inUl){out.push('</ul>');inUl=false;}if(line.match(/^<h[123]>|^<blockquote>|^<hr/))out.push(line);else if(line.trim()==='')out.push('');else out.push(`<p>${line}</p>`);}}
+  if(inUl)out.push('</ul>');return out.join('');
 }
-window.cpy = btn => {
-  const code=btn.closest('[style]').querySelector('code').textContent;
-  navigator.clipboard.writeText(code).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',2e3);}).catch(()=>{});
-};
-
-function appendBubble(role, text, isHtml=false) {
-  const row=document.createElement('div'); row.className=`mrow ${role}`;
-  const bub=document.createElement('div'); bub.className=`bub ${role}`;
-  if(role==='asst'&&!isHtml) bub.innerHTML=renderMd(text);
-  else if(isHtml) bub.innerHTML=text;
-  else bub.textContent=text;
-  row.appendChild(bub); q('chat-msgs').appendChild(row); scrollC();
-  return bub;
+function cpy(btn){const code=btn.closest('[style]').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',2e3);}).catch(()=>{});}
+function appendBubble(role,text,isHtml=false){
+  const row=document.createElement('div');row.className=`mrow ${role}`;
+  const bub=document.createElement('div');bub.className=`bub ${role}`;
+  if(role==='asst'&&!isHtml)bub.innerHTML=renderMd(text);else if(isHtml)bub.innerHTML=text;else bub.textContent=text;
+  row.appendChild(bub);q('chat-msgs').appendChild(row);scrollC();return bub;
 }
 
-// ── Settings ──
-window.saveSettings = () => {
-  S.settings.maxTokens   = parseInt(q('s-tok').value)  || 512;
-  S.settings.temperature = parseFloat(q('s-temp').value)|| 0.7;
-  S.settings.repPenalty  = parseFloat(q('s-rep').value) || 1.1;
-  S.settings.topP        = parseFloat(q('s-topp').value)|| 0.9;
-  saveS(); go('p-home',0);
-};
-window.clearAll = () => { if(!confirm('Clear all saved data and reload?')) return; localStorage.removeItem(SK); location.reload(); };
+// ── Settings
+function saveSettings(){S.settings.maxTokens=parseInt(q('s-tok').value)||512;S.settings.temperature=parseFloat(q('s-temp').value)||0.7;S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;S.settings.topP=parseFloat(q('s-topp').value)||0.9;saveS();go('p-home',0);}
+function clearAll(){if(!confirm('Clear all data and reload?'))return;localStorage.removeItem(SK);location.reload();}
+
+// ── Expose to HTML onclick
+Object.assign(window,{go,fillTG,fillHF,switchTab,renderCurated,showDetail,pickHFFile,loadPickedHF,hfSearchD,addCustom,openModel,removeModel,clearChat,chatKey,autoResize,sendMsg,saveSettings,clearAll,cpy});
 
 boot();
 </script>
