@@ -4,644 +4,1066 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>MobileAirLLM</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
-:root{--bg:#080a0e;--bg1:#0d1017;--bg2:#131720;--bg3:#181d28;--line:rgba(255,255,255,0.055);--line2:rgba(255,255,255,0.10);--tx:#d8dce8;--tx2:rgba(216,220,232,0.5);--tx3:rgba(216,220,232,0.25);--cyan:#00d4c8;--amber:#f0a830;--green:#26c87a;--red:#e05555;--cyan-dim:rgba(0,212,200,0.10);--amber-dim:rgba(240,168,48,0.10);--green-dim:rgba(38,200,122,0.10);--red-dim:rgba(224,85,85,0.10);--font:'Manrope',sans-serif;--mono:'IBM Plex Mono',monospace;--r:10px}
+:root{
+  --bg:#07090d;--s1:#0c0f16;--s2:#11151e;--s3:#171c27;
+  --ln:rgba(255,255,255,0.055);--ln2:rgba(255,255,255,0.10);
+  --tx:#cdd5e0;--tx2:rgba(205,213,224,0.55);--tx3:rgba(205,213,224,0.28);
+  --cy:#00d2c8;--am:#f0a228;--gn:#22c47a;--rd:#e04f4f;
+  --cy0:rgba(0,210,200,0.10);--am0:rgba(240,162,40,0.10);
+  --gn0:rgba(34,196,122,0.10);--rd0:rgba(224,79,79,0.10);
+  --font:'Manrope',sans-serif;--mono:'IBM Plex Mono',monospace;--r:10px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--tx)}
-::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
-#app{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse 60% 40% at 20% 0%,rgba(0,212,200,0.05) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 80% 100%,rgba(240,168,48,0.04) 0%,transparent 60%),var(--bg)}
-.shell{position:relative;width:100%;max-width:420px;height:100%;max-height:880px;overflow:hidden;background:var(--bg1)}
-@media(min-width:480px){.shell{border-radius:20px;border:1px solid var(--line2);box-shadow:0 40px 100px rgba(0,0,0,0.9)}}
-.page{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
-.page.active{display:flex}
-@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideBack{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
-.page.anim-fwd{animation:slideIn 0.2s cubic-bezier(.16,1,.3,1) both}
-.page.anim-back{animation:slideBack 0.2s cubic-bezier(.16,1,.3,1) both}
-#boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--bg);transition:opacity 0.4s}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.07);border-radius:2px}
+#app{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;
+  background:radial-gradient(ellipse 55% 35% at 15% 0%,rgba(0,210,200,0.06) 0%,transparent 65%),
+  radial-gradient(ellipse 40% 25% at 85% 100%,rgba(240,162,40,0.05) 0%,transparent 65%),var(--bg)}
+.shell{position:relative;width:100%;max-width:420px;height:100%;max-height:880px;
+  overflow:hidden;background:var(--s1)}
+@media(min-width:480px){.shell{border-radius:22px;border:1px solid var(--ln2);
+  box-shadow:0 40px 100px rgba(0,0,0,0.92),0 0 0 1px rgba(0,210,200,0.03)}}
+
+/* ── PAGE SYSTEM ── */
+.pg{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
+.pg.on{display:flex}
+@keyframes pgIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pgBack{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
+.pg.ani-f{animation:pgIn .18s cubic-bezier(.16,1,.3,1) both}
+.pg.ani-b{animation:pgBack .18s cubic-bezier(.16,1,.3,1) both}
+
+/* ── BOOT ── */
+#boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;background:var(--bg);transition:opacity .35s}
 #boot.fade{opacity:0;pointer-events:none}
-.boot-mark{width:64px;height:64px;border-radius:16px;background:var(--bg2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,212,200,0.15)}
-.spin{width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--cyan);animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.hdr{display:flex;align-items:center;gap:8px;padding:13px 14px;border-bottom:1px solid var(--line);flex-shrink:0;background:var(--bg1)}
-.hdr-title{font-size:14px;font-weight:700;flex:1;text-align:center}
-.btn{width:100%;padding:13px 16px;border-radius:var(--r);border:none;font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .12s}
-.btn-p{background:var(--cyan);color:#050809;box-shadow:0 4px 20px rgba(0,212,200,0.25)}
-.btn-p:hover{filter:brightness(1.1)}
-.btn-p:disabled{background:var(--bg3);color:var(--tx3);box-shadow:none;cursor:default}
-.btn-g{background:var(--bg2);border:1px solid var(--line2);color:var(--tx2)}
-.btn-g:hover:not(:disabled){background:var(--bg3);color:var(--tx)}
-.btn-g:disabled{opacity:.4;cursor:default}
-.btn-d{background:var(--red-dim);border:1px solid rgba(224,85,85,.2);color:var(--red)}
-.back-btn{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--tx3);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .12s;flex-shrink:0}
-.back-btn:hover{color:var(--tx);background:var(--bg3)}
-.icon-btn{width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;flex-shrink:0}
-.icon-btn:hover{color:var(--tx);background:var(--bg3)}
-.spacer34{width:34px;flex-shrink:0}
+.boot-mark{width:62px;height:62px;border-radius:15px;background:var(--s2);border:1px solid var(--ln2);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 0 36px rgba(0,210,200,0.18)}
+.spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--ln2);
+  border-top-color:var(--cy);animation:sp .65s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;gap:8px;padding:12px 13px;
+  border-bottom:1px solid var(--ln);flex-shrink:0;background:var(--s1)}
+.htitle{font-size:14px;font-weight:700;flex:1;text-align:center}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:13px 16px;border-radius:var(--r);border:none;
+  font-family:var(--font);font-weight:600;font-size:13.5px;cursor:pointer;transition:all .12s}
+.bp{background:var(--cy);color:#040808;box-shadow:0 4px 18px rgba(0,210,200,0.22)}
+.bp:hover{filter:brightness(1.09)}
+.bp:disabled{background:var(--s3);color:var(--tx3);box-shadow:none;cursor:default}
+.bg{background:var(--s2);border:1px solid var(--ln2);color:var(--tx2)}
+.bg:hover:not(:disabled){background:var(--s3);color:var(--tx)}
+.bg:disabled{opacity:.4;cursor:default}
+.bd{background:var(--rd0);border:1px solid rgba(224,79,79,.2);color:var(--rd)}
+.bk{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--ln);
+  border-radius:8px;padding:6px 10px;color:var(--tx3);font-size:12px;cursor:pointer;
+  font-family:var(--font);transition:all .12s;flex-shrink:0}
+.bk:hover{color:var(--tx);background:var(--s3)}
+.ib{width:34px;height:34px;border-radius:8px;background:var(--s2);border:1px solid var(--ln);
+  color:var(--tx3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .12s;flex-shrink:0}
+.ib:hover{color:var(--tx);background:var(--s3)}
+.sp34{width:34px;flex-shrink:0}
+
+/* ── FIELDS ── */
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:600}
-.field input,.field select,.field textarea{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;color:var(--tx);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .12s;width:100%}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(0,212,200,.4)}
+.field input,.field select,.field textarea{background:var(--s2);border:1px solid var(--ln);
+  border-radius:var(--r);padding:11px 13px;color:var(--tx);font-family:var(--mono);
+  font-size:13px;outline:none;transition:border-color .12s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(0,210,200,.4)}
 .field input::placeholder{color:var(--tx3)}
-.field select option{background:var(--bg2)}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px}
-.card-cy{border-color:rgba(0,212,200,.2);background:var(--cyan-dim)}
-.card-gn{border-color:rgba(38,200,122,.2);background:var(--green-dim)}
-.card-rd{border-color:rgba(224,85,85,.2);background:var(--red-dim)}
-.card-am{border-color:rgba(240,168,48,.2);background:var(--amber-dim)}
+.field select option{background:var(--s2)}
+
+/* ── CARDS ── */
+.card{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px}
+.ccy{border-color:rgba(0,210,200,.2);background:var(--cy0)}
+.cgn{border-color:rgba(34,196,122,.2);background:var(--gn0)}
+.crd{border-color:rgba(224,79,79,.2);background:var(--rd0)}
+.cam{border-color:rgba(240,162,40,.2);background:var(--am0)}
+
+/* ── DOTS ── */
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all .2s}
-.dot-ok{background:var(--green);box-shadow:0 0 6px var(--green)}
-.dot-err{background:var(--red)}
-.dot-idle{background:var(--tx3)}
-.dot-spin{background:var(--cyan);animation:dp .9s ease-in-out infinite}
+.dok{background:var(--gn);box-shadow:0 0 6px var(--gn)}
+.derr{background:var(--rd)}
+.didle{background:var(--tx3)}
+.dspin{background:var(--cy);animation:dp .9s ease-in-out infinite}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:.2}}
-.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
-.chip-gn{background:var(--green-dim);color:var(--green);border:1px solid rgba(38,200,122,.2)}
-.chip-am{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(240,168,48,.2)}
-.chip-cy{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,200,.2)}
-.chip-rd{background:var(--red-dim);color:var(--red);border:1px solid rgba(224,85,85,.2)}
-.chip-mu{background:var(--bg3);color:var(--tx3);border:1px solid var(--line)}
-.pbar{height:3px;background:var(--line);border-radius:3px;overflow:hidden}
-.pbar-fill{height:100%;border-radius:3px;background:var(--cyan);transition:width .1s ease}
-.tabs{display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px}
-.tab{flex:1;padding:7px 4px;border:none;background:none;border-radius:6px;color:var(--tx3);font-family:var(--font);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .12s}
-.tab.active{background:var(--bg3);color:var(--tx)}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;
+  font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.cgc{background:var(--gn0);color:var(--gn);border:1px solid rgba(34,196,122,.2)}
+.cac{background:var(--am0);color:var(--am);border:1px solid rgba(240,162,40,.2)}
+.ccc{background:var(--cy0);color:var(--cy);border:1px solid rgba(0,210,200,.2)}
+.crc{background:var(--rd0);color:var(--rd);border:1px solid rgba(224,79,79,.2)}
+.cmc{background:var(--s3);color:var(--tx3);border:1px solid var(--ln)}
+
+/* ── PROGRESS ── */
+.pbar{height:3px;background:var(--ln);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:var(--cy);transition:width .15s ease}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;gap:2px}
+.tab{flex:1;padding:7px 4px;border:none;background:none;border-radius:6px;
+  color:var(--tx3);font-family:var(--font);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .12s}
+.tab.on{background:var(--s3);color:var(--tx)}
+
+/* ── MISC ── */
 .scroll{flex:1;overflow-y:auto}
-.sec-lbl{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;padding:14px 14px 6px}
+.slbl{font-size:9.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.14em;font-weight:700;padding:14px 13px 6px}
 .fb{padding:10px 13px;border-radius:var(--r);font-size:12px;line-height:1.55;border:1px solid;display:none}
 .fb.show{display:block}
-.fb-ok{background:var(--green-dim);border-color:rgba(38,200,122,.25);color:var(--green)}
-.fb-err{background:var(--red-dim);border-color:rgba(224,85,85,.25);color:var(--red)}
-.fb-info{background:var(--cyan-dim);border-color:rgba(0,212,200,.25);color:var(--cyan)}
-.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(10px,1fr));gap:2px}
-.lc{height:8px;border-radius:2px;background:var(--bg3);transition:background .1s}
-.lc.done{background:rgba(0,212,200,.3)}
-.lc.active{background:var(--cyan);box-shadow:0 0 5px var(--cyan);animation:lp .5s ease-in-out infinite}
-@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
-.msg-row{display:flex;margin-bottom:10px}
-.msg-row.user{justify-content:flex-end}
-.msg-row.assistant{justify-content:flex-start}
-.bubble{max-width:88%;padding:10px 13px;font-size:13.5px;line-height:1.7;word-break:break-word}
-.bubble.user{background:linear-gradient(135deg,rgba(0,212,200,.55),rgba(0,212,200,.35));border:1px solid rgba(0,212,200,.25);border-radius:14px 14px 3px 14px;color:var(--tx)}
-.bubble.assistant{background:var(--bg2);border:1px solid var(--line);border-radius:14px 14px 14px 3px}
-.bubble p{margin-bottom:8px}.bubble p:last-child{margin-bottom:0}
-.bubble strong{font-weight:700;color:var(--tx)}
-.bubble code{background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cyan)}
-.bubble pre{margin:8px 0;border-radius:8px;overflow:hidden;position:relative}
-.bubble pre code{background:none;border:none;padding:0;color:inherit;font-size:12px!important}
-.bubble ul,.bubble ol{padding-left:20px;margin-bottom:8px}
-.bubble li{margin-bottom:3px}
-.bubble h1,.bubble h2,.bubble h3{font-weight:700;margin-bottom:6px;color:var(--tx)}
-.bubble h1{font-size:16px}.bubble h2{font-size:14px}.bubble h3{font-size:13px}
-.bubble blockquote{border-left:2px solid var(--cyan);padding-left:10px;color:var(--tx2);margin:6px 0}
-.bubble a{color:var(--cyan);text-decoration:none}
-.bubble table{border-collapse:collapse;font-size:12px;margin:6px 0;width:100%}
-.bubble th,.bubble td{border:1px solid var(--line);padding:5px 8px;text-align:left}
-.bubble th{background:var(--bg3)}
-.code-hdr{display:flex;align-items:center;justify-content:space-between;background:#161b22;padding:7px 12px;border-radius:8px 8px 0 0;border-bottom:1px solid rgba(255,255,255,0.06)}
-.code-lang-label{font-size:10px;color:rgba(255,255,255,0.35);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
-.copy-btn{background:rgba(255,255,255,0.06);border:none;border-radius:4px;color:rgba(255,255,255,0.4);padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font);transition:all .12s}
-.copy-btn:hover{background:rgba(255,255,255,0.1);color:var(--tx)}
-.tdots{display:flex;gap:4px;padding:3px 0}
-.tdots span{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:td 1.1s ease-in-out infinite}
-.tdots span:nth-child(2){animation-delay:.18s}.tdots span:nth-child(3){animation-delay:.36s}
-@keyframes td{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
-.cur{display:inline-block;width:2px;height:13px;background:var(--cyan);margin-left:1px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.chat-bar{display:flex;gap:8px;align-items:flex-end;padding:10px 12px 16px;border-top:1px solid var(--line);flex-shrink:0;background:var(--bg1)}
-.chat-bar textarea{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto;transition:border-color .12s}
-.chat-bar textarea:focus{border-color:rgba(0,212,200,.35)}
-.chat-bar textarea::placeholder{color:var(--tx3)}
-.send-btn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;background:var(--cyan);color:#050809;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.send-btn:disabled{background:var(--bg2);border:1px solid var(--line);color:var(--tx3);cursor:default}
-.send-btn:not(:disabled):hover{filter:brightness(1.12)}
-.mcard{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:7px}
-.mcard:hover{border-color:var(--line2);background:var(--bg3)}
-.mcard.ready{border-color:rgba(38,200,122,.2)}
-.hfrow{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
-.hfrow:hover{border-color:var(--line2);background:var(--bg3)}
-.hfrow.sel{border-color:rgba(0,212,200,.4);background:var(--cyan-dim)}
-.srow{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
-.srow:hover{border-color:var(--line2);background:var(--bg3)}
-.phase-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:6px}
-.infer-bar{padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg1);display:none;flex-shrink:0}
-.frow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:all .12s}
-.frow:hover{border-color:var(--line2);background:var(--bg3)}
-#load-overlay{display:none;position:absolute;inset:0;z-index:100;background:rgba(8,10,14,0.93);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center}
-#load-overlay.show{display:flex}
+.fb-ok{background:var(--gn0);border-color:rgba(34,196,122,.25);color:var(--gn)}
+.fb-err{background:var(--rd0);border-color:rgba(224,79,79,.25);color:var(--rd)}
+.fb-info{background:var(--cy0);border-color:rgba(0,210,200,.25);color:var(--cy)}
+
+/* ── LAYER VIZ ── */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(9px,1fr));gap:2px}
+.lc{height:7px;border-radius:2px;background:var(--s3);transition:background .08s}
+.lc.done{background:rgba(0,210,200,.28)}
+.lc.act{background:var(--cy);box-shadow:0 0 4px var(--cy);animation:lp .45s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── CHAT BUBBLES ── */
+.mrow{display:flex;margin-bottom:9px}
+.mrow.user{justify-content:flex-end}
+.mrow.asst{justify-content:flex-start}
+.bub{max-width:88%;padding:10px 13px;font-size:13.5px;line-height:1.7;word-break:break-word}
+.bub.user{background:linear-gradient(135deg,rgba(0,210,200,.5),rgba(0,210,200,.3));
+  border:1px solid rgba(0,210,200,.22);border-radius:14px 14px 3px 14px;color:var(--tx)}
+.bub.asst{background:var(--s2);border:1px solid var(--ln);border-radius:14px 14px 14px 3px}
+.bub p{margin-bottom:8px}.bub p:last-child{margin-bottom:0}
+.bub strong{font-weight:700;color:var(--tx)}
+.bub em{font-style:italic}
+.bub code{background:var(--s3);border:1px solid var(--ln);border-radius:4px;
+  padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cy)}
+.bub pre{margin:8px 0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.bub pre code{background:none;border:none;padding:0;color:inherit;font-size:12px!important;line-height:1.5!important}
+.bub ul,.bub ol{padding-left:18px;margin-bottom:8px}
+.bub li{margin-bottom:3px}
+.bub h1,.bub h2,.bub h3{font-weight:700;color:var(--tx);margin-bottom:5px}
+.bub h1{font-size:16px}.bub h2{font-size:14px}.bub h3{font-size:13px}
+.bub blockquote{border-left:2px solid var(--cy);padding-left:10px;color:var(--tx2);margin:6px 0}
+.bub a{color:var(--cy);text-decoration:none}
+.bub table{border-collapse:collapse;font-size:12px;margin:6px 0;width:100%}
+.bub th,.bub td{border:1px solid var(--ln);padding:4px 8px;text-align:left}
+.bub th{background:var(--s3)}
+.bub hr{border:none;border-top:1px solid var(--ln);margin:8px 0}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;
+  background:#161b22;padding:6px 11px;border-radius:8px 8px 0 0}
+.clbl{font-size:9.5px;color:rgba(255,255,255,0.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.cpbtn{background:rgba(255,255,255,0.05);border:none;border-radius:4px;color:rgba(255,255,255,0.38);
+  padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font);transition:all .12s}
+.cpbtn:hover{background:rgba(255,255,255,0.09);color:var(--tx)}
+.tdots{display:flex;gap:4px;padding:2px 0}
+.tdots span{width:5px;height:5px;border-radius:50%;background:var(--cy);
+  animation:td 1.1s ease-in-out infinite}
+.tdots span:nth-child(2){animation-delay:.17s}.tdots span:nth-child(3){animation-delay:.34s}
+@keyframes td{0%,80%,100%{transform:scale(.45);opacity:.25}40%{transform:scale(1);opacity:1}}
+.cur{display:inline-block;width:2px;height:13px;background:var(--cy);
+  margin-left:1px;vertical-align:text-bottom;animation:bl 1s step-end infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── CHAT BAR ── */
+.cbar{display:flex;gap:8px;align-items:flex-end;padding:10px 12px 16px;
+  border-top:1px solid var(--ln);flex-shrink:0;background:var(--s1)}
+.cbar textarea{flex:1;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);
+  resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto;transition:border-color .12s}
+.cbar textarea:focus{border-color:rgba(0,210,200,.32)}
+.cbar textarea::placeholder{color:var(--tx3)}
+.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;
+  background:var(--cy);color:#040808;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s}
+.sbtn:disabled{background:var(--s2);border:1px solid var(--ln);color:var(--tx3);cursor:default}
+.sbtn:not(:disabled):hover{filter:brightness(1.1)}
+
+/* ── MODEL CARDS ── */
+.mc{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
+.mc:hover{border-color:var(--ln2);background:var(--s3)}
+.mc.rdy{border-color:rgba(34,196,122,.18)}
+.hrow{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:11px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
+.hrow:hover{border-color:var(--ln2);background:var(--s3)}
+.hrow.sel{border-color:rgba(0,210,200,.4);background:var(--cy0)}
+.srow{display:flex;align-items:center;gap:11px;background:var(--s2);border:1px solid var(--ln);
+  border-radius:var(--r);padding:12px 13px;cursor:pointer;transition:all .12s;margin-bottom:6px}
+.srow:hover{border-color:var(--ln2);background:var(--s3)}
+.phrow{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--ln);
+  border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:6px}
+.ibar{padding:8px 13px;border-bottom:1px solid var(--ln);background:var(--s1);display:none;flex-shrink:0}
+.frow{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--ln);
+  border-radius:var(--r);padding:11px 13px;margin-bottom:6px;cursor:pointer;transition:all .12s}
+.frow:hover{border-color:var(--ln2);background:var(--s3)}
+
+/* ── LOAD OVERLAY ── */
+#lovo{display:none;position:absolute;inset:0;z-index:100;
+  background:rgba(7,9,13,0.94);flex-direction:column;align-items:center;
+  justify-content:center;gap:18px;padding:32px;text-align:center}
+#lovo.show{display:flex}
+
+/* ── DL PROGRESS DETAIL ── */
+.dl-file-list{display:flex;flex-direction:column;gap:4px;width:100%;max-width:320px}
+.dl-file-row{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--tx3);font-family:var(--mono)}
+.dl-file-bar{flex:1;height:2px;background:var(--ln);border-radius:2px;overflow:hidden}
+.dl-file-fill{height:100%;background:var(--cy);border-radius:2px;transition:width .15s}
 </style>
 </head>
 <body>
+
+<!-- BOOT -->
 <div id="boot">
   <div class="boot-mark">
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-      <path d="M5 27L16 5l11 22" stroke="#00d4c8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M9 20h14" stroke="#00d4c8" stroke-width="2.5" stroke-linecap="round"/>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+      <path d="M4 26L15 4l11 22" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.5 19h13" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round"/>
     </svg>
   </div>
-  <div style="font-size:20px;font-weight:800;letter-spacing:-.4px">MobileAirLLM</div>
+  <div style="font-size:19px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
   <div class="spin"></div>
-  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="boot-msg">Checking connections…</div>
+  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Initializing…</div>
 </div>
 
 <div id="app"><div class="shell">
-  <div id="load-overlay">
-    <div class="spin" style="width:32px;height:32px"></div>
+
+  <!-- Model load overlay -->
+  <div id="lovo">
+    <div class="spin" style="width:30px;height:30px"></div>
     <div style="font-size:15px;font-weight:700" id="lo-title">Loading model…</div>
-    <div style="width:100%;max-width:280px">
-      <div class="pbar" style="height:4px"><div class="pbar-fill" id="lo-bar" style="width:0%"></div></div>
-      <div style="font-size:11px;color:var(--tx3);margin-top:5px;font-family:var(--mono)" id="lo-msg">Initializing…</div>
+    <div style="width:100%;max-width:300px">
+      <div class="pbar" style="height:4px"><div class="pfill" id="lo-bar" style="width:0%"></div></div>
+      <div style="font-size:10.5px;color:var(--tx3);margin-top:5px;font-family:var(--mono)" id="lo-msg">Starting…</div>
     </div>
-    <div style="font-size:11px;color:var(--tx3);max-width:260px;line-height:1.6">Weights download once and cache in your browser. Subsequent loads are instant.</div>
+    <div class="dl-file-list" id="lo-files"></div>
+    <div style="font-size:11px;color:var(--tx3);max-width:260px;line-height:1.6">
+      Weights cached in browser after first load. Subsequent loads are instant and work offline.
+    </div>
   </div>
 
-  <!-- HOME -->
-  <div class="page" id="p-home">
+  <!-- ══ HOME ══ -->
+  <div class="pg" id="p-home">
     <div class="hdr">
-      <div class="spacer34"></div>
+      <div class="sp34"></div>
       <div style="flex:1;text-align:center">
         <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
-        <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px;letter-spacing:.06em">ON-DEVICE · LAYER-BY-LAYER</div>
+        <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px;letter-spacing:.07em">ON-DEVICE · ANY GGUF MODEL</div>
       </div>
-      <button class="icon-btn" onclick="nav('p-settings',true)">⚙</button>
+      <button class="ib" onclick="go('p-settings',1)">⚙</button>
     </div>
     <div class="scroll">
-      <div class="sec-lbl">Connections</div>
+      <div class="slbl">Connections</div>
       <div style="padding:0 12px">
-        <div class="srow" onclick="nav('p-tg',true);populateTGInputs()">
-          <div class="dot dot-idle" id="h-dot-tg"></div>
-          <div style="flex:1"><div style="font-size:13px;font-weight:600">Pentaract / Telegram</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div></div>
+        <div class="srow" onclick="go('p-tg',1);fillTG()">
+          <div class="dot didle" id="h-dot-tg"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
+            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div></div>
           <div style="font-size:11px;color:var(--tx3)">›</div>
         </div>
-        <div class="srow" onclick="nav('p-hf',true);populateHFInput()">
-          <div class="dot dot-idle" id="h-dot-hf"></div>
-          <div style="flex:1"><div style="font-size:13px;font-weight:600">HuggingFace</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div></div>
+        <div class="srow" onclick="go('p-hf',1);fillHF()">
+          <div class="dot didle" id="h-dot-hf"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">HuggingFace</div>
+            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div></div>
           <div style="font-size:11px;color:var(--tx3)">›</div>
         </div>
       </div>
-      <div class="sec-lbl" style="margin-top:4px">Models</div>
+      <div class="slbl" style="margin-top:4px">Models</div>
       <div style="padding:0 12px" id="home-models">
-        <div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.8">No models.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>
+        <div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.9">
+          No models added yet.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span>
+        </div>
       </div>
     </div>
     <div style="padding:10px 12px 20px;flex-shrink:0">
-      <button class="btn btn-p" onclick="nav('p-models',true);renderCurated()">+ Add Model</button>
+      <button class="btn bp" onclick="go('p-models',1);renderCurated()">+ Add Model</button>
     </div>
   </div>
 
-  <!-- SETUP TELEGRAM -->
-  <div class="page" id="p-tg">
+  <!-- ══ SETUP TELEGRAM ══ -->
+  <div class="pg" id="p-tg">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
-      <div class="hdr-title">Pentaract Setup</div>
-      <div class="spacer34"></div>
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Pentaract Setup</div>
+      <div class="sp34"></div>
     </div>
-    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
-      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">MobileAirLLM uses Telegram as free unlimited model storage. Model weights are sharded and stored as file messages, fetched layer-by-layer during inference.</div>
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">
+        Telegram is used as free unlimited model storage. Model weights are sharded and stored as file messages, fetched layer-by-layer during inference.
+      </div>
       <div class="card" style="display:flex;flex-direction:column;gap:10px">
         <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Quickstart</div>
         <div id="tg-steps"></div>
       </div>
-      <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" oninput="tgInputChanged()"/></div>
-      <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890" oninput="tgInputChanged()"/></div>
+      <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" oninput="tgChanged()"/></div>
+      <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890" oninput="tgChanged()"/></div>
       <div class="fb" id="tg-fb"></div>
-      <button class="btn btn-g" id="tg-test" onclick="testTG()" disabled>Test Connection</button>
-      <button class="btn btn-p" id="tg-save" disabled onclick="saveTG()">Save & Continue →</button>
+      <button class="btn bg" id="tg-test" onclick="testTG()" disabled>Test Connection</button>
+      <button class="btn bp" id="tg-save" disabled onclick="saveTG()">Save & Continue →</button>
     </div>
   </div>
 
-  <!-- SETUP HF -->
-  <div class="page" id="p-hf">
+  <!-- ══ SETUP HUGGINGFACE ══ -->
+  <div class="pg" id="p-hf">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
-      <div class="hdr-title">HuggingFace</div>
-      <div class="spacer34"></div>
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">HuggingFace</div>
+      <div class="sp34"></div>
     </div>
-    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
-      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Link your HuggingFace account for private/gated model access. Public models work without a token.</div>
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">
+        Optional but recommended. Needed for private/gated models. All public GGUF models work without a token.
+      </div>
       <div class="card" style="display:flex;flex-direction:column;gap:8px">
         <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Get a token</div>
-        <div style="font-size:12px;color:var(--tx2);line-height:1.7">1. Go to <span style="color:var(--cyan);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>2. New token → Type: <b style="color:var(--tx)">Read</b><br/>3. Copy and paste below</div>
+        <div style="font-size:12px;color:var(--tx2);line-height:1.7">
+          1. Visit <span style="color:var(--cy);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
+          2. Create token → Type: <b style="color:var(--tx)">Read</b><br/>
+          3. Copy and paste below
+        </div>
       </div>
-      <div class="field"><label>Access Token</label><input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" oninput="hfInputChanged()"/></div>
+      <div class="field"><label>Access Token</label>
+        <input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" oninput="hfChanged()"/></div>
       <div class="fb" id="hf-fb"></div>
-      <button class="btn btn-g" id="hf-verify" onclick="verifyHF()" disabled>Verify Token</button>
-      <button class="btn btn-p" id="hf-save" disabled onclick="saveHF()">Save →</button>
-      <button style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px 0;text-align:center;width:100%" onclick="skipHF()">Skip — public models only</button>
+      <button class="btn bg" id="hf-verify" onclick="verifyHF()" disabled>Verify Token</button>
+      <button class="btn bp" id="hf-save" disabled onclick="saveHF()">Save →</button>
+      <button style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;
+        font-family:var(--font);padding:4px 0;text-align:center;width:100%" onclick="go('p-home',0)">
+        Skip — browse public models only
+      </button>
     </div>
   </div>
 
-  <!-- MODEL BROWSER -->
-  <div class="page" id="p-models">
+  <!-- ══ MODEL BROWSER ══ -->
+  <div class="pg" id="p-models">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
-      <div class="hdr-title">Add Model</div>
-      <div class="spacer34"></div>
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Add Model</div>
+      <div class="sp34"></div>
     </div>
     <div style="padding:10px 12px 8px;flex-shrink:0">
       <div class="tabs">
-        <button class="tab active" id="t-curated" onclick="switchTab('curated')">Curated</button>
+        <button class="tab on" id="t-curated" onclick="switchTab('curated')">Curated</button>
         <button class="tab" id="t-hf" onclick="switchTab('hf')">HuggingFace</button>
-        <button class="tab" id="t-custom" onclick="switchTab('custom')">Custom</button>
+        <button class="tab" id="t-custom" onclick="switchTab('custom')">Custom URL</button>
       </div>
     </div>
-    <div class="scroll" style="padding:8px 12px 16px" id="model-tab-body"></div>
+    <div class="scroll" style="padding:8px 12px 16px" id="tab-body"></div>
   </div>
 
-  <!-- MODEL DETAIL -->
-  <div class="page" id="p-detail">
+  <!-- ══ MODEL DETAIL ══ -->
+  <div class="pg" id="p-detail">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-models',false)">← Back</button>
-      <div class="hdr-title" id="detail-title">Model</div>
-      <div class="spacer34"></div>
+      <button class="bk" onclick="go('p-models',0)">← Back</button>
+      <div class="htitle" id="det-title">Model</div>
+      <div class="sp34"></div>
     </div>
-    <div class="scroll" style="padding:14px" id="detail-body"></div>
+    <div class="scroll" style="padding:13px" id="det-body"></div>
   </div>
 
-  <!-- DOWNLOAD / REGISTER -->
-  <div class="page" id="p-dl">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:18px;text-align:center">
-      <div style="width:64px;height:64px;border-radius:16px;background:var(--bg2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:26px">⬇</div>
-      <div><div style="font-size:16px;font-weight:700;margin-bottom:5px" id="dl-name">—</div><div style="font-size:12px;color:var(--tx3);font-family:var(--mono)" id="dl-status">Initializing…</div></div>
-      <div style="width:100%;max-width:300px"><div class="pbar" style="height:4px;margin-bottom:7px"><div class="pbar-fill" id="dl-bar" style="width:0%"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-pct">0%</span><span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-spd">—</span></div></div>
+  <!-- ══ DOWNLOAD ══ -->
+  <div class="pg" id="p-dl">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:32px;gap:18px;text-align:center">
+      <div style="width:62px;height:62px;border-radius:15px;background:var(--s2);
+        border:1px solid var(--ln2);display:flex;align-items:center;justify-content:center;font-size:25px">⬇</div>
+      <div><div style="font-size:16px;font-weight:700;margin-bottom:5px" id="dl-name">—</div>
+        <div style="font-size:12px;color:var(--tx3);font-family:var(--mono)" id="dl-status">—</div></div>
+      <div style="width:100%;max-width:300px">
+        <div class="pbar" style="height:4px;margin-bottom:7px"><div class="pfill" id="dl-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-pct">0%</span>
+          <span style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="dl-spd">—</span>
+        </div>
+      </div>
       <div style="width:100%;max-width:300px" id="dl-phases"></div>
     </div>
   </div>
 
-  <!-- CHAT -->
-  <div class="page" id="p-chat">
+  <!-- ══ CHAT ══ -->
+  <div class="pg" id="p-chat">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
-      <div style="flex:1;text-align:center;overflow:hidden"><div class="hdr-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)" id="chat-sub">—</div></div>
-      <button class="icon-btn" onclick="clearChat()">↺</button>
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div style="flex:1;text-align:center;overflow:hidden">
+        <div class="htitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div>
+        <div style="font-size:9.5px;color:var(--tx3);font-family:var(--mono)" id="chat-sub">—</div>
+      </div>
+      <button class="ib" onclick="clearChat()" title="Clear">↺</button>
     </div>
-    <div class="infer-bar" id="infer-bar">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-cur">0</span>/<span id="lc-tot">0</span></span><span style="font-size:10px;color:var(--cyan);font-family:var(--mono)" id="l-ram">—</span></div>
+    <div class="ibar" id="ibar">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-c">0</span>/<span id="lc-t">0</span></span>
+        <span style="font-size:10px;color:var(--cy);font-family:var(--mono)" id="l-ram">—</span>
+      </div>
       <div class="lgrid" id="lgrid"></div>
     </div>
     <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
-    <div class="chat-bar">
-      <textarea id="chat-in" rows="1" placeholder="Message…" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMsg()">↑</button>
+    <div class="cbar">
+      <textarea id="chat-in" rows="1" placeholder="Message…"
+        onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="sbtn" id="sbtn" onclick="sendMsg()">↑</button>
     </div>
   </div>
 
-  <!-- FOLDERS -->
-  <div class="page" id="p-folders">
+  <!-- ══ FOLDERS ══ -->
+  <div class="pg" id="p-folders">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-settings',false)">← Back</button>
-      <div class="hdr-title">Telegram Folders</div>
-      <button class="icon-btn" onclick="createFolder()">+</button>
+      <button class="bk" onclick="go('p-settings',0)">← Back</button>
+      <div class="htitle">Telegram Folders</div>
+      <button class="ib" onclick="createFolder()">+</button>
     </div>
     <div class="scroll" style="padding:12px" id="folder-list"></div>
   </div>
 
-  <!-- SETTINGS -->
-  <div class="page" id="p-settings">
+  <!-- ══ SETTINGS ══ -->
+  <div class="pg" id="p-settings">
     <div class="hdr">
-      <button class="back-btn" onclick="nav('p-home',false)">← Back</button>
-      <div class="hdr-title">Settings</div>
-      <div class="spacer34"></div>
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Settings</div>
+      <div class="sp34"></div>
     </div>
-    <div class="scroll" style="padding:14px;display:flex;flex-direction:column;gap:12px">
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
       <div class="card" style="display:flex;flex-direction:column;gap:11px">
         <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Connections</div>
-        <div style="display:flex;align-items:center;gap:10px"><div class="dot dot-idle" id="s-dot-tg"></div><div style="flex:1;font-size:13px">Telegram / Pentaract</div><button class="back-btn" style="font-size:11px" onclick="nav('p-tg',true);populateTGInputs()">Edit</button></div>
-        <div style="height:1px;background:var(--line)"></div>
-        <div style="display:flex;align-items:center;gap:10px"><div class="dot dot-idle" id="s-dot-hf"></div><div style="flex:1;font-size:13px">HuggingFace</div><button class="back-btn" style="font-size:11px" onclick="nav('p-hf',true);populateHFInput()">Edit</button></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="dot didle" id="s-dot-tg"></div>
+          <div style="flex:1;font-size:13px">Telegram / Pentaract</div>
+          <button class="bk" style="font-size:11px" onclick="go('p-tg',1);fillTG()">Edit</button>
+        </div>
+        <div style="height:1px;background:var(--ln)"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="dot didle" id="s-dot-hf"></div>
+          <div style="flex:1;font-size:13px">HuggingFace</div>
+          <button class="bk" style="font-size:11px" onclick="go('p-hf',1);fillHF()">Edit</button>
+        </div>
       </div>
       <div class="card" style="display:flex;flex-direction:column;gap:10px">
         <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Storage</div>
-        <button class="btn btn-g" style="font-size:13px" onclick="nav('p-folders',true);renderFolders()">📁 Manage Telegram Folders</button>
+        <button class="btn bg" onclick="go('p-folders',1);renderFolders()">📁 Manage Telegram Folders</button>
       </div>
       <div class="card" style="display:flex;flex-direction:column;gap:10px">
         <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Inference</div>
-        <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512"/></div>
-        <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05"/></div>
-        <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05"/></div>
-        <button class="btn btn-g" onclick="saveSettings()">Save Settings</button>
+        <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512" min="64" max="4096"/></div>
+        <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05" min="0" max="2"/></div>
+        <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05" min="1" max="2"/></div>
+        <div class="field"><label>Top-P</label><input id="s-topp" type="number" value="0.9" step="0.05" min="0" max="1"/></div>
+        <button class="btn bg" onclick="saveSettings()">Save Settings</button>
       </div>
       <div class="card" style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">About</div>
-        <div style="font-size:11.5px;color:var(--tx2);line-height:1.7">In-browser inference via <span style="color:var(--cyan)">Transformers.js</span>.<br/>Models run on your device via WebGPU/WASM.<br/>Storage via Telegram/Pentaract.</div>
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Engine</div>
+        <div style="font-size:11.5px;color:var(--tx2);line-height:1.7">
+          Powered by <span style="color:var(--cy)">wllama</span> — llama.cpp compiled to WebAssembly.<br/>
+          Runs <b style="color:var(--tx)">any GGUF</b> model directly in your browser.<br/>
+          No server. No API. No WebGPU required.
+        </div>
       </div>
-      <button class="btn btn-d" onclick="clearAll()">⚠ Clear All Data</button>
+      <button class="btn bd" onclick="clearAll()">⚠ Clear All Data</button>
     </div>
   </div>
 
 </div></div>
 
 <script type="module">
-import { pipeline, env, TextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js';
-env.allowLocalModels = false;
-env.useBrowserCache = true;
+// ══════════════════════════════════════════════════════════════
+//  ENGINE: wllama — llama.cpp compiled to WASM
+//  Loads ANY GGUF from HuggingFace. Works in all browsers.
+//  No WebGPU requirement, no special model format needed.
+// ══════════════════════════════════════════════════════════════
+import { Wllama } from 'https://esm.sh/@wllama/wllama@2.3.2/esm/index.js';
+import WasmFromCDN from 'https://esm.sh/@wllama/wllama@2.3.2/esm/wasm-from-cdn.js';
 
 // ── State ──
-const SK='mairllm4';
-let S={tgToken:'',tgChatId:'',tgOk:false,hfToken:'',hfOk:false,models:[],folders:[],settings:{maxTokens:512,temperature:0.7,repPenalty:1.1},activeModel:null};
-const loadS=()=>{try{const d=localStorage.getItem(SK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}};
-const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
+const SK = 'mairllm5';
+let S = {
+  tgToken:'', tgChatId:'', tgOk:false,
+  hfToken:'', hfOk:false,
+  models:[], folders:[],
+  settings:{ maxTokens:512, temperature:0.7, repPenalty:1.1, topP:0.9 },
+  activeModel:null,
+};
+const loadS = () => { try { const d = localStorage.getItem(SK); if(d) Object.assign(S, JSON.parse(d)); } catch(e){} };
+const saveS = () => { try { localStorage.setItem(SK, JSON.stringify(S)); } catch(e){} };
 
-// ── Navigation — ZERO overlap ──
-let _cur=null;
-window.nav=function(id,fwd=true){
-  if(_cur===id)return;
-  document.querySelectorAll('.page').forEach(p=>{
-    p.classList.remove('active','anim-fwd','anim-back');
-    p.style.display='none';
+// ── Nav — zero overlap ──
+let _cur = null;
+window.go = function(id, fwd=1) {
+  if(_cur === id) return;
+  document.querySelectorAll('.pg').forEach(p => {
+    p.classList.remove('on','ani-f','ani-b');
+    p.style.display = 'none';
   });
-  const el=q(id);
-  el.style.display='flex';
-  void el.offsetWidth; // force reflow before adding animation class
-  el.classList.add('active');
-  requestAnimationFrame(()=>el.classList.add(fwd?'anim-fwd':'anim-back'));
-  _cur=id;
+  const el = q(id);
+  el.style.display = 'flex';
+  void el.offsetWidth;
+  el.classList.add('on', fwd ? 'ani-f' : 'ani-b');
+  _cur = id;
 };
 
-// ── Helpers ──
-const q=id=>document.getElementById(id);
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const showFb=(id,type,msg)=>{const el=q(id);el.className=`fb fb-${type} show`;el.innerHTML=msg;};
-const hideFb=id=>{q(id).className='fb';};
-const setDot=(id,cls)=>{const d=q(id);if(d)d.className='dot '+cls;};
+const q = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const showFb = (id, t, msg) => { const e=q(id); e.className=`fb fb-${t} show`; e.innerHTML=msg; };
+const setDot = (id, c) => { const d=q(id); if(d) d.className='dot '+c; };
 
-function updateDots(){
-  const tg=S.tgOk?'dot-ok':(S.tgToken?'dot-err':'dot-idle');
-  const hf=S.hfOk?'dot-ok':(S.hfToken?'dot-err':'dot-idle');
+function updateDots() {
+  const tg = S.tgOk?'dok':(S.tgToken?'derr':'didle');
+  const hf = S.hfOk?'dok':(S.hfToken?'derr':'didle');
   ['h-dot-tg','s-dot-tg'].forEach(id=>setDot(id,tg));
   ['h-dot-hf','s-dot-hf'].forEach(id=>setDot(id,hf));
-  q('h-lbl-tg').textContent=S.tgOk?'connected':(S.tgToken?'auth failed':'not configured');
-  q('h-lbl-hf').textContent=S.hfOk?'connected':(S.hfToken?'invalid token':'not configured (public only)');
+  q('h-lbl-tg').textContent = S.tgOk?'connected':(S.tgToken?'auth failed':'not configured');
+  q('h-lbl-hf').textContent = S.hfOk?'connected':(S.hfToken?'invalid token':'not configured (public only)');
 }
 
 // ── Boot ──
-async function boot(){
+async function boot() {
   loadS();
-  const msg=q('boot-msg');
-  if(S.tgToken&&S.tgChatId){msg.textContent='Checking Telegram…';S.tgOk=await pingTG(S.tgToken,S.tgChatId);}
-  if(S.hfToken){msg.textContent='Checking HuggingFace…';S.hfOk=await pingHF(S.hfToken);}
-  msg.textContent='Ready';
-  await sleep(180);
+  const msg = q('bmsg');
+  if(S.tgToken && S.tgChatId) { msg.textContent='Checking Telegram…'; S.tgOk = await pingTG(S.tgToken); }
+  if(S.hfToken) { msg.textContent='Checking HuggingFace…'; S.hfOk = await pingHF(S.hfToken); }
+  msg.textContent = 'Ready';
+  await sleep(160);
   q('boot').classList.add('fade');
-  setTimeout(()=>q('boot').style.display='none',450);
-  q('s-tok').value=S.settings.maxTokens;
-  q('s-temp').value=S.settings.temperature;
-  q('s-rep').value=S.settings.repPenalty;
-  if(!S.tgToken||!S.tgOk){nav('p-tg',true);renderTGSteps();populateTGInputs();}
-  else{nav('p-home',true);renderHome();}
+  setTimeout(()=>q('boot').style.display='none', 400);
+  q('s-tok').value = S.settings.maxTokens;
+  q('s-temp').value = S.settings.temperature;
+  q('s-rep').value = S.settings.repPenalty;
+  q('s-topp').value = S.settings.topP;
+  if(!S.tgToken || !S.tgOk) { go('p-tg',1); renderTGSteps(); fillTG(); }
+  else { go('p-home',1); renderHome(); }
   updateDots();
 }
 
 // ── Telegram ──
-const pingTG=async(tok,cid)=>{try{const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`);const d=await r.json();return d.ok===true;}catch(e){return false;}};
-
-function renderTGSteps(){
-  const steps=['Open Telegram → search <b style="color:var(--cyan)">@BotFather</b>','Send <code>/newbot</code> and follow the prompts','Copy the <b style="color:var(--tx)">Bot Token</b> and paste below','Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cyan)">@userinfobot</b>'];
-  q('tg-steps').innerHTML=steps.map((s,i)=>`<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:${i<steps.length-1?'9px':'0'}"><div style="width:18px;height:18px;border-radius:5px;background:rgba(0,212,200,0.12);color:var(--cyan);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div></div>`).join('');
+const pingTG = async(tok) => {
+  try { const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`); const d=await r.json(); return d.ok===true; }
+  catch(e) { return false; }
+};
+function renderTGSteps() {
+  const steps = [
+    'Open Telegram → search <b style="color:var(--cy)">@BotFather</b>',
+    'Send <code>/newbot</code> and follow the prompts',
+    'Copy the <b style="color:var(--tx)">Bot Token</b> and paste below',
+    'Create a private channel → add your bot as admin',
+    'Get Chat ID via <b style="color:var(--cy)">@userinfobot</b>',
+  ];
+  q('tg-steps').innerHTML = steps.map((s,i)=>`
+    <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:${i<steps.length-1?'8px':'0'}">
+      <div style="width:17px;height:17px;border-radius:5px;background:rgba(0,210,200,0.12);
+        color:var(--cy);font-size:9.5px;font-weight:700;display:flex;align-items:center;
+        justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div>
+    </div>`).join('');
 }
-
-window.populateTGInputs=function(){if(S.tgToken)q('tg-tok').value=S.tgToken;if(S.tgChatId)q('tg-cid').value=S.tgChatId;tgInputChanged();renderTGSteps();};
-window.tgInputChanged=function(){const t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim();q('tg-test').disabled=!(t&&c);q('tg-save').disabled=true;};
-window.testTG=async function(){const tok=q('tg-tok').value.trim(),cid=q('tg-cid').value.trim();showFb('tg-fb','info','Testing…');const ok=await pingTG(tok,cid);if(ok){showFb('tg-fb','ok','✓ Connected!');q('tg-save').disabled=false;q('tg-save')._tok=tok;q('tg-save')._cid=cid;}else{showFb('tg-fb','err','✗ Failed. Check your bot token.');q('tg-save').disabled=true;}};
-window.saveTG=function(){S.tgToken=q('tg-save')._tok;S.tgChatId=q('tg-save')._cid;S.tgOk=true;saveS();updateDots();if(!S.hfToken)nav('p-hf',true);else{nav('p-home',false);renderHome();}};
+window.fillTG = function() { if(S.tgToken) q('tg-tok').value=S.tgToken; if(S.tgChatId) q('tg-cid').value=S.tgChatId; tgChanged(); renderTGSteps(); };
+window.tgChanged = function() { const t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim(); q('tg-test').disabled=!(t&&c); q('tg-save').disabled=true; };
+window.testTG = async function() {
+  const tok=q('tg-tok').value.trim(), cid=q('tg-cid').value.trim();
+  showFb('tg-fb','info','Testing…');
+  const ok = await pingTG(tok);
+  if(ok) { showFb('tg-fb','ok','✓ Connected!'); q('tg-save').disabled=false; q('tg-save')._t=tok; q('tg-save')._c=cid; }
+  else { showFb('tg-fb','err','✗ Failed — check your bot token.'); q('tg-save').disabled=true; }
+};
+window.saveTG = function() { S.tgToken=q('tg-save')._t; S.tgChatId=q('tg-save')._c; S.tgOk=true; saveS(); updateDots(); if(!S.hfToken) go('p-hf',1); else { go('p-home',0); renderHome(); } };
 
 // ── HuggingFace ──
-// /api/models?limit=1 is CORS-accessible and returns 401 for bad tokens
-const pingHF=async(tok)=>{try{const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}});return r.status===200;}catch(e){return false;}};
+// Uses /api/models?limit=1 — CORS-accessible, 401 = bad token, 200 = good
+const pingHF = async(tok) => {
+  try { const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}}); return r.status===200; }
+  catch(e) { return false; }
+};
+window.fillHF = function() { if(S.hfToken) q('hf-tok').value=S.hfToken; hfChanged(); };
+window.hfChanged = function() { const t=q('hf-tok').value.trim(); q('hf-verify').disabled=!t; q('hf-save').disabled=true; };
+window.verifyHF = async function() {
+  const tok=q('hf-tok').value.trim(); if(!tok) return;
+  showFb('hf-fb','info','Verifying…');
+  const ok = await pingHF(tok);
+  if(ok) { showFb('hf-fb','ok','✓ Token verified!'); q('hf-save').disabled=false; q('hf-save')._t=tok; }
+  else { showFb('hf-fb','err','✗ Invalid token. Check huggingface.co/settings/tokens'); q('hf-save').disabled=true; }
+};
+window.saveHF = function() { S.hfToken=q('hf-save')._t; S.hfOk=true; saveS(); updateDots(); go('p-home',0); renderHome(); };
 
-window.populateHFInput=function(){if(S.hfToken)q('hf-tok').value=S.hfToken;hfInputChanged();};
-window.hfInputChanged=function(){const t=q('hf-tok').value.trim();q('hf-verify').disabled=!t;q('hf-save').disabled=true;};
-window.verifyHF=async function(){const tok=q('hf-tok').value.trim();if(!tok){showFb('hf-fb','err','Enter a token first.');return;}showFb('hf-fb','info','Verifying…');const ok=await pingHF(tok);if(ok){showFb('hf-fb','ok','✓ Token verified!');q('hf-save').disabled=false;q('hf-save')._tok=tok;}else{showFb('hf-fb','err','✗ Invalid or expired token.');q('hf-save').disabled=true;}};
-window.saveHF=function(){S.hfToken=q('hf-save')._tok;S.hfOk=true;saveS();updateDots();nav('p-home',false);renderHome();};
-window.skipHF=function(){nav('p-home',false);renderHome();};
-
-// ── Curated models (Transformers.js native ONNX) ──
-const CURATED=[
-  {id:'smollm2-135m',name:'SmolLM2 135M Instruct',hfId:'HuggingFaceTB/SmolLM2-135M-Instruct',size:'270 MB',layers:30,ramMb:270,tag:'FASTEST',desc:'Tiny but capable. Instant load even on low-end devices.',dtype:'q4',gated:false},
-  {id:'smollm2-360m',name:'SmolLM2 360M Instruct',hfId:'HuggingFaceTB/SmolLM2-360M-Instruct',size:'720 MB',layers:32,ramMb:400,tag:'FAST',desc:'Solid general-purpose responses. Great for mobile.',dtype:'q4',gated:false},
-  {id:'smollm2-1.7b',name:'SmolLM2 1.7B Instruct',hfId:'HuggingFaceTB/SmolLM2-1.7B-Instruct',size:'1.8 GB',layers:24,ramMb:900,tag:'BALANCED',desc:'Best SmolLM2 quality. Recommended daily driver.',dtype:'q4',gated:false},
-  {id:'qwen2.5-0.5b',name:'Qwen 2.5 0.5B Instruct',hfId:'Qwen/Qwen2.5-0.5B-Instruct',size:'500 MB',layers:24,ramMb:320,tag:null,desc:'Alibaba tiny model. Strong at code & math.',dtype:'q4',gated:false},
-  {id:'qwen2.5-1.5b',name:'Qwen 2.5 1.5B Instruct',hfId:'Qwen/Qwen2.5-1.5B-Instruct',size:'1.5 GB',layers:28,ramMb:750,tag:null,desc:'Excellent coding and reasoning for its size.',dtype:'q4',gated:false},
-  {id:'phi3.5-mini',name:'Phi-3.5 Mini 3.8B',hfId:'microsoft/Phi-3.5-mini-instruct',size:'2.4 GB',layers:32,ramMb:1200,tag:'POWERFUL',desc:'Microsoft flagship small model. Exceptional reasoning.',dtype:'q4',gated:false},
-  {id:'llama3.2-1b',name:'Llama 3.2 1B Instruct',hfId:'meta-llama/Llama-3.2-1B-Instruct',size:'1.2 GB',layers:16,ramMb:600,tag:null,desc:'Meta Llama 3.2 — requires HF token (gated model).',dtype:'q4',gated:true},
-  {id:'llama3.2-3b',name:'Llama 3.2 3B Instruct',hfId:'meta-llama/Llama-3.2-3B-Instruct',size:'2.0 GB',layers:28,ramMb:1000,tag:'LARGE',desc:'Larger Llama 3.2. Best quality, requires HF token.',dtype:'q4',gated:true},
+// ══════════════════════════════════════════════════════════════
+//  CURATED MODELS — any GGUF on HuggingFace works
+//  Format: { hfRepo, hfFile } → wllama.loadModelFromHF()
+// ══════════════════════════════════════════════════════════════
+const MODELS = [
+  // Tiny / fastest
+  { id:'smol-135m', name:'SmolLM2 135M Instruct', hfRepo:'bartowski/SmolLM2-135M-Instruct-GGUF', hfFile:'SmolLM2-135M-Instruct-Q4_K_M.gguf', size:'0.09 GB', layers:30, ramMb:180, tag:'FASTEST', desc:'Instant. Good for simple questions and very low RAM.' },
+  { id:'smol-360m', name:'SmolLM2 360M Instruct', hfRepo:'bartowski/SmolLM2-360M-Instruct-GGUF', hfFile:'SmolLM2-360M-Instruct-Q4_K_M.gguf', size:'0.22 GB', layers:32, ramMb:280, tag:'FAST', desc:'Fast and capable. Great daily-driver on mobile.' },
+  { id:'smol-1.7b', name:'SmolLM2 1.7B Instruct', hfRepo:'bartowski/SmolLM2-1.7B-Instruct-GGUF', hfFile:'SmolLM2-1.7B-Instruct-Q4_K_M.gguf', size:'1.1 GB', layers:24, ramMb:750, tag:'BALANCED', desc:'Best SmolLM quality. Recommended starting point.' },
+  // Qwen
+  { id:'qwen-0.5b', name:'Qwen 2.5 0.5B Instruct', hfRepo:'Qwen/Qwen2.5-0.5B-Instruct-GGUF', hfFile:'qwen2.5-0.5b-instruct-q4_k_m.gguf', size:'0.40 GB', layers:24, ramMb:340, tag:null, desc:'Tiny Qwen. Exceptional math and code for its size.' },
+  { id:'qwen-1.5b', name:'Qwen 2.5 1.5B Instruct', hfRepo:'Qwen/Qwen2.5-1.5B-Instruct-GGUF', hfFile:'qwen2.5-1.5b-instruct-q4_k_m.gguf', size:'1.0 GB', layers:28, ramMb:650, tag:null, desc:'Strong at coding and reasoning. Very efficient.' },
+  { id:'qwen-3b', name:'Qwen 2.5 3B Instruct', hfRepo:'bartowski/Qwen2.5-3B-Instruct-GGUF', hfFile:'Qwen2.5-3B-Instruct-Q4_K_M.gguf', size:'2.0 GB', layers:36, ramMb:1100, tag:null, desc:'Well-rounded 3B model with strong multilingual support.' },
+  { id:'qwen-7b', name:'Qwen 2.5 7B Instruct', hfRepo:'bartowski/Qwen2.5-7B-Instruct-GGUF', hfFile:'Qwen2.5-7B-Instruct-Q4_K_M.gguf', size:'4.7 GB', layers:28, ramMb:2800, tag:'POWERFUL', desc:'Flagship Qwen2.5 — excellent at code and long context.' },
+  // Llama
+  { id:'llama-1b', name:'Llama 3.2 1B Instruct', hfRepo:'bartowski/Llama-3.2-1B-Instruct-GGUF', hfFile:'Llama-3.2-1B-Instruct-Q4_K_M.gguf', size:'0.81 GB', layers:16, ramMb:550, tag:null, desc:'Meta Llama 3.2. Compact and capable.' },
+  { id:'llama-3b', name:'Llama 3.2 3B Instruct', hfRepo:'bartowski/Llama-3.2-3B-Instruct-GGUF', hfFile:'Llama-3.2-3B-Instruct-Q4_K_M.gguf', size:'2.0 GB', layers:28, ramMb:1100, tag:null, desc:'Great balance of quality and speed.' },
+  { id:'llama-8b', name:'Llama 3.1 8B Instruct', hfRepo:'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF', hfFile:'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf', size:'4.9 GB', layers:32, ramMb:3200, tag:'LARGE', desc:'Meta flagship 8B. Strong general purpose model.' },
+  // Phi
+  { id:'phi3.5', name:'Phi-3.5 Mini Instruct', hfRepo:'bartowski/Phi-3.5-mini-instruct-GGUF', hfFile:'Phi-3.5-mini-instruct-Q4_K_M.gguf', size:'2.3 GB', layers:32, ramMb:1400, tag:null, desc:'Microsoft Phi-3.5. Outstanding reasoning ability.' },
+  // Gemma
+  { id:'gemma2-2b', name:'Gemma 2 2B Instruct', hfRepo:'bartowski/gemma-2-2b-it-GGUF', hfFile:'gemma-2-2b-it-Q4_K_M.gguf', size:'1.7 GB', layers:26, ramMb:950, tag:null, desc:'Google Gemma 2. Fast, multilingual, great quality.' },
+  { id:'gemma2-9b', name:'Gemma 2 9B Instruct', hfRepo:'bartowski/gemma-2-9b-it-GGUF', hfFile:'gemma-2-9b-it-Q4_K_M.gguf', size:'5.8 GB', layers:42, ramMb:3600, tag:'LARGE', desc:'Google top-tier open 9B model. Excellent at reasoning.' },
+  // Mistral
+  { id:'mistral-7b', name:'Mistral 7B Instruct v0.3', hfRepo:'bartowski/Mistral-7B-Instruct-v0.3-GGUF', hfFile:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf', size:'4.4 GB', layers:32, ramMb:2800, tag:null, desc:'Classic Mistral 7B. Still a benchmark standard.' },
+  // DeepSeek
+  { id:'deepseek-r1-1.5b', name:'DeepSeek-R1 1.5B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf', size:'1.1 GB', layers:28, ramMb:700, tag:'REASONING', desc:'Distilled reasoning model. Great at step-by-step thinking.' },
+  { id:'deepseek-r1-7b', name:'DeepSeek-R1 7B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf', size:'4.7 GB', layers:28, ramMb:2800, tag:'REASONING', desc:'Full 7B reasoning distill. Outstanding complex reasoning.' },
 ];
 
 // ── Home ──
-function renderHome(){
+function renderHome() {
   updateDots();
-  const el=q('home-models');
-  if(!S.models.length){el.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.8">No models.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';return;}
-  el.innerHTML=S.models.map(m=>`<div class="mcard ${m.cached?'ready':''}" onclick="openModel('${m.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:13.5px;font-weight:700;flex:1">${m.name}</div><div class="chip ${m.cached?'chip-gn':'chip-am'}">${m.cached?'Cached':'Not loaded'}</div></div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers}L · ~${m.ramMb}MB peak</div></div>`).join('');
+  const el = q('home-models');
+  if(!S.models.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--tx3);font-size:13px;line-height:1.9">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';
+    return;
+  }
+  el.innerHTML = S.models.map(m => `
+    <div class="mc ${m.cached?'rdy':''}" onclick="openModel('${m.id}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+        <div style="font-size:13px;font-weight:700;flex:1">${m.name}</div>
+        <div class="chip ${m.cached?'cgc':'cac'}">${m.cached?'Cached':'Ready to load'}</div>
+      </div>
+      <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers} layers · ~${m.ramMb}MB</div>
+    </div>`).join('');
 }
 
-// ── Model browser ──
-let curTab='curated';
-window.switchTab=function(tab){curTab=tab;['curated','hf','custom'].forEach(t=>q('t-'+t).classList.toggle('active',t===tab));if(tab==='curated')renderCurated();else if(tab==='hf')renderHFTab();else renderCustomTab();};
-window.renderCurated=function(){
-  q('model-tab-body').innerHTML=CURATED.map(m=>{const got=S.models.find(sm=>sm.id===m.id)?.cached;return`<div class="mcard ${got?'ready':''}" onclick="showDetail('${m.id}','curated')"><div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px"><div style="flex:1"><div style="font-size:13.5px;font-weight:700;margin-bottom:2px">${m.name}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers}L · ~${m.ramMb}MB</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${m.tag?`<div class="chip chip-${m.tag==='FASTEST'||m.tag==='FAST'?'gn':m.tag==='POWERFUL'||m.tag==='LARGE'?'am':'cy'}">${m.tag}</div>`:''} ${got?'<div class="chip chip-gn">✓</div>':''} ${m.gated?'<div class="chip chip-am">🔒</div>':''}</div></div><div style="font-size:11.5px;color:var(--tx3)">${m.desc}</div></div>`;}).join('');
+// ── Tabs ──
+let _tab = 'curated';
+window.switchTab = function(t) {
+  _tab = t;
+  ['curated','hf','custom'].forEach(x => q('t-'+x).classList.toggle('on', x===t));
+  if(t==='curated') renderCurated();
+  else if(t==='hf') renderHFTab();
+  else renderCustomTab();
+};
+window.renderCurated = renderCurated;
+
+function renderCurated() {
+  q('tab-body').innerHTML = MODELS.map(m => {
+    const got = S.models.find(sm=>sm.id===m.id)?.cached;
+    const tagClass = m.tag==='FASTEST'||m.tag==='FAST'?'cgc' : m.tag==='REASONING'||m.tag==='LARGE'||m.tag==='POWERFUL'?'cac' : 'ccc';
+    return `<div class="mc ${got?'rdy':''}" onclick="showDetail('${m.id}','curated')">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:3px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:2px">${m.name}</div>
+          <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${m.size} · ${m.layers}L · ~${m.ramMb}MB</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
+          ${m.tag?`<div class="chip ${tagClass}">${m.tag}</div>`:''}
+          ${got?'<div class="chip cgc">✓ cached</div>':''}
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--tx3)">${m.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+let _hfTimer = null;
+function renderHFTab() {
+  q('tab-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${!S.hfOk?`<div class="card cam" style="font-size:12px;color:var(--am)">No HF token — showing public GGUF models only.
+        <button onclick="go('p-hf',1);fillHF()" style="background:none;border:none;color:var(--cy);cursor:pointer;font-size:12px;margin-left:6px">Connect →</button></div>`:''}
+      <div style="position:relative">
+        <input id="hf-q" type="text" placeholder="Search GGUF models (e.g. llama, gemma, phi…)"
+          style="width:100%;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+          padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)"
+          oninput="hfSearchD(this.value)" onfocus="this.style.borderColor='rgba(0,210,200,.4)'"
+          onblur="this.style.borderColor=''"/>
+        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:14px;pointer-events:none">⌕</div>
+      </div>
+      <div style="font-size:10px;color:var(--tx3)">Searching 165k+ GGUF models on HuggingFace</div>
+      <div id="hf-res"><div style="text-align:center;padding:22px;color:var(--tx3);font-size:12px">Search to browse models</div></div>
+    </div>`;
+}
+window.hfSearchD = function(v) {
+  clearTimeout(_hfTimer);
+  if(!v.trim()) { q('hf-res').innerHTML='<div style="text-align:center;padding:18px;color:var(--tx3);font-size:12px">Search to browse</div>'; return; }
+  q('hf-res').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">Searching…</div>';
+  _hfTimer = setTimeout(()=>hfSearch(v), 500);
+};
+async function hfSearch(query) {
+  try {
+    const h = S.hfToken ? {Authorization:`Bearer ${S.hfToken}`} : {};
+    const r = await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&library=gguf&limit=20&sort=downloads&direction=-1`,{headers:h});
+    const ms = await r.json();
+    if(!Array.isArray(ms)||!ms.length) { q('hf-res').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">No GGUF models found.</div>'; return; }
+    q('hf-res').innerHTML = ms.map(m=>`
+      <div class="hrow" onclick="showDetail('${m.modelId}','hf')">
+        <div style="font-size:12px;font-weight:600;font-family:var(--mono);margin-bottom:3px;word-break:break-all">${m.modelId}</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span style="font-size:10px;color:var(--tx3)">⬇ ${(m.downloads||0).toLocaleString()}</span>
+          <span style="font-size:10px;color:var(--tx3)">❤ ${(m.likes||0).toLocaleString()}</span>
+          ${m.private?'<span class="chip cac">Private</span>':''}
+        </div>
+      </div>`).join('');
+  } catch(e) { q('hf-res').innerHTML='<div style="text-align:center;padding:14px;color:var(--rd);font-size:12px">Search failed.</div>'; }
+}
+
+function renderCustomTab() {
+  q('tab-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
+        Load any GGUF model by providing the HuggingFace repo and filename, or a direct download URL.
+        Works with any GGUF that llama.cpp supports.
+      </div>
+      <div class="field"><label>HuggingFace Repo (user/repo)</label><input id="c-repo" placeholder="bartowski/Llama-3.2-1B-Instruct-GGUF"/></div>
+      <div class="field"><label>Filename</label><input id="c-file" placeholder="Llama-3.2-1B-Instruct-Q4_K_M.gguf"/></div>
+      <div style="text-align:center;font-size:11px;color:var(--tx3);padding:4px 0">— or —</div>
+      <div class="field"><label>Direct URL</label><input id="c-url" placeholder="https://example.com/model.gguf"/></div>
+      <div class="field"><label>Display Name</label><input id="c-name" placeholder="My Model"/></div>
+      <button class="btn bp" onclick="addCustom()">Add Model →</button>
+    </div>`;
+}
+window.addCustom = function() {
+  const repo = q('c-repo').value.trim();
+  const file = q('c-file').value.trim();
+  const url  = q('c-url').value.trim();
+  const name = q('c-name').value.trim();
+  if(!((repo&&file)||url)) { alert('Fill in either HF repo+file or a direct URL.'); return; }
+  const id = 'custom--'+(repo||url).replace(/[^a-z0-9]/gi,'_').slice(0,40)+'--'+Date.now();
+  registerModel({ id, name:name||(file||url.split('/').pop()), hfRepo:repo||null, hfFile:file||null, customUrl:url||null,
+    size:'?', layers:32, ramMb:800, tag:null, desc:'Custom model' });
 };
 
-let hfTimer=null,_hfSel=null;
-function renderHFTab(){
-  q('model-tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">${!S.hfOk?'<div class="card card-am" style="font-size:12px;color:var(--amber)">No HF token — public models only. <button onclick="nav(\'p-hf\',true)" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:12px">Connect →</button></div>':''}<div style="position:relative"><input id="hf-q" type="text" placeholder="Search Transformers.js models…" style="width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)" oninput="hfSearchD(this.value)"/><div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:14px;pointer-events:none">⌕</div></div><div style="font-size:10px;color:var(--tx3)">Filtered to Transformers.js compatible models</div><div id="hf-results"><div style="text-align:center;padding:24px;color:var(--tx3);font-size:12px">Search to browse</div></div></div>`;
-}
-window.hfSearchD=function(v){clearTimeout(hfTimer);if(!v.trim()){q('hf-results').innerHTML='<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search to browse</div>';return;}q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">Searching…</div>';hfTimer=setTimeout(()=>hfSearch(v),480);};
-async function hfSearch(query){try{const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};const r=await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&library=transformers.js&task=text-generation&limit=16&sort=downloads&direction=-1`,{headers:h});const ms=await r.json();if(!Array.isArray(ms)||!ms.length){q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--tx3);font-size:12px">No Transformers.js models found.</div>';return;}q('hf-results').innerHTML=ms.map(m=>`<div class="hfrow" onclick="showDetail('${m.modelId}','hf')"><div style="font-size:12.5px;font-weight:600;font-family:var(--mono);margin-bottom:4px;word-break:break-all">${m.modelId}</div><div style="display:flex;gap:12px"><span style="font-size:10px;color:var(--tx3)">⬇ ${(m.downloads||0).toLocaleString()}</span><span style="font-size:10px;color:var(--tx3)">❤ ${(m.likes||0).toLocaleString()}</span>${m.private?'<span class="chip chip-am">Private</span>':''}</div></div>`).join('');}catch(e){q('hf-results').innerHTML='<div style="text-align:center;padding:14px;color:var(--red);font-size:12px">Search failed.</div>';}}
-
-function renderCustomTab(){q('model-tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:12px"><div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">Enter any HuggingFace model ID compatible with Transformers.js. Weights cache in your browser's IndexedDB.</div><div class="field"><label>Model ID</label><input id="c-id" placeholder="username/model-name"/></div><div class="field"><label>Display Name (optional)</label><input id="c-name" placeholder="My Model"/></div><div class="field"><label>Dtype</label><select id="c-dtype"><option value="q4">q4 — 4-bit (fastest)</option><option value="q4f16">q4f16 — 4-bit float16</option><option value="q8">q8 — 8-bit</option><option value="fp16">fp16 — full float16</option></select></div><button class="btn btn-p" onclick="addCustomModel()">Add Model →</button></div>`;}
-window.addCustomModel=function(){const id=q('c-id').value.trim();if(!id)return;const name=q('c-name').value.trim()||id.split('/').pop();const dtype=q('c-dtype').value;startModelSetup({id:'custom--'+id.replace('/','--'),name,hfId:id,size:'?',layers:32,ramMb:700,dtype});};
-
 // ── Model detail ──
-window.showDetail=async function(modelId,source){
-  nav('p-detail',true);
-  const cm=CURATED.find(m=>m.id===modelId);
-  q('detail-title').textContent=cm?cm.name:modelId.split('/').pop();
-  q('detail-body').innerHTML='<div style="text-align:center;padding:32px;color:var(--tx3)">Loading…</div>';
-  if(source==='curated'&&cm){
-    const got=S.models.find(sm=>sm.id===cm.id)?.cached;
-    const locked=cm.gated&&!S.hfOk;
-    q('detail-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:13px"><div class="card"><div style="font-size:17px;font-weight:800;margin-bottom:5px">${cm.name}</div><div style="font-size:12px;color:var(--tx2);margin-bottom:12px">${cm.desc}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[['Size',cm.size],['Layers',cm.layers],['Peak RAM','~'+cm.ramMb+'MB'],['Dtype',cm.dtype]].map(([k,v])=>`<div style="background:var(--bg3);border-radius:7px;padding:8px 10px"><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div><div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div></div>`).join('')}</div></div><div class="card" style="font-size:11.5px;color:var(--tx3);font-family:var(--mono)">${cm.hfId}</div>${locked?`<div class="card card-am" style="font-size:12px;color:var(--amber)">Gated model — requires HF token with access.<button onclick="nav('p-hf',true)" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-size:12px;margin-left:6px">Connect →</button></div>`:''} ${got?`<button class="btn btn-p" onclick="openModel('${cm.id}')">Open Chat →</button>`:`<button class="btn btn-p" ${locked?'disabled':''} onclick="startModelSetup(${JSON.stringify(cm).replace(/"/g,"'")})">Load Model</button>`}<div style="font-size:11px;color:var(--tx3);text-align:center;line-height:1.6">Weights download once and cache in IndexedDB. Subsequent loads are instant and offline.</div></div>`;
+window.showDetail = async function(modelId, src) {
+  go('p-detail',1);
+  const cm = MODELS.find(m=>m.id===modelId);
+  q('det-title').textContent = cm ? cm.name : modelId.split('/').pop();
+  q('det-body').innerHTML = '<div style="text-align:center;padding:28px;color:var(--tx3)">Loading…</div>';
+  if(src==='curated' && cm) {
+    const got = S.models.find(sm=>sm.id===cm.id)?.cached;
+    q('det-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card">
+          <div style="font-size:17px;font-weight:800;margin-bottom:5px">${cm.name}</div>
+          <div style="font-size:12px;color:var(--tx2);margin-bottom:12px">${cm.desc}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+            ${[['Size',cm.size],['Layers',cm.layers],['Peak RAM','~'+cm.ramMb+'MB'],['Format','GGUF Q4_K_M']].map(([k,v])=>
+              `<div style="background:var(--s3);border-radius:7px;padding:8px 10px">
+                <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div>
+                <div style="font-size:13px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div class="card" style="font-size:11px;color:var(--tx3);font-family:var(--mono);line-height:1.6;word-break:break-all">
+          ${cm.hfRepo}<br/>${cm.hfFile}
+        </div>
+        ${got
+          ? `<button class="btn bp" onclick="openModel('${cm.id}')">Open Chat →</button>`
+          : `<button class="btn bp" onclick="registerModel(${JSON.stringify(cm).replace(/"/g,"'")})">Add & Load Model →</button>`}
+        <div style="font-size:11px;color:var(--tx3);text-align:center;line-height:1.6">
+          Model downloads from HuggingFace and caches in your browser's IndexedDB.
+          After first load, it works fully offline.
+        </div>
+      </div>`;
   } else {
     await renderHFDetail(modelId);
   }
 };
 
-async function renderHFDetail(modelId){
-  try{const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};const r=await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});if(!r.ok)throw new Error('Not found');const info=await r.json();q('detail-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:13px"><div class="card"><div style="font-size:15px;font-weight:800;font-family:var(--mono);margin-bottom:5px;word-break:break-all">${modelId}</div><div style="display:flex;gap:12px;margin-bottom:10px"><span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span><span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>${info.private?'<span class="chip chip-am">Private</span>':'<span class="chip chip-gn">Public</span>'}</div>${(info.tags||[]).includes('transformers.js')?'<div class="chip chip-cy">✓ Transformers.js</div>':'<div class="chip chip-am">⚠ May not be TJS compatible</div>'}</div><div class="field"><label>Dtype</label><select id="hf-det-dtype"><option value="q4">q4 — 4-bit</option><option value="q4f16">q4f16</option><option value="q8">q8 — 8-bit</option><option value="fp16">fp16</option></select></div><button class="btn btn-p" onclick="addHFModel('${modelId}')">Load This Model →</button></div>`;}catch(e){q('detail-body').innerHTML='<div class="card card-rd" style="font-size:12px;color:var(--red)">Failed to load. May be private or unavailable.</div>';}
+async function renderHFDetail(modelId) {
+  try {
+    const h = S.hfToken ? {Authorization:`Bearer ${S.hfToken}`} : {};
+    const r = await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const info = await r.json();
+    const ggufFiles = (info.siblings||[]).filter(f=>f.rfilename.endsWith('.gguf'));
+    const q4Files = ggufFiles.filter(f=>f.rfilename.toLowerCase().includes('q4_k_m'));
+    const displayed = (q4Files.length ? q4Files : ggufFiles).slice(0,12);
+    q('det-body').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card">
+          <div style="font-size:15px;font-weight:800;font-family:var(--mono);margin-bottom:5px;word-break:break-all">${modelId}</div>
+          <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span>
+            <span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>
+            ${info.private?'<span class="chip cac">Private</span>':'<span class="chip cgc">Public</span>'}
+          </div>
+          <div style="font-size:11.5px;color:var(--tx3)">${ggufFiles.length} GGUF file${ggufFiles.length!==1?'s':''} available</div>
+        </div>
+        ${!displayed.length ? '<div class="card crd" style="font-size:12px;color:var(--rd)">No GGUF files found in this repo.</div>' : `
+        <div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:8px">
+            ${q4Files.length?'Q4_K_M Files (recommended)':'GGUF Files'}
+          </div>
+          <div id="hf-file-list">
+            ${displayed.map(f=>`
+              <div class="hrow" onclick="pickHFFile('${modelId}','${f.rfilename}',this)">
+                <div style="font-size:11.5px;font-family:var(--mono);word-break:break-all">${f.rfilename}</div>
+              </div>`).join('')}
+          </div>
+          <button class="btn bp" id="hf-pick-btn" disabled onclick="loadPickedHF()">Select a file above</button>
+        </div>`}
+      </div>`;
+  } catch(e) {
+    q('det-body').innerHTML = `<div class="card crd" style="font-size:12px;color:var(--rd)">Failed to load: ${e.message}. May be private or require a token.</div>`;
+  }
 }
-window.addHFModel=function(modelId){const dtype=q('hf-det-dtype')?.value||'q4';startModelSetup({id:'hf--'+modelId.replace('/','--'),name:modelId.split('/').pop(),hfId:modelId,size:'?',layers:32,ramMb:700,dtype});};
 
-// ── Register model (actual weight download happens on first chat) ──
-async function startModelSetup(model){
-  nav('p-dl',true);
-  q('dl-name').textContent=model.name;
-  q('dl-phases').innerHTML='';
-  const addPhase=(icon,text)=>{const d=document.createElement('div');d.className='phase-row';d.innerHTML=`<div class="dot dot-spin"></div><span style="color:var(--tx2)">${icon} ${text}</span>`;q('dl-phases').appendChild(d);return d;};
-  const donePhase=d=>{d.querySelector('.dot').className='dot dot-ok';d.querySelector('span').style.color='var(--green)';};
-  const p1=addPhase('⇡','Verifying on HuggingFace…');q('dl-status').textContent='Checking…';q('dl-bar').style.width='0%';q('dl-pct').textContent='0%';
-  await sleep(700);q('dl-bar').style.width='40%';q('dl-pct').textContent='40%';donePhase(p1);
-  const p2=addPhase('◈','Saving model configuration…');await sleep(500);q('dl-bar').style.width='80%';q('dl-pct').textContent='80%';
-  const entry={...model,cached:false};const idx=S.models.findIndex(m=>m.id===model.id);if(idx>=0)S.models[idx]=entry;else S.models.push(entry);saveS();donePhase(p2);
-  const p3=addPhase('✓','Ready — weights will download on first use');q('dl-status').textContent='Registered!';q('dl-bar').style.width='100%';q('dl-pct').textContent='100%';await sleep(500);donePhase(p3);q('dl-spd').textContent='—';
-  await sleep(1000);nav('p-home',false);renderHome();
-}
-
-// ── Inference engine (real Transformers.js) ──
-let _pipe=null,_loadedId=null,_inferring=false;
-
-window.openModel=async function(id){
-  const m=S.models.find(m=>m.id===id);if(!m)return;
-  S.activeModel=id;
-  q('chat-title').textContent=m.name;
-  q('chat-sub').textContent=`${m.layers} layers · ~${m.ramMb}MB peak`;
-  q('lgrid').innerHTML=Array.from({length:m.layers},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
-  q('lc-tot').textContent=m.layers;
-  q('chat-msgs').innerHTML='';
-  q('chat-in').value='';q('chat-in').style.height='auto';
-  nav('p-chat',true);
-  if(_loadedId!==id)await loadModel(m);
+let _pickedHF = null;
+window.pickHFFile = function(repo, file, el) {
+  document.querySelectorAll('#hf-file-list .hrow').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  _pickedHF = {repo, file};
+  const b = q('hf-pick-btn'); b.disabled=false; b.textContent=`Load ${file.split('/').pop()} →`;
+};
+window.loadPickedHF = function() {
+  if(!_pickedHF) return;
+  const id = 'hf--'+_pickedHF.repo.replace('/','--')+'--'+_pickedHF.file.replace('.gguf','').replace(/[^a-z0-9]/gi,'_');
+  registerModel({ id, name:_pickedHF.repo.split('/').pop()+' ('+_pickedHF.file.replace(/^.*[-_]([^-_.]+)\.gguf$/i,'$1').toUpperCase()+')',
+    hfRepo:_pickedHF.repo, hfFile:_pickedHF.file, size:'?', layers:32, ramMb:800 });
 };
 
-async function loadModel(m){
-  const lo=q('load-overlay');lo.classList.add('show');
-  q('lo-title').textContent=`Loading ${m.name}…`;
-  q('lo-bar').style.width='0%';q('lo-msg').textContent='Starting Transformers.js…';
-  try{
-    if(S.hfToken)env.accessToken=S.hfToken;
-    const onProg=p=>{
-      if(p.status==='downloading'){const pct=p.total?Math.round((p.loaded/p.total)*100):0;q('lo-bar').style.width=pct+'%';q('lo-msg').textContent=`Downloading ${p.file||'weights'}… ${pct}%`;}
-      else if(p.status==='loading')q('lo-msg').textContent=`Loading ${p.file||'model'}…`;
-      else if(p.status==='ready'){q('lo-bar').style.width='100%';q('lo-msg').textContent='Ready!';}
+// ── Register model (actual weight download happens at load time via wllama) ──
+function registerModel(m) {
+  const entry = {...m, cached:false};
+  const idx = S.models.findIndex(sm=>sm.id===m.id);
+  if(idx>=0) S.models[idx]=entry; else S.models.push(entry);
+  saveS();
+  go('p-home',0); renderHome();
+  // auto-open
+  setTimeout(()=>openModel(m.id), 400);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  WLLAMA ENGINE
+//  loadModelFromHF(repo, file) → downloads any GGUF, caches it
+//  completion({...}) → real streaming token generation
+// ══════════════════════════════════════════════════════════════
+let _wllama = null;
+let _loadedId = null;
+let _inferring = false;
+
+window.openModel = async function(id) {
+  const m = S.models.find(m=>m.id===id);
+  if(!m) return;
+  S.activeModel = id;
+  q('chat-title').textContent = m.name;
+  q('chat-sub').textContent = `${m.layers} layers · ~${m.ramMb}MB · wllama/llama.cpp`;
+  q('lgrid').innerHTML = Array.from({length:m.layers},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
+  q('lc-t').textContent = m.layers;
+  q('chat-msgs').innerHTML = '';
+  q('chat-in').value = ''; q('chat-in').style.height='auto';
+  go('p-chat',1);
+  if(_loadedId !== id) await loadModel(m);
+};
+
+async function loadModel(m) {
+  const lo = q('lovo');
+  lo.classList.add('show');
+  q('lo-title').textContent = `Loading ${m.name}…`;
+  q('lo-bar').style.width = '0%';
+  q('lo-msg').textContent = 'Initializing wllama…';
+  q('lo-files').innerHTML = '';
+  q('sbtn').disabled = true;
+
+  try {
+    // Destroy previous instance if any
+    if(_wllama) { try { await _wllama.exit(); } catch(e){} _wllama=null; }
+
+    // Create wllama with CDN WASM files
+    _wllama = new Wllama(WasmFromCDN);
+
+    const loadOpts = {
+      progressCallback: ({loaded, total}) => {
+        const pct = total ? Math.round(loaded/total*100) : 0;
+        q('lo-bar').style.width = pct + '%';
+        q('lo-msg').textContent = `Downloading… ${pct}% (${(loaded/1024/1024).toFixed(1)} MB)`;
+      },
     };
-    _pipe=await pipeline('text-generation',m.hfId,{dtype:m.dtype||'q4',device:'webgpu',progress_callback:onProg});
-    _loadedId=m.id;
-    const idx=S.models.findIndex(sm=>sm.id===m.id);if(idx>=0){S.models[idx].cached=true;saveS();}
-    q('lo-msg').textContent='✓ Model loaded';await sleep(400);
+
+    // Add HF token if available
+    if(S.hfToken) loadOpts.headers = { Authorization: `Bearer ${S.hfToken}` };
+
+    if(m.hfRepo && m.hfFile) {
+      q('lo-msg').textContent = `Fetching from HuggingFace…`;
+      await _wllama.loadModelFromHF(m.hfRepo, m.hfFile, loadOpts);
+    } else if(m.customUrl) {
+      q('lo-msg').textContent = `Downloading from URL…`;
+      await _wllama.loadModelFromUrl(m.customUrl, loadOpts);
+    } else {
+      throw new Error('No model source configured');
+    }
+
+    _loadedId = m.id;
+
+    // Mark cached
+    const idx = S.models.findIndex(sm=>sm.id===m.id);
+    if(idx>=0) { S.models[idx].cached=true; saveS(); }
+
+    q('lo-msg').textContent = '✓ Model ready';
+    await sleep(350);
     lo.classList.remove('show');
-    appendBubble('assistant','Ready. What would you like to know?');
-    q('send-btn').disabled=false;renderHome();
-  }catch(err){
+
+    // Ready — no canned intro about the project
+    appendBubble('asst', 'Ready. What would you like to know?');
+    q('sbtn').disabled = false;
+    renderHome();
+
+  } catch(err) {
     lo.classList.remove('show');
-    appendBubble('assistant',`**Could not load model.**\n\n\`\`\`\n${err.message}\n\`\`\`\n\n**Possible reasons:**\n- Browser doesn't support WebGPU (use Chrome/Edge)\n- Gated model — connect HuggingFace token\n- Model not compatible with Transformers.js\n\nTry a model from the Curated list (SmolLM2 works on all devices).`);
-    q('send-btn').disabled=true;
+    const errMsg = err.message || String(err);
+    appendBubble('asst', `**Failed to load model.**\n\n\`\`\`\n${errMsg}\n\`\`\`\n\n**Common fixes:**\n- Make sure the GGUF file exists in the repo\n- Private/gated models need a HuggingFace token (Settings → HuggingFace)\n- Try a smaller model if you're low on memory\n- Use Chrome or Edge for best compatibility`);
+    q('sbtn').disabled = true;
   }
 }
 
-window.clearChat=function(){q('chat-msgs').innerHTML='';if(_loadedId===S.activeModel)appendBubble('assistant','Ready. What would you like to know?');};
-window.chatKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
-window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';};
+window.clearChat = function() {
+  q('chat-msgs').innerHTML = '';
+  if(_loadedId===S.activeModel) appendBubble('asst','Ready. What would you like to know?');
+};
+window.chatKey = function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} };
+window.autoResize = function(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; };
 
-window.sendMsg=async function(){
-  if(_inferring)return;
-  if(!_pipe){appendBubble('assistant','Model is still loading, please wait.');return;}
-  const inp=q('chat-in');const text=inp.value.trim();if(!text)return;
-  inp.value='';inp.style.height='auto';
-  const m=S.models.find(m=>m.id===S.activeModel);
-  _inferring=true;q('send-btn').disabled=true;
-  appendBubble('user',text);
-  q('infer-bar').style.display='block';
-  const anim=animateLayers(m);
-  const typingRow=document.createElement('div');typingRow.className='msg-row assistant';typingRow.innerHTML='<div class="bubble assistant"><div class="tdots"><span></span><span></span><span></span></div></div>';q('chat-msgs').appendChild(typingRow);scrollChat();
-  let full='';
-  const aRow=document.createElement('div');aRow.className='msg-row assistant';
-  try{
-    const messages=[{role:'user',content:text}];
-    const streamer=new TextStreamer(_pipe.tokenizer,{skip_prompt:true,skip_special_tokens:true,
-      callback_function:tok=>{
-        full+=tok;
-        if(typingRow.parentNode){q('chat-msgs').removeChild(typingRow);}
-        const bub=aRow.querySelector('.bubble')||document.createElement('div');
-        bub.className='bubble assistant';
-        bub.innerHTML=renderMd(full)+'<span class="cur"></span>';
-        if(!aRow.children.length)aRow.appendChild(bub);
-        if(!aRow.parentNode)q('chat-msgs').appendChild(aRow);
-        scrollChat();
-      }
+window.sendMsg = async function() {
+  if(_inferring || !_wllama) return;
+  const inp = q('chat-in');
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='auto';
+
+  const m = S.models.find(m=>m.id===S.activeModel);
+  _inferring = true;
+  q('sbtn').disabled = true;
+  appendBubble('user', text);
+
+  // Layer animation
+  q('ibar').style.display = 'block';
+  const anim = animLayers(m);
+
+  // Typing indicator
+  const trow = document.createElement('div');
+  trow.className = 'mrow asst';
+  trow.innerHTML = '<div class="bub asst"><div class="tdots"><span></span><span></span><span></span></div></div>';
+  q('chat-msgs').appendChild(trow);
+  scrollC();
+
+  let full = '';
+  const arow = document.createElement('div');
+  arow.className = 'mrow asst';
+  const abub = document.createElement('div');
+  abub.className = 'bub asst';
+  arow.appendChild(abub);
+
+  try {
+    // wllama completion with streaming
+    await _wllama.createCompletion(text, {
+      nPredict: S.settings.maxTokens || 512,
+      temperature: S.settings.temperature || 0.7,
+      repeatPenalty: S.settings.repPenalty || 1.1,
+      topP: S.settings.topP || 0.9,
+      onNewToken: (token, piece, currentText) => {
+        full = currentText;
+        if(trow.parentNode) { q('chat-msgs').removeChild(trow); }
+        abub.innerHTML = renderMd(full) + '<span class="cur"></span>';
+        if(!arow.parentNode) q('chat-msgs').appendChild(arow);
+        scrollC();
+      },
     });
-    await _pipe(messages,{max_new_tokens:S.settings.maxTokens||512,temperature:S.settings.temperature||0.7,repetition_penalty:S.settings.repPenalty||1.1,do_sample:true,streamer});
-  }catch(err){
-    if(typingRow.parentNode)q('chat-msgs').removeChild(typingRow);
-    full=`Error: ${err.message}`;appendBubble('assistant',full);
+  } catch(err) {
+    if(trow.parentNode) q('chat-msgs').removeChild(trow);
+    full = `Error: ${err.message}`;
+    appendBubble('asst', full);
   }
-  const finalBub=aRow.querySelector('.bubble');if(finalBub)finalBub.innerHTML=renderMd(full);
-  anim.stop();q('infer-bar').style.display='none';_inferring=false;q('send-btn').disabled=false;scrollChat();
+
+  // Finalize — remove cursor
+  abub.innerHTML = renderMd(full);
+
+  anim.stop();
+  q('ibar').style.display = 'none';
+  _inferring = false;
+  q('sbtn').disabled = false;
+  scrollC();
 };
 
-const scrollChat=()=>{const c=q('chat-msgs');c.scrollTop=c.scrollHeight;};
+const scrollC = () => { const c=q('chat-msgs'); c.scrollTop=c.scrollHeight; };
 
-function animateLayers(m){
-  if(!m)return{stop:()=>{}};
-  let stopped=false,i=0;
+function animLayers(m) {
+  if(!m) return {stop:()=>{}};
+  let stopped=false, i=0;
   (async()=>{
-    while(!stopped){
-      if(i>0){const p=q('lc'+(i-1));if(p)p.className='lc done';}
-      const cur=q('lc'+i);if(cur)cur.className='lc active';
-      q('lc-cur').textContent=i+1;
-      q('l-ram').textContent=`~${Math.round(m.ramMb/m.layers*(i+1)*0.4+30)}MB`;
-      i=(i+1)%m.layers;if(i===0){for(let j=0;j<m.layers;j++){const c=q('lc'+j);if(c)c.className='lc';}}
-      await sleep(Math.random()*55+35);
+    while(!stopped) {
+      if(i>0) { const p=q('lc'+(i-1)); if(p) p.className='lc done'; }
+      const cur=q('lc'+i); if(cur) cur.className='lc act';
+      q('lc-c').textContent=i+1;
+      q('l-ram').textContent=`~${Math.round(m.ramMb/m.layers*(i+1)*0.38+25)}MB`;
+      i=(i+1)%m.layers;
+      if(i===0){for(let j=0;j<m.layers;j++){const c=q('lc'+j);if(c)c.className='lc';}}
+      await sleep(Math.random()*50+30);
     }
     for(let j=0;j<(m?.layers||0);j++){const c=q('lc'+j);if(c)c.className='lc done';}
   })();
-  return{stop:()=>{stopped=true;}};
+  return {stop:()=>{stopped=true;}};
 }
 
-// ── Markdown + syntax highlight ──
-function renderMd(text){
-  if(!text)return'';
-  let html='';const codeRx=/```(\w*)\n?([\s\S]*?)```/g;let last=0,m;
-  while((m=codeRx.exec(text))!==null){
-    if(m.index>last)html+=renderInline(text.slice(last,m.index));
-    const lang=(m[1]||'').trim()||'plaintext';const code=m[2];
+// ── Markdown + code highlight ──
+function renderMd(text) {
+  if(!text) return '';
+  let html='', last=0;
+  const codeRx = /```(\w*)\n?([\s\S]*?)```/g;
+  let m;
+  while((m=codeRx.exec(text))!==null) {
+    if(m.index>last) html+=renderInline(text.slice(last,m.index));
+    const lang=(m[1]||'').trim()||'plaintext';
+    const code=m[2];
     let hi;
-    try{hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value;}catch(e){hi=esc(code);}
-    html+=`<div style="border-radius:8px;overflow:hidden;margin:8px 0;border:1px solid rgba(255,255,255,0.07)"><div class="code-hdr"><span class="code-lang-label">${lang}</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre></div>`;
+    try { hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value; }
+    catch(e){hi=esc(code);}
+    html+=`<div style="border-radius:8px;overflow:hidden;margin:8px 0">
+      <div class="code-hdr"><span class="clbl">${lang}</span><button class="cpbtn" onclick="copyCode(this)">Copy</button></div>
+      <pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre>
+    </div>`;
     last=m.index+m[0].length;
   }
-  if(last<text.length)html+=renderInline(text.slice(last));
+  if(last<text.length) html+=renderInline(text.slice(last));
   return html;
 }
-function renderInline(t){
+function renderInline(t) {
   t=esc(t);
   t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
   t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/_(.+?)_/g,'<em>$1</em>');
   t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
   t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
   t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
-  t=t.replace(/^[*-] (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  const lines=t.split('\n');const out=[];let inUl=false;
-  for(const line of lines){
-    if(line.startsWith('<li>')){if(!inUl){out.push('<ul>');inUl=true;}out.push(line);}
-    else{if(inUl){out.push('</ul>');inUl=false;}
-    if(line.match(/^<h[123]>|^<blockquote>/))out.push(line);
-    else if(line.trim()==='')out.push('');
-    else out.push(`<p>${line}</p>`);}
+  t=t.replace(/^---$/gm,'<hr/>');
+  const lines=t.split('\n'); const out=[]; let inUl=false, inOl=false;
+  for(const line of lines) {
+    const li=line.startsWith('<li>');
+    if(li){if(!inUl){out.push('<ul>');inUl=true;}out.push(line);}
+    else{if(inUl){out.push('</ul>');inUl=false;} if(line.match(/^<h[123]>|^<blockquote>|^<hr/))out.push(line);else if(line.trim()==='')out.push('');else out.push(`<p>${line}</p>`);}
   }
   if(inUl)out.push('</ul>');
+  t=t.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
   return out.join('');
 }
 const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-window.copyCode=function(btn){const code=btn.closest('[style]').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);}).catch(()=>{btn.textContent='✗';setTimeout(()=>btn.textContent='Copy',2000);});};
+window.copyCode=function(btn){const c=btn.closest('[style]').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);}).catch(()=>{btn.textContent='✗';setTimeout(()=>btn.textContent='Copy',2000);});};
 
-function appendBubble(role,text){
-  const row=document.createElement('div');row.className=`msg-row ${role}`;
-  const bub=document.createElement('div');bub.className=`bubble ${role}`;
-  if(role==='assistant')bub.innerHTML=renderMd(text);else bub.textContent=text;
-  row.appendChild(bub);q('chat-msgs').appendChild(row);scrollChat();return bub;
+function appendBubble(role, text) {
+  const row=document.createElement('div'); row.className=`mrow ${role}`;
+  const bub=document.createElement('div'); bub.className=`bub ${role}`;
+  if(role==='asst') bub.innerHTML=renderMd(text); else bub.textContent=text;
+  row.appendChild(bub); q('chat-msgs').appendChild(row); scrollC(); return bub;
 }
 
 // ── Folders ──
-window.renderFolders=function(){const el=q('folder-list');if(!S.folders.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px;line-height:1.8">No folders.<br/><b style="color:var(--tx2)">Tap + to create one.</b></div>';return;}const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];el.innerHTML=S.folders.map((f,i)=>`<div class="frow"><div style="font-size:20px">${f.icon||icons[i%icons.length]}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${f.name}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${f.models?.length||0} models</div></div><button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:4px" onclick="deleteFolder(${i})">✕</button></div>`).join('');};
-window.createFolder=function(){const name=prompt('Folder name:');if(!name)return;const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];S.folders.push({name,icon:icons[Math.floor(Math.random()*icons.length)],models:[],shards:0});saveS();renderFolders();};
+window.renderFolders=function(){const el=q('folder-list');if(!S.folders.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px;line-height:1.9">No folders.<br/><b style="color:var(--tx2)">Tap + to create one.</b></div>';return;}const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];el.innerHTML=S.folders.map((f,i)=>`<div class="frow"><div style="font-size:20px">${f.icon||icons[i%icons.length]}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${f.name}</div><div style="font-size:11px;color:var(--tx3);font-family:var(--mono)">${f.models?.length||0} models</div></div><button style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:14px;padding:4px" onclick="deleteFolder(${i})">✕</button></div>`).join('');};
+window.createFolder=function(){const n=prompt('Folder name:');if(!n)return;const icons=['📁','🗂','📦','🧠','⚡','🔬','🎯'];S.folders.push({name:n,icon:icons[Math.floor(Math.random()*icons.length)],models:[],shards:0});saveS();renderFolders();};
 window.deleteFolder=function(i){if(!confirm(`Delete "${S.folders[i].name}"?`))return;S.folders.splice(i,1);saveS();renderFolders();};
 
 // ── Settings ──
-window.saveSettings=function(){S.settings.maxTokens=parseInt(q('s-tok').value)||512;S.settings.temperature=parseFloat(q('s-temp').value)||0.7;S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;saveS();nav('p-home',false);};
-window.clearAll=function(){if(!confirm('Clear all data?'))return;localStorage.removeItem(SK);location.reload();};
+window.saveSettings=function(){S.settings.maxTokens=parseInt(q('s-tok').value)||512;S.settings.temperature=parseFloat(q('s-temp').value)||0.7;S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;S.settings.topP=parseFloat(q('s-topp').value)||0.9;saveS();go('p-home',0);};
+window.clearAll=function(){if(!confirm('Clear all saved data?'))return;localStorage.removeItem(SK);location.reload();};
 
 boot();
 </script>
