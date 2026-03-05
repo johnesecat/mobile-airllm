@@ -146,7 +146,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   </div>
   <div style="font-size:19px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
   <div class="spin" style="width:22px;height:22px"></div>
-  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Loading engines…</div>
+  <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Starting…</div>
 </div>
 <div id="app"><div class="shell">
 
@@ -290,43 +290,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 </div></div>
 
 <!--
-  WLLAMA FIX — The root cause of "Importing a module script failed":
-  =================================================================
-  wllama must be imported from cdn.jsdelivr.net/npm/... NOT from esm.sh.
-  esm.sh bundles everything into one file, which breaks wllama's internal
-  Worker() constructor — it spawns workers by fetching sibling .js files
-  relative to its own URL. When bundled by esm.sh those relative paths
-  are destroyed.
+  CRITICAL: Do NOT use top-level imports for wllama or transformers.js.
+  Top-level ESM imports block the entire script — if ANY CDN import fails
+  or is slow, boot() never runs and the app is stuck on "Loading engines…".
 
-  With jsdelivr, the full package directory structure is preserved:
-    /esm/index.js  (imports)
-    /esm/single-thread/wllama.js   ← Worker script
-    /esm/single-thread/wllama.wasm ← WASM binary
-    /esm/multi-thread/wllama.js
-    /esm/multi-thread/wllama.wasm
-    /esm/multi-thread/wllama.worker.mjs
-
-  We pass ONLY the 2 .wasm paths. wllama auto-derives the .js worker
-  path from the WASM URL by swapping the extension: .wasm → .js
-  Since both live at the same jsdelivr URL base, resolution succeeds.
+  Instead: lazy dynamic import() inside loadWllama() / loadTransformers()
+  so the app boots instantly and engines load only when a model is opened.
 -->
 <script type="module">
-// ── wllama from jsdelivr (full package structure preserved, workers resolve correctly)
-import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/index.js';
-import WasmFromCDN from 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/wasm-from-cdn.js';
+// ── CDN URLs for lazy loading (imported on demand, never at boot)
+const WLLAMA_INDEX   = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/index.js';
+const WLLAMA_CDN_CFG = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/wasm-from-cdn.js';
+const TJS_URL        = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
 
-// ── Transformers.js for ONNX / any non-GGUF HF model
-import { pipeline, env as TJSEnv } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+// Cached engine references after first load
+let _WllamaClass  = null;   // Wllama constructor
+let _WasmFromCDN  = null;   // official CDN WASM config object
+let _TJSPipeline  = null;   // transformers pipeline function
+let _TJSEnv       = null;   // transformers env
 
-TJSEnv.allowLocalModels = false;
-TJSEnv.useBrowserCache  = true;
-
-// ── wllama WASM config
-// WasmFromCDN is the ONLY officially supported way to use wllama from a CDN
-// (imported above — it's a pre-built object with all WASM + worker JS URLs)
-// Do NOT manually specify paths; wasm-from-cdn.js handles versioning correctly
-
-// ── Capability detection
+// ── Capability detection (synchronous, safe at startup)
 const hasSharedMem = typeof SharedArrayBuffer !== 'undefined';
 const isCOI        = !!self.crossOriginIsolated;
 const hasWebGPU    = !!navigator.gpu;
@@ -775,9 +758,17 @@ async function loadModel(m){
 }
 
 async function loadWllama(m,setMsg){
-  // WasmFromCDN is the officially supported CDN config object
-  // It already contains all correct WASM + worker JS paths from unpkg
-  _wllama = new Wllama(WasmFromCDN, { parallelDownloads: 5 });
+  // Lazy-load wllama only when first model is opened (never at boot)
+  if(!_WllamaClass || !_WasmFromCDN) {
+    setMsg(`<div style="display:flex;align-items:center;gap:8px"><div class="spin" style="width:14px;height:14px;flex-shrink:0"></div><span>Importing wllama engine…</span></div>`);
+    const [{ Wllama }, { default: wasmCfg }] = await Promise.all([
+      import(WLLAMA_INDEX),
+      import(WLLAMA_CDN_CFG),
+    ]);
+    _WllamaClass = Wllama;
+    _WasmFromCDN = wasmCfg;
+  }
+  _wllama = new _WllamaClass(_WasmFromCDN, { parallelDownloads: 5 });
 
   const opts={
     progressCallback:({loaded,total})=>{
@@ -803,9 +794,18 @@ async function loadWllama(m,setMsg){
 }
 
 async function loadTransformers(m,setMsg){
-  if(S.hfToken)TJSEnv.accessToken=S.hfToken;
+  // Lazy-load transformers.js only when first ONNX model is opened
+  if(!_TJSPipeline) {
+    setMsg(`<div style="display:flex;align-items:center;gap:8px"><div class="spin" style="width:14px;height:14px;flex-shrink:0"></div><span>Importing Transformers.js engine…</span></div>`);
+    const mod = await import(TJS_URL);
+    _TJSPipeline = mod.pipeline;
+    _TJSEnv = mod.env;
+    _TJSEnv.allowLocalModels = false;
+    _TJSEnv.useBrowserCache  = true;
+  }
+  if(S.hfToken) _TJSEnv.accessToken = S.hfToken;
   const device=hasWebGPU?'webgpu':'wasm';
-  _tjsPipe=await pipeline('text-generation',m.hfRepo,{
+  _tjsPipe=await _TJSPipeline('text-generation',m.hfRepo,{
     dtype:'q4',device,
     progress_callback:(prog)=>{
       if(prog.status==='downloading'&&prog.total){
