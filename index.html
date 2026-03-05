@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>MobileAirLLM</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 <style>
 :root{
   --bg:#07090d;--s1:#0c0f16;--s2:#11151e;--s3:#171c27;
@@ -27,8 +26,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 @media(min-width:480px){.shell{border-radius:22px;border:1px solid var(--ln2);box-shadow:0 40px 100px rgba(0,0,0,.92)}}
 .pg{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
 .pg.on{display:flex}
-@keyframes pgIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pgBk{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pgIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes pgBk{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 .pg.af{animation:pgIn .17s cubic-bezier(.16,1,.3,1) both}
 .pg.ab{animation:pgBk .17s cubic-bezier(.16,1,.3,1) both}
 #boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
@@ -64,9 +63,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .field input:focus{border-color:rgba(0,210,200,.45)}
 .field input::placeholder{color:var(--tx3)}
 .card{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:13px 14px}
-.crd{border-color:rgba(224,79,79,.22);background:var(--rd0)}
 .cam{border-color:rgba(240,162,40,.22);background:var(--am0)}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cgn{border-color:rgba(34,196,122,.22);background:var(--gn0)}
+.crd{border-color:rgba(224,79,79,.22)!important;background:var(--rd0)!important}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:all .2s}
 .dok{background:var(--gn);box-shadow:0 0 6px var(--gn)}.derr{background:var(--rd)}.didle{background:var(--tx3)}
 .chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;
   font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;flex-shrink:0}
@@ -101,7 +101,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(8px,1fr));gap:2px}
 .lc{height:6px;border-radius:2px;background:var(--s3)}
 .lc.done{background:rgba(0,210,200,.25)}
-.lc.act{background:var(--cy);animation:lp .4s ease-in-out infinite}
+.lc.act{background:var(--cy);box-shadow:0 0 5px var(--cy);animation:lp .4s ease-in-out infinite}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:.2}}
 .mrow{display:flex;margin-bottom:9px}
 .mrow.user{justify-content:flex-end}.mrow.asst{justify-content:flex-start}
@@ -111,34 +111,49 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .bub.asst{background:var(--s2);border:1px solid var(--ln);border-radius:14px 14px 14px 3px}
 .bub p{margin-bottom:7px}.bub p:last-child{margin:0}
 .bub strong{font-weight:700;color:var(--tx)}.bub em{font-style:italic}
-.bub code{background:var(--s3);border:1px solid var(--ln);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cy)}
+.bub code{background:var(--s3);border:1px solid var(--ln);border-radius:4px;
+  padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--cy)}
 .bub pre{margin:7px 0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
-.bub pre code{background:none;border:none;padding:0;color:inherit;font-size:11.5px!important;line-height:1.55!important}
+.bub pre code{background:none;border:none;padding:0;color:#e6edf3;font-size:11.5px!important;line-height:1.6!important}
 .bub ul,.bub ol{padding-left:18px;margin-bottom:7px}.bub li{margin-bottom:3px}
-.bub h1{font-size:16px;font-weight:700;margin-bottom:5px}.bub h2{font-size:14px;font-weight:700;margin-bottom:4px}.bub h3{font-size:13px;font-weight:700;margin-bottom:3px}
+.bub h1{font-size:16px;font-weight:700;margin-bottom:5px}
+.bub h2{font-size:14px;font-weight:700;margin-bottom:4px}
+.bub h3{font-size:13px;font-weight:700;margin-bottom:3px}
 .bub blockquote{border-left:2px solid var(--cy);padding-left:10px;color:var(--tx2);margin:5px 0}
-.bub a{color:var(--cy);text-decoration:none}.bub hr{border:none;border-top:1px solid var(--ln);margin:7px 0}
-.code-hdr{display:flex;align-items:center;justify-content:space-between;background:#161b22;padding:5px 11px;border-radius:8px 8px 0 0}
+.bub a{color:var(--cy);text-decoration:none}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;
+  background:#161b22;padding:5px 11px;border-radius:8px 8px 0 0}
 .clbl{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em}
-.cpbtn{background:rgba(255,255,255,.05);border:none;border-radius:4px;color:rgba(255,255,255,.38);padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font)}
+.cpbtn{background:rgba(255,255,255,.05);border:none;border-radius:4px;color:rgba(255,255,255,.38);
+  padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font)}
 .cpbtn:hover{background:rgba(255,255,255,.1);color:var(--tx)}
-.tdots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cy);margin:0 2px;animation:td 1.1s ease-in-out infinite}
+.tdots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cy);margin:0 2px;
+  animation:td 1.1s ease-in-out infinite}
 .tdots span:nth-child(2){animation-delay:.17s}.tdots span:nth-child(3){animation-delay:.34s}
 @keyframes td{0%,80%,100%{transform:scale(.4);opacity:.2}40%{transform:scale(1);opacity:1}}
-.cur{display:inline-block;width:2px;height:13px;background:var(--cy);margin-left:1px;vertical-align:text-bottom;animation:bl 1s step-end infinite}
+.cur{display:inline-block;width:2px;height:13px;background:var(--cy);
+  margin-left:1px;vertical-align:text-bottom;animation:bl 1s step-end infinite}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
 .cbar{display:flex;gap:8px;align-items:flex-end;padding:9px 12px 18px;border-top:1px solid var(--ln);flex-shrink:0}
-.cbar textarea{flex:1;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto}
+.cbar textarea{flex:1;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);
+  padding:10px 12px;color:var(--tx);font-size:13.5px;font-family:var(--font);
+  resize:none;outline:none;line-height:1.5;max-height:100px;overflow-y:auto;transition:border-color .12s}
+.cbar textarea:focus{border-color:rgba(0,210,200,.32)}
 .cbar textarea::placeholder{color:var(--tx3)}
-.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;background:var(--cy);color:#040808;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center}
+.sbtn{width:40px;height:40px;border-radius:var(--r);border:none;flex-shrink:0;
+  background:var(--cy);color:#040808;cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s}
 .sbtn[disabled]{background:var(--s2);border:1px solid var(--ln);color:var(--tx3);cursor:default}
 .ibar{padding:8px 13px;border-bottom:1px solid var(--ln);display:none;flex-shrink:0}
-.warn{background:rgba(240,162,40,.08);border:1px solid rgba(240,162,40,.2);border-radius:var(--r);padding:10px 12px;font-size:11.5px;color:var(--am);line-height:1.6}
+.warn{background:rgba(240,162,40,.08);border:1px solid rgba(240,162,40,.2);
+  border-radius:var(--r);padding:10px 12px;font-size:11.5px;color:var(--am);line-height:1.6}
 </style>
 </head>
 <body>
+
 <div id="boot">
-  <div style="width:64px;height:64px;border-radius:16px;background:var(--s2);border:1px solid var(--ln2);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,210,200,.18)">
+  <div style="width:64px;height:64px;border-radius:16px;background:var(--s2);border:1px solid var(--ln2);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,210,200,.18)">
     <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
       <path d="M4 26L15 4l11 22" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M8.5 19h13" stroke="#00d2c8" stroke-width="2.4" stroke-linecap="round"/>
@@ -148,812 +163,615 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <div class="spin" style="width:22px;height:22px"></div>
   <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="bmsg">Starting…</div>
 </div>
+
 <div id="app"><div class="shell">
 
-<!-- HOME -->
-<div class="pg" id="p-home">
-  <div class="hdr">
-    <div class="sp34"></div>
-    <div style="flex:1;text-align:center">
-      <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
-      <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="eng-lbl">any HF model · on-device</div>
-    </div>
-    <button class="ib" onclick="go('p-settings',1)">⚙</button>
-  </div>
-  <div class="scroll">
-    <div class="slbl">Connections</div>
-    <div style="padding:0 12px">
-      <div class="srow" onclick="go('p-tg',1);fillTG()">
-        <div class="dot didle" id="h-dot-tg"></div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
-          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div></div>
-        <span style="color:var(--tx3)">›</span>
+  <!-- HOME -->
+  <div class="pg" id="p-home">
+    <div class="hdr">
+      <div class="sp34"></div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">MobileAirLLM</div>
+        <div style="font-size:9px;color:var(--tx3);font-family:var(--mono);margin-top:1px">HuggingFace Inference API · any model</div>
       </div>
-      <div class="srow" onclick="go('p-hf',1);fillHF()">
-        <div class="dot didle" id="h-dot-hf"></div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600">HuggingFace</div>
-          <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not configured</div></div>
-        <span style="color:var(--tx3)">›</span>
+      <button class="ib" onclick="go('p-settings',1)">⚙</button>
+    </div>
+    <div class="scroll">
+      <div class="slbl">Connections</div>
+      <div style="padding:0 12px">
+        <div class="srow" onclick="go('p-hf',1);fillHF()">
+          <div class="dot didle" id="h-dot-hf"></div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">HuggingFace</div>
+            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-hf">not connected</div>
+          </div>
+          <span style="color:var(--tx3)">›</span>
+        </div>
+        <div class="srow" onclick="go('p-tg',1);fillTG()">
+          <div class="dot didle" id="h-dot-tg"></div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">Pentaract / Telegram</div>
+            <div style="font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="h-lbl-tg">not configured</div>
+          </div>
+          <span style="color:var(--tx3)">›</span>
+        </div>
+      </div>
+      <div class="slbl" style="margin-top:4px">My Models</div>
+      <div style="padding:0 12px" id="home-models">
+        <div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">
+          No models yet.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span>
+        </div>
       </div>
     </div>
-    <div class="slbl" style="margin-top:4px">My Models</div>
-    <div style="padding:0 12px" id="home-models">
-      <div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>
+    <div style="padding:10px 12px 22px;flex-shrink:0">
+      <button class="btn bp" onclick="go('p-models',1);renderCurated()">+ Add Model</button>
     </div>
   </div>
-  <div style="padding:10px 12px 22px;flex-shrink:0">
-    <button class="btn bp" onclick="go('p-models',1);renderCurated()">+ Add Model</button>
-  </div>
-</div>
 
-<!-- TG -->
-<div class="pg" id="p-tg">
-  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Pentaract Setup</div><div class="sp34"></div></div>
-  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-    <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Telegram as free unlimited model shard storage via the Pentaract protocol.</div>
-    <div class="card" style="display:flex;flex-direction:column;gap:9px" id="tg-steps"></div>
-    <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" autocomplete="off"/></div>
-    <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890"/></div>
-    <div class="fb" id="tg-fb"></div>
-    <button class="btn bg" id="tg-test-btn" disabled>Test Connection</button>
-    <button class="btn bp" id="tg-save-btn" disabled>Save &amp; Continue →</button>
+  <!-- HF SETUP -->
+  <div class="pg" id="p-hf">
+    <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">HuggingFace</div><div class="sp34"></div></div>
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+      <div class="card cgn" style="font-size:12px;color:var(--gn);line-height:1.7">
+        ✓ The HF Inference API runs <b>any model</b> on HuggingFace servers.<br/>No downloads. Works on all devices including iOS.
+      </div>
+      <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
+        1. Go to <span style="color:var(--cy);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
+        2. Create a new token → type: <b style="color:var(--tx)">Read</b><br/>
+        3. Paste it below and tap Verify
+      </div>
+      <div class="field"><label>Access Token</label>
+        <input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/></div>
+      <div class="fb" id="hf-fb"></div>
+      <button class="btn bg" id="hf-verify-btn" disabled>Verify Token</button>
+      <button class="btn bp" id="hf-save-btn" disabled>Save &amp; Continue →</button>
+    </div>
   </div>
-</div>
 
-<!-- HF -->
-<div class="pg" id="p-hf">
-  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">HuggingFace</div><div class="sp34"></div></div>
-  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-    <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Optional. Required for gated/private models. All public models work without a token.</div>
-    <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
-      1. Visit <span style="color:var(--cy);font-family:var(--mono)">huggingface.co/settings/tokens</span><br/>
-      2. Create token → type: <b style="color:var(--tx)">Read</b><br/>3. Paste below and verify
+  <!-- TG SETUP -->
+  <div class="pg" id="p-tg">
+    <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Pentaract / Telegram</div><div class="sp34"></div></div>
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+      <div class="card" style="font-size:12.5px;color:var(--tx2);line-height:1.7">Telegram as free storage for model shards via the Pentaract protocol.</div>
+      <div class="card" style="display:flex;flex-direction:column;gap:9px" id="tg-steps"></div>
+      <div class="field"><label>Bot Token</label><input id="tg-tok" type="password" placeholder="1234567890:ABCdef…" autocomplete="off"/></div>
+      <div class="field"><label>Storage Chat ID</label><input id="tg-cid" placeholder="-1001234567890"/></div>
+      <div class="fb" id="tg-fb"></div>
+      <button class="btn bg" id="tg-test-btn" disabled>Test Connection</button>
+      <button class="btn bp" id="tg-save-btn" disabled>Save →</button>
     </div>
-    <div class="field"><label>Access Token</label><input id="hf-tok" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/></div>
-    <div class="fb" id="hf-fb"></div>
-    <button class="btn bg" id="hf-verify-btn" disabled>Verify Token</button>
-    <button class="btn bp" id="hf-save-btn" disabled>Save →</button>
-    <button class="btn bg" style="margin-top:-4px" onclick="go('p-home',0)">Skip — public models only</button>
   </div>
-</div>
 
-<!-- MODEL BROWSER -->
-<div class="pg" id="p-models">
-  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Add Model</div><div class="sp34"></div></div>
-  <div style="padding:10px 12px 8px;flex-shrink:0">
-    <div class="tabs">
-      <button class="tab on" id="t-curated"    onclick="switchTab('curated')">Curated</button>
-      <button class="tab"   id="t-abliterated" onclick="switchTab('abliterated')">Abliterated</button>
-      <button class="tab"   id="t-hf"          onclick="switchTab('hf')">Browse HF</button>
-      <button class="tab"   id="t-custom"      onclick="switchTab('custom')">Custom</button>
+  <!-- MODEL BROWSER -->
+  <div class="pg" id="p-models">
+    <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Add Model</div><div class="sp34"></div></div>
+    <div style="padding:10px 12px 8px;flex-shrink:0">
+      <div class="tabs">
+        <button class="tab on" id="t-curated"    onclick="switchTab('curated')">Curated</button>
+        <button class="tab"   id="t-abliterated" onclick="switchTab('abliterated')">Abliterated</button>
+        <button class="tab"   id="t-search"      onclick="switchTab('search')">Search HF</button>
+        <button class="tab"   id="t-custom"      onclick="switchTab('custom')">Custom</button>
+      </div>
     </div>
+    <div class="scroll" style="padding:8px 12px 16px" id="tab-body"></div>
   </div>
-  <div class="scroll" style="padding:8px 12px 16px" id="tab-body"></div>
-</div>
 
-<!-- DETAIL -->
-<div class="pg" id="p-detail">
-  <div class="hdr"><button class="bk" onclick="go('p-models',0)">← Back</button><div class="htitle" id="det-title">Model</div><div class="sp34"></div></div>
-  <div class="scroll" style="padding:13px" id="det-body"></div>
-</div>
+  <!-- CHAT -->
+  <div class="pg" id="p-chat">
+    <div class="hdr">
+      <button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div style="flex:1;text-align:center;overflow:hidden;min-width:0">
+        <div class="htitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div>
+        <div style="font-size:9.5px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="chat-sub">HF Inference API</div>
+      </div>
+      <button class="ib" onclick="clearChat()">↺</button>
+    </div>
+    <div class="ibar" id="ibar">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:10px;color:var(--tx3);font-family:var(--mono)" id="ibar-lbl">Generating…</span>
+        <span style="font-size:10px;color:var(--cy);font-family:var(--mono)" id="ibar-toks">0 tokens</span>
+      </div>
+      <div style="height:3px;background:var(--ln);border-radius:3px;overflow:hidden">
+        <div id="ibar-fill" style="height:100%;width:0%;background:var(--cy);border-radius:3px;transition:width .3s"></div>
+      </div>
+    </div>
+    <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
+    <div class="cbar">
+      <textarea id="chat-in" rows="1" placeholder="Message…"
+        onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="sbtn" id="sbtn" onclick="sendMsg()" disabled>↑</button>
+    </div>
+  </div>
 
-<!-- CHAT -->
-<div class="pg" id="p-chat">
-  <div class="hdr">
-    <button class="bk" onclick="go('p-home',0)">← Back</button>
-    <div style="flex:1;text-align:center;overflow:hidden;min-width:0">
-      <div class="htitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chat-title">—</div>
-      <div style="font-size:9.5px;color:var(--tx3);font-family:var(--mono);margin-top:1px" id="chat-sub">—</div>
+  <!-- SETTINGS -->
+  <div class="pg" id="p-settings">
+    <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button>
+      <div class="htitle">Settings</div><div class="sp34"></div></div>
+    <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
+      <div class="card" style="display:flex;flex-direction:column;gap:11px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Accounts</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="dot didle" id="s-dot-hf"></div>
+          <div style="flex:1;font-size:13px">HuggingFace</div>
+          <button class="bk" onclick="go('p-hf',1);fillHF()">Edit</button>
+        </div>
+        <div style="height:1px;background:var(--ln)"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="dot didle" id="s-dot-tg"></div>
+          <div style="flex:1;font-size:13px">Telegram / Pentaract</div>
+          <button class="bk" onclick="go('p-tg',1);fillTG()">Edit</button>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Generation</div>
+        <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512" min="64" max="4096"/></div>
+        <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05" min="0" max="2"/></div>
+        <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05" min="1" max="2"/></div>
+        <div class="field"><label>Top-P</label><input id="s-topp" type="number" value="0.9" step="0.05" min="0" max="1"/></div>
+        <button class="btn bg" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="card" style="font-size:11.5px;color:var(--tx2);line-height:1.8">
+        <b style="color:var(--tx)">Engine:</b> HuggingFace Inference API<br/>
+        Runs entirely on HF servers via fetch(). No WASM, no downloads, works on every device and browser.
+      </div>
+      <button class="btn bd" onclick="clearAll()">⚠ Clear All Data</button>
     </div>
-    <button class="ib" onclick="clearChat()">↺</button>
   </div>
-  <div class="ibar" id="ibar">
-    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-      <span style="font-size:10px;color:var(--tx3);font-family:var(--mono)">Layer <span id="lc-c">0</span>/<span id="lc-t">0</span></span>
-      <span style="font-size:10px;color:var(--cy);font-family:var(--mono)" id="l-ram">—</span>
-    </div>
-    <div class="lgrid" id="lgrid"></div>
-  </div>
-  <div class="scroll" id="chat-msgs" style="padding:12px 12px 4px"></div>
-  <div class="cbar">
-    <textarea id="chat-in" rows="1" placeholder="Message…" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
-    <button class="sbtn" id="sbtn" onclick="sendMsg()" disabled>↑</button>
-  </div>
-</div>
-
-<!-- SETTINGS -->
-<div class="pg" id="p-settings">
-  <div class="hdr"><button class="bk" onclick="go('p-home',0)">← Back</button><div class="htitle">Settings</div><div class="sp34"></div></div>
-  <div class="scroll" style="padding:13px;display:flex;flex-direction:column;gap:11px">
-    <div class="card" style="display:flex;flex-direction:column;gap:11px">
-      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Connections</div>
-      <div style="display:flex;align-items:center;gap:10px"><div class="dot didle" id="s-dot-tg"></div><div style="flex:1;font-size:13px">Telegram</div><button class="bk" onclick="go('p-tg',1);fillTG()">Edit</button></div>
-      <div style="height:1px;background:var(--ln)"></div>
-      <div style="display:flex;align-items:center;gap:10px"><div class="dot didle" id="s-dot-hf"></div><div style="flex:1;font-size:13px">HuggingFace</div><button class="bk" onclick="go('p-hf',1);fillHF()">Edit</button></div>
-    </div>
-    <div class="card" style="display:flex;flex-direction:column;gap:8px">
-      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Engines</div>
-      <div id="eng-status" style="font-size:11.5px;color:var(--tx2);font-family:var(--mono);line-height:1.9;white-space:pre">Detecting…</div>
-    </div>
-    <div class="card" style="display:flex;flex-direction:column;gap:10px">
-      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700">Inference</div>
-      <div class="field"><label>Max New Tokens</label><input id="s-tok" type="number" value="512" min="64" max="8192"/></div>
-      <div class="field"><label>Temperature</label><input id="s-temp" type="number" value="0.7" step="0.05" min="0" max="2"/></div>
-      <div class="field"><label>Repetition Penalty</label><input id="s-rep" type="number" value="1.1" step="0.05" min="1" max="2"/></div>
-      <div class="field"><label>Top-P</label><input id="s-topp" type="number" value="0.9" step="0.05" min="0" max="1"/></div>
-      <button class="btn bg" onclick="saveSettings()">Save Settings</button>
-    </div>
-    <button class="btn bd" onclick="clearAll()">⚠ Clear All Data</button>
-  </div>
-</div>
 
 </div></div>
 
-<!--
-  CRITICAL: Do NOT use top-level imports for wllama or transformers.js.
-  Top-level ESM imports block the entire script — if ANY CDN import fails
-  or is slow, boot() never runs and the app is stuck on "Loading engines…".
+<script>
+(function(){
+'use strict';
 
-  Instead: lazy dynamic import() inside loadWllama() / loadTransformers()
-  so the app boots instantly and engines load only when a model is opened.
--->
-<script type="module">
-// ── CDN URLs for lazy loading (imported on demand, never at boot)
-const WLLAMA_INDEX   = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/index.js';
-const WLLAMA_CDN_CFG = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@2.3.7/esm/wasm-from-cdn.js';
-const TJS_URL        = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+// ── Persistence ───────────────────────────────────────────────
+var SK = 'mallm12';
+var S = { hfToken:'', hfOk:false, tgToken:'', tgChatId:'', tgOk:false,
+          models:[], settings:{maxTokens:512,temperature:0.7,repPenalty:1.1,topP:0.9},
+          activeModel:null };
+function loadS(){ try{ var d=localStorage.getItem(SK); if(d) Object.assign(S,JSON.parse(d)); }catch(e){} }
+function saveS(){ try{ localStorage.setItem(SK,JSON.stringify(S)); }catch(e){} }
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function q(id){ return document.getElementById(id); }
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// Cached engine references after first load
-let _WllamaClass  = null;   // Wllama constructor
-let _WasmFromCDN  = null;   // official CDN WASM config object
-let _TJSPipeline  = null;   // transformers pipeline function
-let _TJSEnv       = null;   // transformers env
-
-// ── Capability detection (synchronous, safe at startup)
-const hasSharedMem = typeof SharedArrayBuffer !== 'undefined';
-const isCOI        = !!self.crossOriginIsolated;
-const hasWebGPU    = !!navigator.gpu;
-const threadMode   = (hasSharedMem && isCOI) ? 'multi-thread' : 'single-thread';
-
-// ── State
-const SK = 'mairllm9';
-let S = {
-  tgToken:'',tgChatId:'',tgOk:false,
-  hfToken:'',hfOk:false,
-  models:[],
-  settings:{maxTokens:512,temperature:0.7,repPenalty:1.1,topP:0.9},
-  activeModel:null,
-};
-const loadS=()=>{try{const d=localStorage.getItem(SK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}};
-const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const q=id=>document.getElementById(id);
-const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-
-// ── Engine runtime state
-let _wllama    = null;
-let _tjsPipe   = null;
-let _loadedId  = null;
-let _engUsed   = null;   // 'wllama' | 'transformers'
-let _inferring = false;
-let _hist      = [];
-
-// ── Nav
-let _cur=null;
-function go(id,fwd=1){
+// ── Navigation ────────────────────────────────────────────────
+var _cur = null;
+function go(id,fwd){
+  if(fwd===undefined)fwd=1;
   if(_cur===id)return;
-  document.querySelectorAll('.pg').forEach(p=>{p.classList.remove('on','af','ab');p.style.display='none';});
-  const el=q(id);el.style.display='flex';void el.offsetWidth;
-  el.classList.add('on',fwd?'af':'ab');_cur=id;
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on','af','ab');p.style.display='none';});
+  var el=q(id); el.style.display='flex'; void el.offsetWidth;
+  el.classList.add('on',fwd?'af':'ab'); _cur=id;
 }
-const showFb=(id,t,msg)=>{const e=q(id);e.className=`fb fb-${t} show`;e.innerHTML=msg;};
-const setDot=(id,cls)=>{const d=q(id);if(d)d.className='dot '+cls;};
+function showFb(id,t,msg){ var e=q(id); e.className='fb fb-'+t+' show'; e.innerHTML=msg; }
+function setDot(id,cls){ var d=q(id); if(d) d.className='dot '+cls; }
 function updateDots(){
-  const tc=S.tgOk?'dok':S.tgToken?'derr':'didle';
-  const hc=S.hfOk?'dok':S.hfToken?'derr':'didle';
-  ['h-dot-tg','s-dot-tg'].forEach(id=>setDot(id,tc));
-  ['h-dot-hf','s-dot-hf'].forEach(id=>setDot(id,hc));
-  q('h-lbl-tg').textContent=S.tgOk?'connected':S.tgToken?'auth failed':'not configured';
-  q('h-lbl-hf').textContent=S.hfOk?'connected':S.hfToken?'invalid token':'not configured (public only)';
-}
-function updateEngUI(){
-  if(q('eng-lbl'))q('eng-lbl').textContent=`wllama(GGUF) + transformers.js(ONNX) · ${threadMode}`;
-  if(q('eng-status'))q('eng-status').textContent=
-    `wllama (llama.cpp WASM): ✓\n  mode: ${threadMode}\n  SharedArrayBuffer: ${hasSharedMem}\n  CrossOriginIsolated: ${isCOI}\ntransformers.js v3: ✓\n  WebGPU: ${hasWebGPU?'✓ available':'✗ WASM fallback'}\n\nEngine auto-selected per model type.`;
+  setDot('h-dot-hf', S.hfOk?'dok':S.hfToken?'derr':'didle');
+  setDot('s-dot-hf', S.hfOk?'dok':S.hfToken?'derr':'didle');
+  setDot('h-dot-tg', S.tgOk?'dok':S.tgToken?'derr':'didle');
+  setDot('s-dot-tg', S.tgOk?'dok':S.tgToken?'derr':'didle');
+  q('h-lbl-hf').textContent = S.hfOk?'connected — inference ready':S.hfToken?'token invalid':'not connected';
+  q('h-lbl-tg').textContent = S.tgOk?'connected':S.tgToken?'auth failed':'not configured';
 }
 
-// ── Boot
+// ── Boot ──────────────────────────────────────────────────────
 async function boot(){
   loadS();
-  updateEngUI();
-  const bm=q('bmsg');
-  if(S.tgToken&&S.tgChatId){bm.textContent='Checking Telegram…';S.tgOk=await pingTG(S.tgToken);}
-  if(S.hfToken){bm.textContent='Checking HuggingFace…';S.hfOk=await pingHF(S.hfToken);}
+  var bm=q('bmsg');
+  if(S.hfToken){ bm.textContent='Checking HuggingFace…'; S.hfOk=await pingHF(S.hfToken); }
+  if(S.tgToken&&S.tgChatId){ bm.textContent='Checking Telegram…'; S.tgOk=await pingTG(S.tgToken); }
   bm.textContent='Ready';
-  await sleep(100);
+  await sleep(70);
   q('boot').classList.add('fade');
-  setTimeout(()=>q('boot').style.display='none',350);
-  q('s-tok').value=S.settings.maxTokens;q('s-temp').value=S.settings.temperature;
-  q('s-rep').value=S.settings.repPenalty;q('s-topp').value=S.settings.topP;
-  if(!S.tgToken){renderTGSteps();fillTG();go('p-tg',1);}
-  else{go('p-home',1);renderHome();}
+  setTimeout(function(){ q('boot').style.display='none'; },300);
+  q('s-tok').value=S.settings.maxTokens; q('s-temp').value=S.settings.temperature;
+  q('s-rep').value=S.settings.repPenalty; q('s-topp').value=S.settings.topP;
   updateDots();
+  if(!S.hfToken){ fillHF(); go('p-hf',1); }
+  else { renderHome(); go('p-home',1); }
 }
 
-// ── TG
-const pingTG=async tok=>{try{const r=await fetch(`https://api.telegram.org/bot${tok}/getMe`);const d=await r.json();return!!d.ok;}catch(e){return false;}};
-function renderTGSteps(){
-  q('tg-steps').innerHTML='<div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:7px">Quickstart</div>'
-    +['Open Telegram → search <b style="color:var(--cy)">@BotFather</b>','Send <code>/newbot</code> → follow prompts','Copy the <b>Bot Token</b> → paste below','Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cy)">@userinfobot</b>']
-    .map((s,i)=>`<div style="display:flex;gap:9px;align-items:flex-start${i?';margin-top:7px':''}"><div style="width:16px;height:16px;border-radius:4px;background:var(--cy0);color:var(--cy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${i+1}</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">${s}</div></div>`).join('');
+// ── HuggingFace ───────────────────────────────────────────────
+async function pingHF(tok){
+  try{ var r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:'Bearer '+tok}}); return r.status===200; }catch(e){ return false; }
 }
-function fillTG(){
-  if(!q('tg-steps').children.length)renderTGSteps();
-  q('tg-tok').value=S.tgToken||'';q('tg-cid').value=S.tgChatId||'';
-  const chk=()=>{const t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim();q('tg-test-btn').disabled=!(t&&c);q('tg-save-btn').disabled=true;};
-  q('tg-tok').oninput=chk;q('tg-cid').oninput=chk;
-  q('tg-test-btn').onclick=async()=>{
-    const tok=q('tg-tok').value.trim(),cid=q('tg-cid').value.trim();
-    showFb('tg-fb','info','Testing…');
-    const ok=await pingTG(tok);
-    if(ok){showFb('tg-fb','ok','✓ Connected!');q('tg-save-btn').disabled=false;q('tg-save-btn')._v={tok,cid};}
-    else{showFb('tg-fb','err','✗ Failed — check your bot token.');q('tg-save-btn').disabled=true;}
-  };
-  q('tg-save-btn').onclick=()=>{
-    const v=q('tg-save-btn')._v||{tok:q('tg-tok').value.trim(),cid:q('tg-cid').value.trim()};
-    S.tgToken=v.tok;S.tgChatId=v.cid;S.tgOk=true;saveS();updateDots();
-    if(!S.hfToken)go('p-hf',1);else{go('p-home',0);renderHome();}
-  };
-  chk();
-}
-
-// ── HF
-const pingHF=async tok=>{try{const r=await fetch('https://huggingface.co/api/models?limit=1&full=false',{headers:{Authorization:`Bearer ${tok}`}});return r.status===200;}catch(e){return false;}};
 function fillHF(){
   q('hf-tok').value=S.hfToken||'';
-  const chk=()=>{const t=q('hf-tok').value.trim();q('hf-verify-btn').disabled=!t;q('hf-save-btn').disabled=true;};
+  function chk(){ var t=q('hf-tok').value.trim(); q('hf-verify-btn').disabled=!t; q('hf-save-btn').disabled=true; }
   q('hf-tok').oninput=chk;
-  q('hf-verify-btn').onclick=async()=>{
-    const tok=q('hf-tok').value.trim();showFb('hf-fb','info','Verifying…');
-    const ok=await pingHF(tok);
-    if(ok){showFb('hf-fb','ok','✓ Token valid!');q('hf-save-btn').disabled=false;q('hf-save-btn')._tok=tok;}
-    else{showFb('hf-fb','err','✗ Invalid token. Check huggingface.co/settings/tokens');q('hf-save-btn').disabled=true;}
+  q('hf-verify-btn').onclick=async function(){
+    var tok=q('hf-tok').value.trim(); showFb('hf-fb','info','Verifying…');
+    if(await pingHF(tok)){ showFb('hf-fb','ok','✓ Token valid! You can now run any model.'); q('hf-save-btn').disabled=false; q('hf-save-btn')._tok=tok; }
+    else showFb('hf-fb','err','✗ Invalid. Check huggingface.co/settings/tokens');
   };
-  q('hf-save-btn').onclick=()=>{
-    S.hfToken=q('hf-save-btn')._tok||q('hf-tok').value.trim();
-    S.hfOk=true;saveS();updateDots();go('p-home',0);renderHome();
+  q('hf-save-btn').onclick=function(){
+    S.hfToken=q('hf-save-btn')._tok||q('hf-tok').value.trim(); S.hfOk=true;
+    saveS(); updateDots(); renderHome(); go('p-home',0);
+  };
+  chk();
+}
+
+// ── Telegram ──────────────────────────────────────────────────
+async function pingTG(tok){
+  try{ var r=await fetch('https://api.telegram.org/bot'+tok+'/getMe'); var d=await r.json(); return !!d.ok; }catch(e){ return false; }
+}
+function fillTG(){
+  var steps=['Open Telegram → search <b style="color:var(--cy)">@BotFather</b>','Send <code>/newbot</code> → follow prompts','Copy the Bot Token → paste below','Create a private channel → add your bot as admin','Get Chat ID via <b style="color:var(--cy)">@userinfobot</b>'];
+  if(!q('tg-steps').children.length)
+    q('tg-steps').innerHTML='<div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:7px">Setup</div>'+steps.map(function(s,i){ return '<div style="display:flex;gap:9px;align-items:flex-start'+(i?';margin-top:7px':'')+'"><div style="width:16px;height:16px;border-radius:4px;background:var(--cy0);color:var(--cy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">'+(i+1)+'</div><div style="font-size:12px;color:var(--tx2);line-height:1.6">'+s+'</div></div>'; }).join('');
+  q('tg-tok').value=S.tgToken||''; q('tg-cid').value=S.tgChatId||'';
+  function chk(){ var t=q('tg-tok').value.trim(),c=q('tg-cid').value.trim(); q('tg-test-btn').disabled=!(t&&c); q('tg-save-btn').disabled=true; }
+  q('tg-tok').oninput=chk; q('tg-cid').oninput=chk;
+  q('tg-test-btn').onclick=async function(){
+    showFb('tg-fb','info','Testing…');
+    if(await pingTG(q('tg-tok').value.trim())){ showFb('tg-fb','ok','✓ Connected!'); q('tg-save-btn').disabled=false; q('tg-save-btn')._v={tok:q('tg-tok').value.trim(),cid:q('tg-cid').value.trim()}; }
+    else showFb('tg-fb','err','✗ Failed — check your bot token.');
+  };
+  q('tg-save-btn').onclick=function(){
+    var v=q('tg-save-btn')._v||{tok:q('tg-tok').value.trim(),cid:q('tg-cid').value.trim()};
+    S.tgToken=v.tok; S.tgChatId=v.cid; S.tgOk=true; saveS(); updateDots(); go('p-home',0);
   };
   chk();
 }
 
 // ══════════════════════════════════════════════════════════════
-//  CATALOGUES
+//  CATALOGUE — all via HF Inference API, no downloads
 // ══════════════════════════════════════════════════════════════
-const MODELS=[
-  {id:'smol-135m', name:'SmolLM2 135M',    hfRepo:'bartowski/SmolLM2-135M-Instruct-GGUF',        hfFile:'SmolLM2-135M-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'90 MB', L:30,ram:180,  tag:'INSTANT'},
-  {id:'smol-1.7b', name:'SmolLM2 1.7B',    hfRepo:'bartowski/SmolLM2-1.7B-Instruct-GGUF',        hfFile:'SmolLM2-1.7B-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'1.1 GB',L:24,ram:750,  tag:'FAST'},
-  {id:'qwen-0.5b', name:'Qwen 2.5 0.5B',   hfRepo:'Qwen/Qwen2.5-0.5B-Instruct-GGUF',            hfFile:'qwen2.5-0.5b-instruct-q4_k_m.gguf',                       eng:'wllama',size:'400 MB',L:24,ram:340,  tag:null},
-  {id:'qwen-7b',   name:'Qwen 2.5 7B',     hfRepo:'bartowski/Qwen2.5-7B-Instruct-GGUF',          hfFile:'Qwen2.5-7B-Instruct-Q4_K_M.gguf',                        eng:'wllama',size:'4.7 GB',L:28,ram:2800, tag:'BALANCED'},
-  {id:'qwen-14b',  name:'Qwen 2.5 14B',    hfRepo:'bartowski/Qwen2.5-14B-Instruct-GGUF',         hfFile:'Qwen2.5-14B-Instruct-Q4_K_M.gguf',                       eng:'wllama',size:'8.9 GB',L:48,ram:5600, tag:null},
-  {id:'qwen-32b',  name:'Qwen 2.5 32B',    hfRepo:'bartowski/Qwen2.5-32B-Instruct-GGUF',         hfFile:'Qwen2.5-32B-Instruct-Q4_K_M-00001-of-00002.gguf',        eng:'wllama',size:'19 GB', L:64,ram:11000,tag:'LARGE',split:true},
-  {id:'qwen-72b',  name:'Qwen 2.5 72B',    hfRepo:'bartowski/Qwen2.5-72B-Instruct-GGUF',         hfFile:'Qwen2.5-72B-Instruct-Q4_K_M-00001-of-00009.gguf',        eng:'wllama',size:'43 GB', L:80,ram:26000,tag:'HUGE', split:true},
-  {id:'llama-1b',  name:'Llama 3.2 1B',    hfRepo:'bartowski/Llama-3.2-1B-Instruct-GGUF',        hfFile:'Llama-3.2-1B-Instruct-Q4_K_M.gguf',                      eng:'wllama',size:'810 MB',L:16,ram:550,  tag:null},
-  {id:'llama-3b',  name:'Llama 3.2 3B',    hfRepo:'bartowski/Llama-3.2-3B-Instruct-GGUF',        hfFile:'Llama-3.2-3B-Instruct-Q4_K_M.gguf',                      eng:'wllama',size:'2.0 GB',L:28,ram:1100, tag:null},
-  {id:'llama-8b',  name:'Llama 3.1 8B',    hfRepo:'bartowski/Meta-Llama-3.1-8B-Instruct-GGUF',   hfFile:'Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf',                 eng:'wllama',size:'4.9 GB',L:32,ram:3200, tag:null},
-  {id:'llama-70b', name:'Llama 3.3 70B',   hfRepo:'bartowski/Llama-3.3-70B-Instruct-GGUF',       hfFile:'Llama-3.3-70B-Instruct-Q4_K_M-00001-of-00009.gguf',      eng:'wllama',size:'42 GB', L:80,ram:25000,tag:'HUGE', split:true},
-  {id:'phi3.5',    name:'Phi-3.5 Mini',    hfRepo:'bartowski/Phi-3.5-mini-instruct-GGUF',         hfFile:'Phi-3.5-mini-instruct-Q4_K_M.gguf',                      eng:'wllama',size:'2.3 GB',L:32,ram:1400, tag:null},
-  {id:'phi4',      name:'Phi-4 14B',       hfRepo:'bartowski/phi-4-GGUF',                         hfFile:'phi-4-Q4_K_M.gguf',                                      eng:'wllama',size:'8.8 GB',L:40,ram:5500, tag:null},
-  {id:'gemma2-2b', name:'Gemma 2 2B',      hfRepo:'bartowski/gemma-2-2b-it-GGUF',                hfFile:'gemma-2-2b-it-Q4_K_M.gguf',                              eng:'wllama',size:'1.7 GB',L:26,ram:950,  tag:null},
-  {id:'gemma2-9b', name:'Gemma 2 9B',      hfRepo:'bartowski/gemma-2-9b-it-GGUF',                hfFile:'gemma-2-9b-it-Q4_K_M.gguf',                              eng:'wllama',size:'5.8 GB',L:42,ram:3600, tag:null},
-  {id:'gemma2-27b',name:'Gemma 2 27B',     hfRepo:'bartowski/gemma-2-27b-it-GGUF',               hfFile:'gemma-2-27b-it-Q4_K_M-00001-of-00002.gguf',              eng:'wllama',size:'16.6 GB',L:46,ram:9500,tag:'LARGE',split:true},
-  {id:'mistral-7b',name:'Mistral 7B v0.3', hfRepo:'bartowski/Mistral-7B-Instruct-v0.3-GGUF',     hfFile:'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf',                  eng:'wllama',size:'4.4 GB',L:32,ram:2800, tag:null},
-  {id:'ds-1.5b',   name:'DeepSeek-R1 1.5B',hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF',hfFile:'DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf',            eng:'wllama',size:'1.1 GB',L:28,ram:700,  tag:'REASON'},
-  {id:'ds-7b',     name:'DeepSeek-R1 7B',  hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF',  hfFile:'DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf',               eng:'wllama',size:'4.7 GB',L:28,ram:2800, tag:'REASON'},
-  {id:'ds-14b',    name:'DeepSeek-R1 14B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-14B-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'8.9 GB',L:48,ram:5600,tag:'REASON',split:true},
-  {id:'ds-32b',    name:'DeepSeek-R1 32B', hfRepo:'bartowski/DeepSeek-R1-Distill-Qwen-32B-GGUF', hfFile:'DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-00001-of-00003.gguf',eng:'wllama',size:'19 GB', L:64,ram:11000,tag:'REASON',split:true},
-  {id:'ds-70b',    name:'DeepSeek-R1 70B', hfRepo:'bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF',hfFile:'DeepSeek-R1-Distill-Llama-70B-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:25000,tag:'REASON',split:true},
-  // Transformers.js ONNX models (no GGUF needed)
-  {id:'tjs-smol135', name:'SmolLM2 135M (ONNX)',  hfRepo:'HuggingFaceTB/SmolLM2-135M-Instruct',eng:'transformers',size:'~270 MB',L:30,ram:350,tag:'INSTANT'},
-  {id:'tjs-smol360', name:'SmolLM2 360M (ONNX)',  hfRepo:'HuggingFaceTB/SmolLM2-360M-Instruct',eng:'transformers',size:'~730 MB',L:32,ram:600, tag:'FAST'},
-  {id:'tjs-phi3.5',  name:'Phi-3.5 Mini (ONNX)',  hfRepo:'onnx-community/Phi-3.5-mini-instruct-onnx-web',eng:'transformers',size:'~2.3 GB',L:32,ram:1600,tag:null},
+var MODELS=[
+  // Small / fast
+  {id:'smol-135m',  name:'SmolLM2 135M',         hfRepo:'HuggingFaceTB/SmolLM2-135M-Instruct', size:'135M params', tag:'INSTANT', tagCls:'cgc'},
+  {id:'smol-360m',  name:'SmolLM2 360M',         hfRepo:'HuggingFaceTB/SmolLM2-360M-Instruct', size:'360M params', tag:'INSTANT', tagCls:'cgc'},
+  {id:'smol-1.7b',  name:'SmolLM2 1.7B',         hfRepo:'HuggingFaceTB/SmolLM2-1.7B-Instruct', size:'1.7B params', tag:'FAST',    tagCls:'cgc'},
+  // Qwen
+  {id:'qwen3-0.6b', name:'Qwen3 0.6B',           hfRepo:'Qwen/Qwen3-0.6B',                    size:'0.6B params', tag:'INSTANT', tagCls:'cgc'},
+  {id:'qwen3-1.7b', name:'Qwen3 1.7B',           hfRepo:'Qwen/Qwen3-1.7B',                    size:'1.7B params', tag:'FAST',    tagCls:'cgc'},
+  {id:'qwen3-4b',   name:'Qwen3 4B',             hfRepo:'Qwen/Qwen3-4B',                      size:'4B params',   tag:'BALANCED',tagCls:'ccc'},
+  {id:'qwen3-8b',   name:'Qwen3 8B',             hfRepo:'Qwen/Qwen3-8B',                      size:'8B params',   tag:'BALANCED',tagCls:'ccc'},
+  {id:'qwen3-14b',  name:'Qwen3 14B',            hfRepo:'Qwen/Qwen3-14B',                     size:'14B params',  tag:'LARGE',   tagCls:'cac'},
+  {id:'qwen3-32b',  name:'Qwen3 32B',            hfRepo:'Qwen/Qwen3-32B',                     size:'32B params',  tag:'LARGE',   tagCls:'cac'},
+  {id:'qwen25-7b',  name:'Qwen 2.5 7B',          hfRepo:'Qwen/Qwen2.5-7B-Instruct',           size:'7B params',   tag:null},
+  {id:'qwen25-14b', name:'Qwen 2.5 14B',         hfRepo:'Qwen/Qwen2.5-14B-Instruct',          size:'14B params',  tag:null},
+  {id:'qwen25-72b', name:'Qwen 2.5 72B',         hfRepo:'Qwen/Qwen2.5-72B-Instruct',          size:'72B params',  tag:'HUGE',    tagCls:'crc'},
+  // Llama
+  {id:'llama32-1b', name:'Llama 3.2 1B',         hfRepo:'meta-llama/Llama-3.2-1B-Instruct',   size:'1B params',   tag:'FAST',    tagCls:'cgc'},
+  {id:'llama32-3b', name:'Llama 3.2 3B',         hfRepo:'meta-llama/Llama-3.2-3B-Instruct',   size:'3B params',   tag:null},
+  {id:'llama31-8b', name:'Llama 3.1 8B',         hfRepo:'meta-llama/Meta-Llama-3.1-8B-Instruct',size:'8B params', tag:'BALANCED',tagCls:'ccc'},
+  {id:'llama31-70b',name:'Llama 3.1 70B',        hfRepo:'meta-llama/Meta-Llama-3.1-70B-Instruct',size:'70B params',tag:'HUGE',   tagCls:'crc'},
+  // Mistral / Phi / Gemma
+  {id:'mistral-7b', name:'Mistral 7B v0.3',      hfRepo:'mistralai/Mistral-7B-Instruct-v0.3', size:'7B params',   tag:null},
+  {id:'phi35-mini', name:'Phi-3.5 Mini',         hfRepo:'microsoft/Phi-3.5-mini-instruct',    size:'3.8B params', tag:null},
+  {id:'phi4',       name:'Phi-4 14B',            hfRepo:'microsoft/phi-4',                    size:'14B params',  tag:null},
+  {id:'gemma2-2b',  name:'Gemma 2 2B',           hfRepo:'google/gemma-2-2b-it',               size:'2B params',   tag:null},
+  {id:'gemma2-9b',  name:'Gemma 2 9B',           hfRepo:'google/gemma-2-9b-it',               size:'9B params',   tag:null},
+  // DeepSeek
+  {id:'ds-r1-7b',   name:'DeepSeek-R1 Distill 7B', hfRepo:'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B',  size:'7B params', tag:'REASON',tagCls:'cpc'},
+  {id:'ds-r1-14b',  name:'DeepSeek-R1 Distill 14B',hfRepo:'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B', size:'14B params',tag:'REASON',tagCls:'cpc'},
+  {id:'ds-r1-32b',  name:'DeepSeek-R1 Distill 32B',hfRepo:'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B', size:'32B params',tag:'REASON',tagCls:'cpc'},
 ];
 
-const ABLITERATED=[
-  {id:'hh-q3-1.7b', name:'Qwen3 1.7B Abliterated',      hfRepo:'bartowski/huihui-ai_Qwen3-1.7B-abliterated-GGUF',                     hfFile:'huihui-ai_Qwen3-1.7B-abliterated-Q4_K_M.gguf',                         eng:'wllama',size:'1.1 GB', L:28,ram:750,  tag:'FAST',  abl:true},
-  {id:'hh-q3-4b',   name:'Qwen3 4B Abliterated',        hfRepo:'bartowski/huihui-ai_Qwen3-4B-abliterated-GGUF',                       hfFile:'huihui-ai_Qwen3-4B-abliterated-Q4_K_M.gguf',                           eng:'wllama',size:'2.5 GB', L:36,ram:1600, tag:null,    abl:true},
-  {id:'hh-q3-8b',   name:'Qwen3 8B Abliterated',        hfRepo:'bartowski/huihui-ai_Qwen3-8B-abliterated-GGUF',                       hfFile:'huihui-ai_Qwen3-8B-abliterated-Q4_K_M.gguf',                           eng:'wllama',size:'5.0 GB', L:36,ram:3200, tag:null,    abl:true},
-  {id:'hh-q3-14b',  name:'Qwen3 14B Abliterated',       hfRepo:'bartowski/huihui-ai_Qwen3-14B-abliterated-GGUF',                      hfFile:'huihui-ai_Qwen3-14B-abliterated-Q4_K_M.gguf',                          eng:'wllama',size:'8.9 GB', L:40,ram:5600, tag:null,    abl:true},
-  {id:'hh-q3-30b',  name:'Qwen3 30B-A3B Abliterated',   hfRepo:'bartowski/huihui-ai_Qwen3-30B-A3B-abliterated-GGUF',                  hfFile:'huihui-ai_Qwen3-30B-A3B-abliterated-Q4_K_M-00001-of-00002.gguf',      eng:'wllama',size:'17.2 GB',L:48,ram:10000,tag:'LARGE',  abl:true,split:true},
-  {id:'hh-q3-32b',  name:'Qwen3 32B Abliterated',       hfRepo:'bartowski/huihui-ai_Qwen3-32B-abliterated-GGUF',                      hfFile:'huihui-ai_Qwen3-32B-abliterated-Q4_K_M-00001-of-00002.gguf',          eng:'wllama',size:'19 GB',  L:64,ram:11500,tag:'LARGE',  abl:true,split:true},
-  {id:'hh-l70b',    name:'Llama 3.1 70B Abliterated',   hfRepo:'bartowski/huihui-ai_Llama-3.1-70B-Instruct-abliterated-GGUF',         hfFile:'huihui-ai_Llama-3.1-70B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:26000,tag:'HUGE',abl:true,split:true},
-  {id:'hh-q25-14b', name:'Qwen2.5 14B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-14B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-14B-Instruct-abliterated-Q4_K_M.gguf',              eng:'wllama',size:'8.9 GB', L:48,ram:5600, tag:null,    abl:true},
-  {id:'hh-q25-32b', name:'Qwen2.5 32B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-32B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-32B-Instruct-abliterated-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'19 GB',L:64,ram:11000,tag:'LARGE',abl:true,split:true},
-  {id:'hh-q25-72b', name:'Qwen2.5 72B Abliterated',     hfRepo:'bartowski/huihui-ai_Qwen2.5-72B-Instruct-abliterated-GGUF',           hfFile:'huihui-ai_Qwen2.5-72B-Instruct-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'43 GB',L:80,ram:26000,tag:'HUGE',abl:true,split:true},
-  {id:'hh-ds-7b',   name:'DeepSeek-R1 7B Abliterated',  hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-GGUF',    hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-7B-abliterated-Q4_K_M.gguf',       eng:'wllama',size:'4.7 GB', L:28,ram:2800, tag:'REASON',abl:true},
-  {id:'hh-ds-14b',  name:'DeepSeek-R1 14B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-GGUF',   hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-14B-abliterated-Q4_K_M-00001-of-00002.gguf',eng:'wllama',size:'8.9 GB',L:48,ram:5600,tag:'REASON',abl:true,split:true},
-  {id:'hh-ds-32b',  name:'DeepSeek-R1 32B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-GGUF',   hfFile:'huihui-ai_DeepSeek-R1-Distill-Qwen-32B-abliterated-Q4_K_M-00001-of-00003.gguf',eng:'wllama',size:'19 GB',L:64,ram:11000,tag:'REASON',abl:true,split:true},
-  {id:'hh-ds-70b',  name:'DeepSeek-R1 70B Abliterated', hfRepo:'bartowski/huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-GGUF',  hfFile:'huihui-ai_DeepSeek-R1-Distill-Llama-70B-abliterated-Q4_K_M-00001-of-00009.gguf',eng:'wllama',size:'42 GB',L:80,ram:25000,tag:'REASON',abl:true,split:true},
+var ABLITERATED=[
+  {id:'hh-q3-0.6b',name:'Qwen3 0.6B Abliterated', hfRepo:'huihui-ai/Qwen3-0.6B-abliterated',size:'0.6B',tag:'INSTANT',tagCls:'cgc',abl:true},
+  {id:'hh-q3-1.7b',name:'Qwen3 1.7B Abliterated', hfRepo:'huihui-ai/Qwen3-1.7B-abliterated',size:'1.7B',tag:'FAST',   tagCls:'cgc',abl:true},
+  {id:'hh-q3-4b',  name:'Qwen3 4B Abliterated',   hfRepo:'huihui-ai/Qwen3-4B-abliterated',  size:'4B',  tag:null,abl:true},
+  {id:'hh-q3-8b',  name:'Qwen3 8B Abliterated',   hfRepo:'huihui-ai/Qwen3-8B-abliterated',  size:'8B',  tag:null,abl:true},
+  {id:'hh-q3-14b', name:'Qwen3 14B Abliterated',  hfRepo:'huihui-ai/Qwen3-14B-abliterated', size:'14B', tag:null,abl:true},
+  {id:'hh-ds-7b',  name:'DeepSeek-R1 7B Abliterated', hfRepo:'huihui-ai/DeepSeek-R1-Distill-Qwen-7B-abliterated', size:'7B',tag:'REASON',tagCls:'cpc',abl:true},
+  {id:'hh-ds-14b', name:'DeepSeek-R1 14B Abliterated',hfRepo:'huihui-ai/DeepSeek-R1-Distill-Qwen-14B-abliterated',size:'14B',tag:'REASON',tagCls:'cpc',abl:true},
 ];
 
-const ALL=[...MODELS,...ABLITERATED];
-const findM=id=>ALL.find(m=>m.id===id)||S.models.find(m=>m.id===id)||null;
-const tagCls=t=>({INSTANT:'cgc',FAST:'cgc',BALANCED:'ccc',LARGE:'cac',HUGE:'crc',REASON:'cpc'})[t]||'cmc';
+var ALL=MODELS.concat(ABLITERATED);
+function findM(id){ return ALL.find(function(m){ return m.id===id; })||S.models.find(function(m){ return m.id===id; }); }
 
-// ── Home
+// ── Home ──────────────────────────────────────────────────────
 function renderHome(){
   updateDots();
-  const el=q('home-models');
-  if(!S.models.length){el.innerHTML='<div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models added.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>';return;}
-  el.innerHTML=S.models.map(m=>{
-    const f=findM(m.id)||m;
-    return `<div class="mc ${m.cached?'rdy':''}" onclick="openModel('${m.id}')">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-        <div style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.name)}</div>
-        ${f.abl?'<div class="chip cpc">ABL</div>':''}
-        <div class="chip ${m.cached?'cgc':'cmc'}">${m.cached?'cached':'ready'}</div>
-      </div>
-      <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${f.size||'?'} · ${f.L||'?'}L · ${m.eng||f.eng||'auto'}${f.split?' · split':''}</div>
-    </div>`;
+  var el=q('home-models');
+  if(!S.models.length){ el.innerHTML='<div style="text-align:center;padding:36px 0;color:var(--tx3);font-size:13px;line-height:2">No models yet.<br/><span style="color:var(--tx2)">Tap <b>+ Add Model</b> below.</span></div>'; return; }
+  el.innerHTML=S.models.map(function(m){
+    var full=findM(m.id)||m;
+    return '<div class="mc '+(m.active?'rdy':'')+'" onclick="openChat(\''+m.id+'\')">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+      +'<div style="font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(m.name)+'</div>'
+      +(full.abl?'<div class="chip cpc">ABL</div>':'')
+      +'<div class="chip cpc">HF API</div></div>'
+      +'<div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">'+esc(full.hfRepo||'')+'</div>'
+      +'</div>';
   }).join('');
 }
 
-// ── Tabs
-let _tab='curated';
+// ── Tabs ──────────────────────────────────────────────────────
 function switchTab(t){
-  _tab=t;
-  ['curated','abliterated','hf','custom'].forEach(x=>q('t-'+x).classList.toggle('on',x===t));
-  ({curated:renderCurated,abliterated:renderAbliterated,hf:renderHFTab,custom:renderCustomTab})[t]?.();
+  ['curated','abliterated','search','custom'].forEach(function(x){ q('t-'+x).classList.toggle('on',x===t); });
+  ({curated:renderCurated,abliterated:renderAbliterated,search:renderSearch,custom:renderCustom})[t]();
 }
-function modelCard(m){
-  const got=S.models.find(x=>x.id===m.id);
-  return `<div class="mc ${got?.cached?'rdy':''}" onclick="showDetail('${m.id}')">
-    <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:2px">
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700">${esc(m.name)}</div>
-        <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-top:2px">${m.size} · ${m.L}L · ${m.eng}${m.split?' · split':''}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">
-        ${m.tag?`<div class="chip ${tagCls(m.tag)}">${m.tag}</div>`:''}
-        ${got?.cached?'<div class="chip cgc">✓</div>':''}
-      </div>
-    </div>
-  </div>`;
+function mCard(m){
+  var added=S.models.find(function(x){ return x.id===m.id; });
+  return '<div class="mc '+(added?'rdy':'')+'" onclick="addAndOpen(\''+m.id+'\')">'
+    +'<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:3px">'
+    +'<div style="flex:1"><div style="font-size:13px;font-weight:700">'+esc(m.name)+'</div>'
+    +'<div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-top:2px;word-break:break-all">'+esc(m.hfRepo)+'</div></div>'
+    +'<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0">'
+    +(m.tag?'<div class="chip '+(m.tagCls||'cmc')+'">'+m.tag+'</div>':'')
+    +(added?'<div class="chip cgc">✓</div>':'')
+    +'</div></div>'
+    +(m.size?'<div style="font-size:10px;color:var(--tx3)">'+esc(m.size)+'</div>':'')
+    +'</div>';
 }
-function renderCurated(){q('tab-body').innerHTML=MODELS.map(modelCard).join('');}
-function renderAbliterated(){q('tab-body').innerHTML='<div class="warn" style="margin-bottom:10px">⚠ Safety filters removed. Uncensored outputs possible. Use responsibly.</div>'+ABLITERATED.map(modelCard).join('');}
+function renderCurated(){ q('tab-body').innerHTML=MODELS.map(mCard).join(''); }
+function renderAbliterated(){ q('tab-body').innerHTML='<div class="warn" style="margin-bottom:10px">⚠ Safety filters removed. Use responsibly.</div>'+ABLITERATED.map(mCard).join(''); }
 
-// HF search — searches ALL text-generation models, not just GGUF
-let _hfT=null;
-function renderHFTab(){
-  q('tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">
-    ${!S.hfOk?`<div class="card cam" style="font-size:12px;color:var(--am)">No HF token — public models only. <button onclick="go('p-hf',1);fillHF()" style="background:none;border:none;color:var(--cy);cursor:pointer;font-family:var(--font)">Connect →</button></div>`:''}
-    <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">Searches all text-generation models. GGUF → wllama. ONNX/transformers.js → transformers.js. Engine auto-detected.</div>
-    <div style="position:relative">
-      <input id="hf-q" type="text" placeholder="Search any HuggingFace model…"
-        style="width:100%;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)"
-        oninput="hfSearchD(this.value)" onfocus="this.style.borderColor='rgba(0,210,200,.4)'" onblur="this.style.borderColor=''"/>
-      <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none">⌕</div>
-    </div>
-    <div id="hf-res"><div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search any model on HuggingFace</div></div>
-  </div>`;
+var _hft=null;
+function renderSearch(){
+  q('tab-body').innerHTML='<div style="display:flex;flex-direction:column;gap:10px">'
+    +'<div class="card" style="font-size:12px;color:var(--tx2);line-height:1.75">Search any text-generation model on HuggingFace. All run via HF Inference API.</div>'
+    +'<div style="position:relative"><input id="hf-q" type="text" placeholder="e.g. mistral, llama, phi…"'
+    +' style="width:100%;background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:11px 36px 11px 13px;color:var(--tx);font-size:13px;outline:none;font-family:var(--mono)"'
+    +' oninput="hfSearchD(this.value)" onfocus="this.style.borderColor=\'rgba(0,210,200,.4)\'" onblur="this.style.borderColor=\'\'"/>'
+    +'<div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none">⌕</div></div>'
+    +'<div id="hf-res"><div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">Search any model</div></div></div>';
 }
 function hfSearchD(v){
-  clearTimeout(_hfT);
-  if(!v.trim()){q('hf-res').innerHTML='';return;}
+  clearTimeout(_hft); if(!v.trim()){ q('hf-res').innerHTML=''; return; }
   q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">Searching…</div>';
-  _hfT=setTimeout(()=>hfSearch(v),480);
+  _hft=setTimeout(function(){ hfSearch(v); },450);
 }
 async function hfSearch(query){
   try{
-    const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
-    const r=await fetch(`https://huggingface.co/api/models?search=${encodeURIComponent(query)}&pipeline_tag=text-generation&limit=24&sort=downloads&direction=-1`,{headers:h});
-    const ms=await r.json();
-    if(!Array.isArray(ms)||!ms.length){q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">No results.</div>';return;}
-    q('hf-res').innerHTML=ms.map(m=>{
-      const tags=m.tags||[];
-      const isGGUF=tags.includes('gguf');
-      const isTJS=(m.library_name||'')==='transformers.js'||tags.includes('transformers.js');
-      const eng=isGGUF?'wllama':isTJS?'transformers.js':'auto-detect';
-      return `<div class="hrow" onclick="showDetail('${esc(m.modelId)}')">
-        <div style="font-size:12px;font-weight:600;font-family:var(--mono);margin-bottom:3px;word-break:break-all">${esc(m.modelId)}</div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:10px;color:var(--tx3)">⬇ ${(m.downloads||0).toLocaleString()}</span>
-          <span style="font-size:10px;color:var(--tx3)">❤ ${(m.likes||0).toLocaleString()}</span>
-          <span class="chip ccc">${eng}</span>
-          ${m.private?'<span class="chip cac">private</span>':''}
-        </div>
-      </div>`;
+    var h=S.hfToken?{Authorization:'Bearer '+S.hfToken}:{};
+    var r=await fetch('https://huggingface.co/api/models?search='+encodeURIComponent(query)+'&pipeline_tag=text-generation&limit=20&sort=downloads&direction=-1',{headers:h});
+    var ms=await r.json();
+    if(!Array.isArray(ms)||!ms.length){ q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--tx3);font-size:12px">No results.</div>'; return; }
+    q('hf-res').innerHTML=ms.map(function(m){
+      var id='search_'+m.modelId.replace(/\//g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+      return '<div class="hrow" onclick="addAndOpenCustom(\''+esc(m.modelId)+'\',\''+esc(m.modelId.split('/').pop())+'\')">'
+        +'<div style="font-size:12px;font-weight:600;font-family:var(--mono);margin-bottom:4px;word-break:break-all">'+esc(m.modelId)+'</div>'
+        +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+        +'<span class="chip cpc">HF API</span>'
+        +'<span style="font-size:10px;color:var(--tx3)">⬇ '+(m.downloads||0).toLocaleString()+'</span>'
+        +'<span style="font-size:10px;color:var(--tx3)">❤ '+(m.likes||0).toLocaleString()+'</span>'
+        +(m.private?'<span class="chip cac">private</span>':'')+'</div></div>';
     }).join('');
-  }catch(e){q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--rd);font-size:12px">Search failed.</div>';}
+  }catch(e){ q('hf-res').innerHTML='<div style="text-align:center;padding:12px;color:var(--rd);font-size:12px">Search failed.</div>'; }
+}
+function renderCustom(){
+  q('tab-body').innerHTML='<div style="display:flex;flex-direction:column;gap:12px">'
+    +'<div class="card" style="font-size:12px;color:var(--tx2);line-height:1.75">Add any model from HuggingFace by repo ID. It will run via HF Inference API.</div>'
+    +'<div class="field"><label>HF Repo (user/model-name)</label><input id="c-repo" placeholder="e.g. mistralai/Mistral-7B-Instruct-v0.3"/></div>'
+    +'<div class="field"><label>Display Name (optional)</label><input id="c-name" placeholder="My Model"/></div>'
+    +'<button class="btn bp" onclick="addCustomModel()">Add &amp; Open →</button></div>';
+}
+function addCustomModel(){
+  var repo=q('c-repo').value.trim(); if(!repo){ alert('Enter a HuggingFace repo.'); return; }
+  var name=q('c-name').value.trim()||repo.split('/').pop();
+  addAndOpenCustom(repo,name);
 }
 
-function renderCustomTab(){
-  q('tab-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-    <div class="card" style="font-size:12px;color:var(--tx2);line-height:1.7">
-      Load any model. GGUF files → wllama. Transformers/ONNX repos → transformers.js.<br/>For split GGUFs provide the first shard — all chunks auto-downloaded.
-    </div>
-    <div class="field"><label>HF Repo (user/repo)</label><input id="c-repo" placeholder="bartowski/Llama-3.2-1B-Instruct-GGUF"/></div>
-    <div class="field"><label>GGUF filename (blank = ONNX/auto)</label><input id="c-file" placeholder="model-Q4_K_M.gguf or first shard"/></div>
-    <div style="text-align:center;font-size:11px;color:var(--tx3)">— or direct URL —</div>
-    <div class="field"><label>Direct URL</label><input id="c-url" placeholder="https://…/model.gguf"/></div>
-    <div class="field"><label>Display Name</label><input id="c-name" placeholder="My Model"/></div>
-    <button class="btn bp" onclick="addCustom()">Add Model →</button>
-  </div>`;
+// ── Add & open ────────────────────────────────────────────────
+function addAndOpen(id){
+  var m=findM(id); if(!m) return;
+  var entry={id:m.id,name:m.name,hfRepo:m.hfRepo,abl:!!m.abl,active:true};
+  upsert(entry); openChat(m.id);
 }
-function addCustom(){
-  const repo=q('c-repo').value.trim(),file=q('c-file').value.trim(),url=q('c-url').value.trim(),name=q('c-name').value.trim();
-  if(!(repo||url)){alert('Fill in an HF repo or a direct URL.');return;}
-  const isGGUF=(file||url).toLowerCase().endsWith('.gguf');
-  registerAndOpen({id:'custom_'+Date.now(),name:name||(repo||url).split('/').pop(),
-    hfRepo:repo||null,hfFile:file||null,customUrl:url||null,
-    eng:isGGUF?'wllama':'transformers',size:'?',L:32,ram:800,split:file.includes('-of-')});
+function addAndOpenCustom(repo,name){
+  var id='custom_'+Date.now();
+  var entry={id:id,name:name,hfRepo:repo,active:true};
+  upsert(entry); openChat(id);
 }
-
-// ── Detail
-let _pickedHF=null;
-async function showDetail(modelId){
-  const cm=findM(modelId);
-  q('det-title').textContent=cm?cm.name:modelId.split('/').pop();
-  q('det-body').innerHTML='<div style="text-align:center;padding:28px;color:var(--tx3)">Loading…</div>';
-  go('p-detail',1);
-
-  if(cm&&(cm.hfRepo||cm.customUrl)&&cm.eng){
-    // Known curated model — show detail immediately
-    const got=S.models.find(x=>x.id===cm.id);
-    const bigWarn=cm.ram>8000?`<div class="warn" style="margin-bottom:10px">⚠ ~${Math.round(cm.ram/1024)}GB RAM · ${cm.size} download · Desktop only</div>`:'';
-    q('det-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:11px">
-      ${bigWarn}${cm.abl?'<div class="warn" style="margin-bottom:0">⚠ Abliterated — safety filters removed.</div>':''}
-      <div class="card">
-        <div style="font-size:17px;font-weight:800;margin-bottom:8px">${esc(cm.name)}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
-          ${[['Size',cm.size],['Layers',cm.L||'?'],['Peak RAM','~'+cm.ram+'MB'],['Engine',cm.eng],
-             ['Format',cm.hfFile?.endsWith('.gguf')?'GGUF Q4_K_M':'ONNX/auto'],['Shards',cm.split?'Auto (all)':'Single']]
-            .map(([k,v])=>`<div style="background:var(--s3);border-radius:7px;padding:7px 10px"><div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em">${k}</div><div style="font-size:12.5px;font-weight:700;margin-top:2px;font-family:var(--mono)">${v}</div></div>`).join('')}
-        </div>
-      </div>
-      <div class="card" style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);line-height:1.7;word-break:break-all">${esc(cm.hfRepo||'')}${cm.hfFile?'<br/>'+esc(cm.hfFile):''}</div>
-      <button class="btn bp" id="det-btn">${got?'Open Chat →':'Add &amp; Load →'}</button>
-      ${got?'<button class="btn bg" id="det-rm">Remove from list</button>':''}
-    </div>`;
-    q('det-btn').onclick=()=>{ if(got)openModel(cm.id); else registerAndOpen(cm); };
-    q('det-rm')?.addEventListener('click',()=>removeModel(cm.id));
-  } else {
-    await renderHFDetail(modelId);
-  }
-}
-
-async function renderHFDetail(modelId){
-  try{
-    const h=S.hfToken?{Authorization:`Bearer ${S.hfToken}`}:{};
-    const r=await fetch(`https://huggingface.co/api/models/${modelId}`,{headers:h});
-    if(!r.ok)throw new Error(`HTTP ${r.status}`);
-    const info=await r.json();
-    const files=(info.siblings||[]).map(f=>f.rfilename);
-    const gguf=files.filter(f=>f.endsWith('.gguf'));
-    const onnx=files.filter(f=>f.endsWith('.onnx')||f.includes('/onnx/'));
-    const lib=(info.library_name||'');
-    const isTJS=lib==='transformers.js'||(info.tags||[]).includes('transformers.js');
-    const hasGGUF=gguf.length>0;
-    const canTJS=isTJS||onnx.length>0||(lib==='transformers')||(info.tags||[]).includes('text-generation');
-
-    _pickedHF=null;
-    let fileSection='<div class="warn">No GGUF or ONNX files detected. This model may not be runnable directly in the browser.</div>';
-
-    if(hasGGUF){
-      const q4=gguf.filter(f=>f.toLowerCase().includes('q4_k_m'));
-      const shown=(q4.length?q4:gguf).filter(f=>!f.includes('-0000')||f.includes('-00001-of-')).slice(0,14);
-      fileSection=`<div>
-        <div class="slbl" style="padding:0 0 7px">Select GGUF file:</div>
-        <div id="hf-file-list">${shown.map(f=>`
-          <div class="hrow" data-repo="${esc(modelId)}" data-file="${esc(f)}" onclick="pickHFFile(this)">
-            <div style="font-size:11.5px;font-family:var(--mono);word-break:break-all">${esc(f)}</div>
-            ${f.includes('-of-')?'<div style="font-size:10px;color:var(--am);margin-top:3px">⚡ split — first shard, rest auto-downloaded</div>':''}
-          </div>`).join('')}</div>
-        <button class="btn bp" id="hf-pick-btn" disabled style="margin-top:8px">Select a file above →</button>
-      </div>`;
-    } else if(canTJS){
-      fileSection=`<div class="card" style="background:var(--gn0);border-color:rgba(34,196,122,.2);font-size:12.5px;color:var(--gn);margin-bottom:8px">✓ Will load via transformers.js (ONNX pipeline)</div>
-        <button class="btn bp" id="hf-tjs-btn">Load via Transformers.js →</button>`;
-    }
-
-    q('det-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:11px">
-      <div class="card">
-        <div style="font-size:14px;font-weight:800;font-family:var(--mono);word-break:break-all;margin-bottom:5px">${esc(modelId)}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span style="font-size:11px;color:var(--tx3)">⬇ ${(info.downloads||0).toLocaleString()}</span>
-          <span style="font-size:11px;color:var(--tx3)">❤ ${(info.likes||0).toLocaleString()}</span>
-          <span class="chip ccc">${hasGGUF?'wllama':canTJS?'transformers.js':'unknown'}</span>
-          ${info.private?'<span class="chip cac">Private</span>':'<span class="chip cgc">Public</span>'}
-        </div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:6px">${gguf.length} GGUF · ${onnx.length} ONNX · lib: ${lib||'unknown'}</div>
-      </div>
-      ${fileSection}
-    </div>`;
-
-    if(hasGGUF){
-      q('hf-pick-btn').onclick=loadPickedHF;
-    } else if(canTJS){
-      q('hf-tjs-btn')?.addEventListener('click',()=>{
-        registerAndOpen({id:'tjs_'+Date.now(),name:modelId.split('/').pop(),hfRepo:modelId,hfFile:null,eng:'transformers',size:'?',L:32,ram:1000});
-      });
-    }
-  }catch(e){
-    q('det-body').innerHTML=`<div class="card crd" style="font-size:12px;color:var(--rd)">Failed: ${esc(e.message)}<br/>Model may be private — add a HuggingFace token in Settings.</div>`;
-  }
-}
-
-function pickHFFile(el){
-  document.querySelectorAll('#hf-file-list .hrow').forEach(e=>e.classList.remove('sel'));
-  el.classList.add('sel');
-  _pickedHF={repo:el.dataset.repo,file:el.dataset.file};
-  const b=q('hf-pick-btn');b.disabled=false;
-  b.textContent=`Load ${_pickedHF.file.split('/').pop()} →`;
-}
-function loadPickedHF(){
-  if(!_pickedHF)return;
-  const{repo,file}=_pickedHF;
-  registerAndOpen({id:'hf_'+Date.now(),name:repo.split('/').pop(),hfRepo:repo,hfFile:file,
-    eng:'wllama',size:'?',L:32,ram:800,split:file.includes('-of-')});
-}
-
-function registerAndOpen(m){
-  const entry={...m,cached:false};
-  const idx=S.models.findIndex(x=>x.id===m.id);
-  if(idx>=0)S.models[idx]=entry;else S.models.push(entry);
-  saveS();renderHome();openModel(m.id);
+function upsert(entry){
+  var idx=S.models.findIndex(function(x){ return x.id===entry.id; });
+  if(idx>=0) S.models[idx]=entry; else S.models.push(entry);
+  saveS(); renderHome();
 }
 function removeModel(id){
-  if(!confirm('Remove this model?'))return;
-  S.models=S.models.filter(m=>m.id!==id);saveS();go('p-home',0);renderHome();
+  if(!confirm('Remove?')) return;
+  S.models=S.models.filter(function(m){ return m.id!==id; }); saveS(); go('p-home',0); renderHome();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  INFERENCE
-// ══════════════════════════════════════════════════════════════
-async function openModel(id){
-  const m=findM(id);
-  if(!m){console.error('Model not found:',id);return;}
-  S.activeModel=id;saveS();
-  const L=m.L||m.layers||32;
+// ── Chat ──────────────────────────────────────────────────────
+var _activeModel=null, _inferring=false, _hist=[];
+
+function openChat(id){
+  var m=findM(id); if(!m){ console.error('Model not found:',id); return; }
+  S.activeModel=id; saveS();
+  _activeModel=m; _hist=[];
   q('chat-title').textContent=m.name;
-  q('chat-sub').textContent=`${L}L · ~${m.ram||m.ramMb||'?'}MB · ${m.eng||'auto'}${m.split?' · split':''}`;
-  q('lgrid').innerHTML=Array.from({length:L},(_,i)=>`<div class="lc" id="lc${i}"></div>`).join('');
-  q('lc-t').textContent=L;
-  q('chat-msgs').innerHTML='';q('chat-in').value='';q('chat-in').style.height='auto';
-  _hist=[];
+  q('chat-sub').textContent=m.hfRepo+' · HF API';
+  q('chat-msgs').innerHTML='';
+  q('chat-in').value=''; q('chat-in').style.height='auto';
   go('p-chat',1);
-  if(_loadedId!==id)await loadModel(m);
-}
-
-async function loadModel(m){
-  q('sbtn').setAttribute('disabled','');
-  // Tear down previous
-  if(_wllama){try{await _wllama.exit();}catch(e){}  _wllama=null;}
-  _tjsPipe=null;_loadedId=null;_engUsed=null;
-
-  const bub=appendBubble('asst','');
-  const setMsg=html=>{bub.innerHTML=html;scrollC();};
-
-  const eng=m.eng||'wllama';
-  setMsg(`<div style="display:flex;align-items:center;gap:9px">
-    <div class="spin" style="width:14px;height:14px;flex-shrink:0"></div>
-    <span style="font-size:12.5px">Loading <b>${esc(m.name)}</b> via <b>${eng}</b>…</span></div>`);
-
-  try{
-    if(eng==='wllama'){
-      await loadWllama(m,setMsg);
-    } else {
-      await loadTransformers(m,setMsg);
-    }
-    _loadedId=m.id;
-    const idx=S.models.findIndex(x=>x.id===m.id);
-    if(idx>=0){S.models[idx].cached=true;saveS();renderHome();}
-    q('sbtn').removeAttribute('disabled');
-  }catch(err){
-    const msg=String(err?.message||err);
-    console.error('Load failed:',err);
-    setMsg(renderMd(`**Failed to load ${m.name}**\n\n\`\`\`\n${msg}\n\`\`\`\n\n**Tips:**\n- Check the HF repo and filename are correct\n- For gated models: add a HuggingFace token in Settings\n- Large models need lots of RAM — try a smaller one\n- Check browser console (F12) for the full error`));
-    q('sbtn').setAttribute('disabled','');
+  if(!S.hfToken){
+    appendBubble('asst','⚠ No HuggingFace token set. Go to Settings → HuggingFace to add one before chatting.');
+    return;
   }
+  q('sbtn').removeAttribute('disabled');
 }
 
-async function loadWllama(m,setMsg){
-  // Lazy-load wllama only when first model is opened (never at boot)
-  if(!_WllamaClass || !_WasmFromCDN) {
-    setMsg(`<div style="display:flex;align-items:center;gap:8px"><div class="spin" style="width:14px;height:14px;flex-shrink:0"></div><span>Importing wllama engine…</span></div>`);
-    const [{ Wllama }, { default: wasmCfg }] = await Promise.all([
-      import(WLLAMA_INDEX),
-      import(WLLAMA_CDN_CFG),
-    ]);
-    _WllamaClass = Wllama;
-    _WasmFromCDN = wasmCfg;
-  }
-  _wllama = new _WllamaClass(_WasmFromCDN, { parallelDownloads: 5 });
-
-  const opts={
-    progressCallback:({loaded,total})=>{
-      const pct=total?Math.round(loaded/total*100):0;
-      const mb=(loaded/1024/1024).toFixed(1);
-      const tot=total?(total/1024/1024/1024).toFixed(2)+'GB':'?';
-      setMsg(`<div style="font-size:12px;font-weight:600;margin-bottom:8px">⬇ ${esc(m.name)}</div>
-        <div style="width:100%;background:var(--s3);border-radius:3px;height:4px;overflow:hidden;margin-bottom:6px">
-          <div style="height:100%;width:${pct}%;background:var(--cy);border-radius:3px;transition:width .2s"></div></div>
-        <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${pct}% · ${mb}MB / ${tot}</div>
-        ${m.split?'<div style="font-size:10px;color:var(--am);margin-top:4px">⚡ All shards downloading (5 parallel)</div>':''}
-        <div style="font-size:10px;color:var(--tx3);margin-top:4px">Caches in IndexedDB — instant on next load</div>`);
-    },
-  };
-  if(S.hfToken)opts.headers={Authorization:`Bearer ${S.hfToken}`};
-
-  if(m.hfRepo&&m.hfFile) await _wllama.loadModelFromHF(m.hfRepo,m.hfFile,opts);
-  else if(m.customUrl)   await _wllama.loadModelFromUrl(m.customUrl,opts);
-  else throw new Error('No model source defined (need hfRepo+hfFile or customUrl)');
-
-  _engUsed='wllama';
-  setMsg(renderMd(`**${m.name}** ready\n\n🔧 wllama · llama.cpp WASM · ${threadMode}\n✓ Fully on-device — no data leaves your browser`));
+function clearChat(){
+  q('chat-msgs').innerHTML=''; _hist=[];
+  if(_activeModel) appendBubble('asst','Chat cleared. Send a message to start.');
 }
-
-async function loadTransformers(m,setMsg){
-  // Lazy-load transformers.js only when first ONNX model is opened
-  if(!_TJSPipeline) {
-    setMsg(`<div style="display:flex;align-items:center;gap:8px"><div class="spin" style="width:14px;height:14px;flex-shrink:0"></div><span>Importing Transformers.js engine…</span></div>`);
-    const mod = await import(TJS_URL);
-    _TJSPipeline = mod.pipeline;
-    _TJSEnv = mod.env;
-    _TJSEnv.allowLocalModels = false;
-    _TJSEnv.useBrowserCache  = true;
-  }
-  if(S.hfToken) _TJSEnv.accessToken = S.hfToken;
-  const device=hasWebGPU?'webgpu':'wasm';
-  _tjsPipe=await _TJSPipeline('text-generation',m.hfRepo,{
-    dtype:'q4',device,
-    progress_callback:(prog)=>{
-      if(prog.status==='downloading'&&prog.total){
-        const pct=Math.round(prog.loaded/prog.total*100);
-        setMsg(`<div style="font-size:12px;font-weight:600;margin-bottom:8px">⬇ ${esc(m.name)} — transformers.js</div>
-          <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono);margin-bottom:6px">${prog.file||''}</div>
-          <div style="width:100%;background:var(--s3);border-radius:3px;height:4px;overflow:hidden;margin-bottom:5px">
-            <div style="height:100%;width:${pct}%;background:var(--cy);border-radius:3px;transition:width .2s"></div></div>
-          <div style="font-size:10.5px;color:var(--tx3);font-family:var(--mono)">${pct}%</div>`);
-      }
-    },
-  });
-  _engUsed='transformers';
-  setMsg(renderMd(`**${m.name}** ready\n\n🔧 Transformers.js${hasWebGPU?' · WebGPU':' · WASM'}\n✓ Fully on-device`));
-}
-
-// ── Chat
-function clearChat(){q('chat-msgs').innerHTML='';_hist=[];const m=findM(S.activeModel);if(m&&_loadedId===S.activeModel){const b=appendBubble('asst','');b.innerHTML=renderMd(`**${m.name}** — cleared.`);}}
-function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 
 async function sendMsg(){
-  if(_inferring||(!_wllama&&!_tjsPipe))return;
-  const inp=q('chat-in');const text=inp.value.trim();if(!text)return;
-  inp.value='';inp.style.height='auto';
-  const m=findM(S.activeModel);
-  _inferring=true;q('sbtn').setAttribute('disabled','');
+  if(_inferring||!_activeModel||!S.hfToken) return;
+  var inp=q('chat-in'); var text=inp.value.trim(); if(!text) return;
+  inp.value=''; inp.style.height='auto';
+  _inferring=true; q('sbtn').setAttribute('disabled','');
   appendBubble('user',text);
   _hist.push({role:'user',content:text});
 
-  q('ibar').style.display='block';
-  const anim=animLayers(m);
-
-  const trow=document.createElement('div');trow.className='mrow asst';
+  // Show thinking dots
+  var trow=document.createElement('div'); trow.className='mrow asst';
   trow.innerHTML='<div class="bub asst"><div class="tdots"><span></span><span></span><span></span></div></div>';
-  q('chat-msgs').appendChild(trow);scrollC();
+  q('chat-msgs').appendChild(trow); scrollC();
 
-  let full='';
-  const arow=document.createElement('div');arow.className='mrow asst';
-  const abub=document.createElement('div');abub.className='bub asst';
-  arow.appendChild(abub);
+  // Response bubble (streamed into)
+  var arow=document.createElement('div'); arow.className='mrow asst';
+  var abub=document.createElement('div'); abub.className='bub asst'; arow.appendChild(abub);
 
+  q('ibar').style.display='block';
+  q('ibar-lbl').textContent='Generating…';
+  q('ibar-fill').style.width='0%';
+
+  var full='', tokenCount=0;
   try{
-    if(_engUsed==='wllama'){
-      const prompt=_hist.map(h=>`${h.role==='user'?'User':'Assistant'}: ${h.content}`).join('\n')+'\nAssistant:';
-      await _wllama.createCompletion(prompt,{
-        nPredict:S.settings.maxTokens||512,
-        temperature:S.settings.temperature||0.7,
-        repeatPenalty:S.settings.repPenalty||1.1,
-        topP:S.settings.topP||0.9,
-        onNewToken:(_t,_p,cur)=>{
-          full=cur;
-          if(trow.parentNode)q('chat-msgs').removeChild(trow);
-          abub.innerHTML=renderMd(full)+'<span class="cur"></span>';
-          if(!arow.parentNode)q('chat-msgs').appendChild(arow);
-          scrollC();
+    // Build prompt from history
+    var prompt=_hist.map(function(h){ return (h.role==='user'?'<|user|>':'<|assistant|>')+'\n'+h.content+'\n'; }).join('')+'<|assistant|>\n';
+
+    var resp=await fetch('https://api-inference.huggingface.co/models/'+_activeModel.hfRepo,{
+      method:'POST',
+      headers:{Authorization:'Bearer '+S.hfToken,'Content-Type':'application/json','X-Wait-For-Model':'true'},
+      body:JSON.stringify({
+        inputs:prompt,
+        parameters:{
+          max_new_tokens:S.settings.maxTokens||512,
+          temperature:S.settings.temperature||0.7,
+          repetition_penalty:S.settings.repPenalty||1.1,
+          top_p:S.settings.topP||0.9,
+          return_full_text:false,
+          stop:['<|user|>','</s>','<|end|>','<|endoftext|>']
         },
-      });
-    } else {
-      if(trow.parentNode)q('chat-msgs').removeChild(trow);
-      const out=await _tjsPipe(_hist.map(h=>({role:h.role,content:h.content})),{
-        max_new_tokens:S.settings.maxTokens||512,
-        temperature:S.settings.temperature||0.7,
-        repetition_penalty:S.settings.repPenalty||1.1,
-        top_p:S.settings.topP||0.9,
-        do_sample:true,
-        callback_function:(t)=>{
-          full+=t;
-          abub.innerHTML=renderMd(full)+'<span class="cur"></span>';
-          if(!arow.parentNode)q('chat-msgs').appendChild(arow);
-          scrollC();
-        },
-      });
-      if(!full)full=out?.[0]?.generated_text?.at(-1)?.content||'(no output)';
+        stream:true
+      }),
+    });
+
+    if(!resp.ok){
+      var errText=await resp.text();
+      var msg='HF API error '+resp.status;
+      try{ var ej=JSON.parse(errText); msg=ej.error||msg; }catch(e){}
+      if(resp.status===503) msg='Model is loading on HF servers — wait ~20 seconds and retry.';
+      else if(resp.status===403) msg='Access denied. This model may be gated — request access on huggingface.co first.';
+      else if(resp.status===401) msg='Invalid HF token. Update it in Settings → HuggingFace.';
+      throw new Error(msg);
     }
+
+    var reader=resp.body.getReader(), dec=new TextDecoder();
+    var maxTok=S.settings.maxTokens||512;
+
+    while(true){
+      var chunk=await reader.read(); if(chunk.done) break;
+      var lines=dec.decode(chunk.value,{stream:true}).split('\n');
+      for(var i=0;i<lines.length;i++){
+        var line=lines[i].trim();
+        if(!line.startsWith('data:')) continue;
+        var raw=line.slice(5).trim();
+        if(raw==='[DONE]') break;
+        try{
+          var d=JSON.parse(raw);
+          var tok=(d.token&&d.token.text!=null)?d.token.text:
+                  (d.choices&&d.choices[0]&&d.choices[0].delta&&d.choices[0].delta.content)?d.choices[0].delta.content:'';
+          // Skip stop tokens
+          if(!tok||tok==='</s>'||tok==='<|endoftext|>'||tok==='<|user|>'||tok==='<|end|>') continue;
+          full+=tok; tokenCount++;
+          q('ibar-toks').textContent=tokenCount+' tokens';
+          q('ibar-fill').style.width=Math.min(tokenCount/maxTok*100,98)+'%';
+          if(trow.parentNode) q('chat-msgs').removeChild(trow);
+          abub.innerHTML=renderMd(full)+'<span class="cur"></span>';
+          if(!arow.parentNode) q('chat-msgs').appendChild(arow);
+          scrollC();
+        }catch(e){}
+      }
+    }
+
+    // Fallback: non-streaming response
+    if(!full){
+      var fb=await resp.clone().json().catch(function(){ return null; });
+      if(fb&&Array.isArray(fb)&&fb[0]) full=(fb[0].generated_text||'').replace(prompt,'').trim();
+      else if(fb&&fb.generated_text) full=fb.generated_text.replace(prompt,'').trim();
+    }
+
   }catch(e){
-    if(trow.parentNode)q('chat-msgs').removeChild(trow);
-    appendBubble('asst',`Error: ${e?.message||e}`);
+    full=''; // ensure cleanup
+    if(trow.parentNode) q('chat-msgs').removeChild(trow);
+    appendBubble('asst','**Error:** '+(e&&e.message?e.message:String(e)));
   }
 
-  if(arow.parentNode)abub.innerHTML=renderMd(full);
-  _hist.push({role:'assistant',content:full});
-  if(_hist.length>20)_hist=_hist.slice(-20);
-  anim.stop();q('ibar').style.display='none';
-  _inferring=false;q('sbtn').removeAttribute('disabled');
-  scrollC();
+  // Finalise
+  if(full){
+    if(trow.parentNode) q('chat-msgs').removeChild(trow);
+    abub.innerHTML=renderMd(full);
+    if(!arow.parentNode) q('chat-msgs').appendChild(arow);
+    _hist.push({role:'assistant',content:full});
+    if(_hist.length>24) _hist=_hist.slice(-24);
+  }
+
+  q('ibar').style.display='none';
+  q('ibar-fill').style.width='100%';
+  _inferring=false; q('sbtn').removeAttribute('disabled'); scrollC();
 }
 
-const scrollC=()=>{const c=q('chat-msgs');c.scrollTop=c.scrollHeight;};
-function animLayers(m){
-  const L=m?.L||m?.layers||32;let stopped=false,i=0;
-  (async()=>{
-    while(!stopped){
-      if(i>0){const p=q('lc'+(i-1));if(p)p.className='lc done';}
-      const cur=q('lc'+i);if(cur)cur.className='lc act';
-      q('lc-c').textContent=i+1;
-      q('l-ram').textContent=`~${Math.round((m?.ram||m?.ramMb||800)/L*(i+1)*0.38+20)}MB`;
-      i=(i+1)%L;if(i===0){for(let j=0;j<L;j++){const c=q('lc'+j);if(c)c.className='lc';}}
-      await sleep(Math.random()*45+28);
-    }
-    for(let j=0;j<L;j++){const c=q('lc'+j);if(c)c.className='lc done';}
-  })();
-  return{stop(){stopped=true;}};
-}
+function scrollC(){ var c=q('chat-msgs'); c.scrollTop=c.scrollHeight; }
 
-// ── Markdown
+// ── Markdown ──────────────────────────────────────────────────
 function renderMd(text){
-  if(!text)return'';
-  let html='',last=0;const rx=/```(\w*)\n?([\s\S]*?)```/g;let m;
+  if(!text) return '';
+  var html='',last=0,rx=/```(\w*)\n?([\s\S]*?)```/g,m;
   while((m=rx.exec(text))!==null){
-    if(m.index>last)html+=renderInline(text.slice(last,m.index));
-    const lang=(m[1]||'').trim()||'plaintext',code=m[2];
-    let hi;try{hi=lang!=='plaintext'&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value;}catch(e){hi=esc(code);}
-    html+=`<div style="border-radius:8px;overflow:hidden;margin:7px 0"><div class="code-hdr"><span class="clbl">${esc(lang)}</span><button class="cpbtn" onclick="cpy(this)">Copy</button></div><pre style="margin:0;border-radius:0"><code class="hljs">${hi}</code></pre></div>`;
+    if(m.index>last) html+=renderInline(text.slice(last,m.index));
+    var lang=(m[1]||'').trim()||'plaintext',code=m[2];
+    var hi; try{ hi=esc(code); }catch(e){ hi=esc(code); }
+    html+='<div style="border-radius:8px;overflow:hidden;margin:7px 0"><div class="code-hdr"><span class="clbl">'+esc(lang)+'</span><button class="cpbtn" onclick="cpy(this)">Copy</button></div><pre style="margin:0;border-radius:0;background:#161b22;padding:12px 14px;overflow-x:auto"><code style="font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#e6edf3;white-space:pre">'+hi+'</code></pre></div>';
     last=m.index+m[0].length;
   }
-  if(last<text.length)html+=renderInline(text.slice(last));
+  if(last<text.length) html+=renderInline(text.slice(last));
   return html;
 }
 function renderInline(t){
   t=esc(t);
   t=t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>');
-  t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/_([^_\n]+)_/g,'<em>$1</em>');
+  t=t.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
   t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
   t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-  t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>').replace(/^---$/gm,'<hr/>');
+  t=t.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
   t=t.replace(/^\* (.+)$/gm,'<li>$1</li>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  const lines=t.split('\n'),out=[];let inUl=false;
-  for(const line of lines){if(line.startsWith('<li>')){if(!inUl){out.push('<ul>');inUl=true;}out.push(line);}else{if(inUl){out.push('</ul>');inUl=false;}if(line.match(/^<h[123]>|^<blockquote>|^<hr/))out.push(line);else if(line.trim()==='')out.push('');else out.push(`<p>${line}</p>`);}}
-  if(inUl)out.push('</ul>');return out.join('');
+  var lines=t.split('\n'),out=[],ul=false;
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(l.startsWith('<li>')){ if(!ul){ out.push('<ul>'); ul=true; } out.push(l); }
+    else{ if(ul){ out.push('</ul>'); ul=false; }
+      if(l.match(/^<h[123]>|^<blockquote>/)) out.push(l);
+      else if(l.trim()==='') out.push('');
+      else out.push('<p>'+l+'</p>'); }
+  }
+  if(ul) out.push('</ul>');
+  return out.join('');
 }
-function cpy(btn){const code=btn.closest('[style]').querySelector('code').textContent;navigator.clipboard.writeText(code).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',2e3);}).catch(()=>{});}
-function appendBubble(role,text,isHtml=false){
-  const row=document.createElement('div');row.className=`mrow ${role}`;
-  const bub=document.createElement('div');bub.className=`bub ${role}`;
-  if(role==='asst'&&!isHtml)bub.innerHTML=renderMd(text);else if(isHtml)bub.innerHTML=text;else bub.textContent=text;
-  row.appendChild(bub);q('chat-msgs').appendChild(row);scrollC();return bub;
+function cpy(btn){
+  navigator.clipboard.writeText(btn.closest('[style]').querySelector('code').textContent)
+    .then(function(){ btn.textContent='✓'; setTimeout(function(){ btn.textContent='Copy'; },2000); }).catch(function(){});
+}
+function appendBubble(role,text){
+  var row=document.createElement('div'); row.className='mrow '+role;
+  var bub=document.createElement('div'); bub.className='bub '+role;
+  bub.innerHTML=renderMd(text);
+  row.appendChild(bub); q('chat-msgs').appendChild(row); scrollC(); return bub;
 }
 
-// ── Settings
-function saveSettings(){S.settings.maxTokens=parseInt(q('s-tok').value)||512;S.settings.temperature=parseFloat(q('s-temp').value)||0.7;S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;S.settings.topP=parseFloat(q('s-topp').value)||0.9;saveS();go('p-home',0);}
-function clearAll(){if(!confirm('Clear all data and reload?'))return;localStorage.removeItem(SK);location.reload();}
+// ── Settings ──────────────────────────────────────────────────
+function saveSettings(){
+  S.settings.maxTokens=parseInt(q('s-tok').value)||512;
+  S.settings.temperature=parseFloat(q('s-temp').value)||0.7;
+  S.settings.repPenalty=parseFloat(q('s-rep').value)||1.1;
+  S.settings.topP=parseFloat(q('s-topp').value)||0.9;
+  saveS(); go('p-home',0);
+}
+function clearAll(){ if(!confirm('Clear all data and reload?')) return; localStorage.removeItem(SK); location.reload(); }
 
-// ── Expose to HTML onclick
-Object.assign(window,{go,fillTG,fillHF,switchTab,renderCurated,showDetail,pickHFFile,loadPickedHF,hfSearchD,addCustom,openModel,removeModel,clearChat,chatKey,autoResize,sendMsg,saveSettings,clearAll,cpy});
+// ── Expose ────────────────────────────────────────────────────
+window.go=go; window.fillHF=fillHF; window.fillTG=fillTG;
+window.switchTab=switchTab; window.renderCurated=renderCurated;
+window.addAndOpen=addAndOpen; window.addAndOpenCustom=addAndOpenCustom; window.addCustomModel=addCustomModel;
+window.removeModel=removeModel; window.openChat=openChat;
+window.clearChat=clearChat; window.chatKey=chatKey; window.autoResize=autoResize; window.sendMsg=sendMsg;
+window.hfSearchD=hfSearchD; window.saveSettings=saveSettings; window.clearAll=clearAll; window.cpy=cpy;
 
 boot();
+})();
 </script>
 </body>
 </html>
